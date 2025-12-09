@@ -11,14 +11,13 @@
     "**/.tox/**": true,
     "**/.venv/**": true
   },
-  "editor.formatOnSave": true,
-  "editor.defaultFormatter": "prettier.prettier-vscode",
   "editor.wordWrapColumn": 90,
   "editor.minimap.maxColumn": 90,
   "editor.rulers": [90],
-  "ruff.enable": true,
-  "ruff.fixAll": true,
-  "ruff.organizeImports": true,
+  "editor.formatOnSave": true,
+  "editor.defaultFormatter": "prettier.prettier-vscode",
+  "python.analysis.autoFormatStrings": true,
+  "python.analysis.extraPaths": ["server"],
   "flake8.args": ["--max-line-length=90"],
   "flake8.cwd": "${workspaceFolder}/server",
   "mypy.enabled": true,
@@ -29,7 +28,9 @@
     "editor.insertSpaces": true,
     "editor.defaultFormatter": "charliermarsh.ruff",
     "editor.codeActionsOnSave": {
-      "source.organizeImports": "explicit"
+      "source.fixAll": "explicit",
+      "source.organizeImports": "explicit",
+      "source.unusedImports": "explicit"
     }
   },
   "python.testing.pytestArgs": [
@@ -38,6 +39,7 @@
     "--cov-report",
     "xml:coverage.xml"
   ],
+  "python.testing.cwd": "${workspaceFolder}/server",
   "python.testing.unittestEnabled": false,
   "python.testing.pytestEnabled": true
 }

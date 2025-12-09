@@ -63,6 +63,7 @@ target-version = "py313"
 # select = ["E4", "E7", "E9", "F", "I001"]
 fixable = ["ALL"]
 select = ["ALL"]
+extend-select = ["I"]
 ignore = [
   "ERA001",
   "D100", # Missing docstring in public module
@@ -92,14 +93,19 @@ skip-magic-trailing-comma = false
 line-ending = "auto"
 
 [tool.mypy]
+strict = true
 packages = "api"
 exclude = ["alembic", "tests"]
 show_error_context = true
-strict = true
+explicit_package_bases=false
+no_namespace_packages=true
 
 # [[tool.mypy.overrides]]
 # # These modules don't have mypy stubs
-# module = ["authlib.jose"]
+# module = [
+#     "authlib.jose",
+#     "authlib.jose.errors",
+# ]
 # ignore_missing_imports = true
 
 [tool.pytest]
