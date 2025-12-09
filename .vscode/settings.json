@@ -1,0 +1,40 @@
+{
+  "files.associations": {
+    "**/.dockerignore": "ignore",
+    "**/.ini": "properties",
+    "**/docker-compose.*.yml": "dockercompose"
+  },
+  "files.exclude": {
+    "**/__pycache__/**": true,
+    "**/.mypy_cache/**": true,
+    "**/.pytest_cache/**": true,
+    "**/.tox/**": true,
+    "**/.venv/**": true
+  },
+  "editor.formatOnSave": true,
+  "editor.formatOnSaveMode": "file", // required to format on save
+  "editor.formatOnType": false, // required
+  "editor.formatOnPaste": false, // optional
+  "editor.defaultFormatter": "prettier.prettier-vscode",
+  "editor.minimap.maxColumn": 99,
+  "ruff.enable": true,
+  "ruff.fixAll": true,
+  "ruff.organizeImports": true,
+  "mypy.runUsingActiveInterpreter": true,
+  "mypy.configFile": "server/pyproject.toml",
+  "[python]": {
+    "editor.defaultFormatter": "charliermarsh.ruff",
+    "editor.codeActionsOnSave": {
+      "source.fixAll": "explicit",
+      "source.organizeImports": "explicit"
+    }
+  },
+  // "python.testing.pytestArgs": [
+  //     "--cov",
+  //     "api",
+  //     "--cov-report",
+  //     "xml:coverage.xml"
+  // ],
+  "python.testing.unittestEnabled": false,
+  "python.testing.pytestEnabled": true
+}

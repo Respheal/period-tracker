@@ -1,0 +1,76 @@
+[project]
+name = "server"
+version = "0.1.0"
+description = "A period tracker for people who menstruate, don't like android apps, and have a home docker box. Backend server."
+authors = [{ name = "Respheal", email = "madeleine.ethridge@gmail.com" }]
+readme = "README.md"
+requires-python = ">=3.13,<4.0"
+dependencies = [
+    "fastapi[standard-no-fastapi-cloud-cli] (>=0.124.0,<0.125.0)",
+    "alembic (>=1.17.2,<2.0.0)",
+]
+
+[tool.poetry]
+package-mode = false
+
+[tool.poetry.group.test.dependencies]
+pytest = "^9.0.2"
+pytest-cov = "^7.0.0"
+coverage = "^7.13.0"
+httpx = "^0.28.1"
+
+[tool.poetry.group.lint.dependencies]
+mypy = "^1.19.0"
+ruff = "^0.14.8"
+pylint = "^4.0.4"
+
+[tool.poetry.group.security.dependencies]
+bandit = "^1.9.2"
+pip-audit = "^2.10.0"
+
+[tool.poetry.group.tox.dependencies]
+tox = "^4.32.0"
+
+[tool.poetry.group.server.dependencies]
+uvicorn = "^0.38.0"
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+# Tool Configs
+
+[tool.bandit]
+exclude_dirs = ["tests"]
+
+[tool.ruff]
+line-length = 79
+
+[tool.ruff.lint]
+# select = ["E4", "E7", "E9", "F", "I001"]
+
+[tool.mypy]
+packages = "api"
+exclude = ["alembic", "tests"]
+show_error_context = true
+strict = true
+
+# [[tool.mypy.overrides]]
+# # These modules don't have mypy stubs
+# module = ["authlib.jose"]
+# ignore_missing_imports = true
+
+[tool.pytest]
+minversion = "9.0"
+addopts = ["--no-header", "-vv", "--color=yes"]
+testpaths = ["tests"]
+# filterwarnings = ["ignore::DeprecationWarning"]
+# env_files = [".env/.env.pytest"]
+
+[tool.coverage.run]
+branch = true
+source = ["api"]
+omit = ["*__init__.py"]
+
+[tool.coverage.report]
+omit = ["*__init__.py"]

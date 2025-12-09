@@ -1,0 +1,23 @@
+# Ignore everything
+*
+
+# Include these specific files
+!alembic.ini
+!pyproject.toml
+!poetry.lock
+
+# Include specific files from directories
+!requirements.txt
+!api/
+!api/**/
+!api/**/*.md
+!api/**/*.py
+!alembic/
+!alembic/**/
+!alembic/**/*.md
+!alembic/**/*.py
+!alembic/script.py.mako
+!tests/
+!tests/**/
+!tests/**/*.md
+!tests/**/*.py

@@ -1,0 +1,22 @@
+services:
+  frontend:
+    image: tracker-frontend
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+    ports:
+      - "3000:80"
+    environment:
+      NODE_ENV: development
+      API_PROTOCOL: http
+      API_HOST: backend
+      API_PORT: 5000
+  backend:
+    image: tracker-backend
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    # volumes:
+    #   - db-data:/data
+# volumes:
+#   db-data:

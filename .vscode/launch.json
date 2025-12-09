@@ -1,0 +1,32 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Python: FastAPI",
+      "cwd": "${workspaceFolder}/server",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "uvicorn",
+      "args": [
+        "api.main:app",
+        "--reload"
+        //   "--env-file",
+        //   ".env/.env.dev"
+      ],
+      "justMyCode": true
+    },
+    {
+      "name": "Python: Debug Unit Test",
+      "cwd": "${workspaceFolder}/server",
+      "type": "debugpy",
+      "request": "launch",
+      "justMyCode": false,
+      "program": "${file}",
+      "purpose": ["debug-test"],
+      "console": "integratedTerminal",
+      "env": {
+        "PYTEST_ADDOPTS": "--no-cov"
+      }
+    }
+  ]
+}

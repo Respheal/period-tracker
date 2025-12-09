@@ -1,0 +1,12 @@
+{
+  "recommendations": [
+    "ms-python.python",
+    "editorconfig.editorconfig",
+    "charliermarsh.ruff",
+    "alexcvzz.vscode-sqlite",
+    "matangover.mypy",
+    "dbaeumer.vscode-eslint",
+    "prettier.prettier-vscode",
+    "ms-playwright.playwright"
+  ]
+}
