@@ -1,0 +1,28 @@
+name: Setup Python
+description: Setup Python for testing suites
+
+inputs:
+  working-directory:
+    description: "Working directory to run in, default ."
+    required: false
+    default: "./server"
+
+runs:
+  using: composite
+  steps:
+    - name: Install Poetry
+      shell: bash
+      working-directory: ${{ inputs.working-directory }}
+      run: pip install -r ./requirements.txt
+
+    - name: Set up Python 3.13
+      uses: actions/setup-python@v6
+      with:
+        python-version: "3.13.3"
+        cache: poetry
+        cache-dependency-path: ${{ inputs.working-directory }}/poetry.lock
+
+    - name: Install Dependencies
+      shell: bash
+      working-directory: ${{ inputs.working-directory }}
+      run: poetry install --only tox
