@@ -9,6 +9,7 @@ dependencies = [
     "fastapi[standard-no-fastapi-cloud-cli] (>=0.124.0,<0.125.0)",
     "alembic[tz] (>=1.17.2,<2.0.0)",
     "sqlmodel (>=0.0.27,<0.0.28)",
+    "pydantic-settings (>=2.12.0,<3.0.0)",
 ]
 
 [tool.poetry]
@@ -65,7 +66,7 @@ fixable = ["ALL"]
 select = ["ALL"]
 extend-select = ["I"]
 ignore = [
-  "ERA001",
+  #"ERA001", 
   "D100", # Missing docstring in public module
   "D101", # Missing docstring in public method
   "D102", # Missing docstring in public class
@@ -98,7 +99,7 @@ packages = "api"
 exclude = ["alembic", "tests"]
 show_error_context = true
 explicit_package_bases=false
-no_namespace_packages=true
+# no_namespace_packages=true
 
 # [[tool.mypy.overrides]]
 # # These modules don't have mypy stubs
