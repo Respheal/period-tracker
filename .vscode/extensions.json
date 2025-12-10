@@ -1,12 +1,19 @@
 {
   "recommendations": [
-    "ms-python.python",
-    "editorconfig.editorconfig",
-    "charliermarsh.ruff",
     "alexcvzz.vscode-sqlite",
-    "matangover.mypy",
+    "charliermarsh.ruff",
     "dbaeumer.vscode-eslint",
+    "editorconfig.editorconfig",
+    "matangover.mypy",
+    "ms-playwright.playwright",
+    "ms-python.debugpy",
+    "ms-python.flake8",
+    "ms-python.isort",
+    "ms-python.python",
+    "ms-python.vscode-pylance",
+    "ms-python.vscode-python-envs",
     "prettier.prettier-vscode",
-    "ms-playwright.playwright"
+    "redhat.vscode-yaml",
+    "tamasfe.even-better-toml"
   ]
 }
