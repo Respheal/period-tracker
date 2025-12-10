@@ -1,6 +1,6 @@
 from sqlmodel import Session, select
 
-from api.db.models import User
+from api.db.models.user import User
 
 
 def get_users(session: Session, offset: int = 0, limit: int = 100) -> list[User]:
