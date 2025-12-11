@@ -3,10 +3,6 @@ from uuid import uuid4
 from sqlmodel import Field, SQLModel
 
 
-def db_safe_uuid() -> str:
-    return str(uuid4())
-
-
 class Token(SQLModel):
     access_token: str
     refresh_token: str
@@ -23,7 +19,9 @@ class UserCreate(UserBase):
 
 
 class User(UserBase, table=True):
-    user_id: str = Field(default_factory=db_safe_uuid, primary_key=True, index=True)
+    user_id: str = Field(
+        default_factory=lambda: str(uuid4()), primary_key=True, index=True
+    )
     hashed_password: str
     disabled: bool = False
 

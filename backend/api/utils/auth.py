@@ -29,7 +29,6 @@ def get_password_hash(password: str) -> str:
 def authenticate_user(
     session: Annotated[Session, Depends(get_session)], username: str, password: str
 ) -> models.User | None:
-
     user = user_crud.get_user_by_username(session=session, username=username)
     if user and not user.disabled and verify_password(password, user.hashed_password):
         return user
@@ -64,7 +63,6 @@ async def get_current_user(
     session: Annotated[Session, Depends(get_session)],
     settings: Annotated[Settings, Depends(get_settings)],
 ) -> models.User:
-
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",
