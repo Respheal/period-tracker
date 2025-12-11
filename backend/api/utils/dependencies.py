@@ -9,7 +9,7 @@ from api.utils.config import Settings
 
 @lru_cache
 def get_settings() -> Settings:
-    return Settings()
+    return Settings()  # type: ignore
 
 
 def get_session() -> Generator[Session]:
