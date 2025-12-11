@@ -8,6 +8,7 @@
     "**/__pycache__/**": true,
     "**/.mypy_cache/**": true,
     "**/.pytest_cache/**": true,
+    "**/.ruff_cache/**": true,
     "**/.tox/**": true,
     "**/.venv/**": true
   },

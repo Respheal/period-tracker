@@ -3,7 +3,7 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, Query
 from sqlmodel import Session
 
-from api.db.crud import users as user_crud
+from api.db.crud import user as user_crud
 from api.db.models.user import User
 from api.utils.dependencies import get_session
 

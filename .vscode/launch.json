@@ -7,12 +7,7 @@
       "type": "debugpy",
       "request": "launch",
       "module": "uvicorn",
-      "args": [
-        "api.main:app",
-        "--reload"
-        //   "--env-file",
-        //   ".env/.env.dev"
-      ],
+      "args": ["api.main:app", "--reload", "--env-file", "./../.env"],
       "justMyCode": true
     },
     {
