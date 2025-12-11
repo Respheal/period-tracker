@@ -3,7 +3,7 @@
   "configurations": [
     {
       "name": "Python: FastAPI",
-      "cwd": "${workspaceFolder}/server",
+      "cwd": "${workspaceFolder}/backend",
       "type": "debugpy",
       "request": "launch",
       "module": "uvicorn",
@@ -12,7 +12,7 @@
     },
     {
       "name": "Python: Debug Unit Test",
-      "cwd": "${workspaceFolder}/server",
+      "cwd": "${workspaceFolder}/backend",
       "type": "debugpy",
       "request": "launch",
       "justMyCode": false,

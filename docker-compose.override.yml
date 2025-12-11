@@ -2,7 +2,7 @@ services:
   # frontend:
   #   image: tracker-frontend
   #   build:
-  #     context: ./client
+  #     context: ./frontend
   #     dockerfile: Dockerfile
   #   ports:
   #     - "3000:80"
@@ -14,7 +14,7 @@ services:
   backend:
     image: tracker-backend
     build:
-      context: ./server
+      context: ./backend
       dockerfile: Dockerfile
     # volumes:
     #   - db-data:/data
