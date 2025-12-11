@@ -23,14 +23,18 @@
   "mypy.enabled": true,
   "mypy.runUsingActiveInterpreter": true,
   "mypy.configFile": "server/pyproject.toml",
+  "black-formatter.cwd": "${workspaceFolder}/server",
+  "black-formatter.args": ["--config=./pyproject.toml"],
+  "black-formatter.importStrategy": "fromEnvironment",
+  "isort.args": ["--settings-path", "server/pyproject.toml"],
+  "isort.importStrategy": "fromEnvironment",
   "[python]": {
     "editor.tabSize": 4,
     "editor.insertSpaces": true,
-    "editor.defaultFormatter": "charliermarsh.ruff",
+    "editor.defaultFormatter": "ms-python.black-formatter",
     "editor.codeActionsOnSave": {
       "source.fixAll": "explicit",
-      "source.organizeImports": "explicit",
-      "source.unusedImports": "explicit"
+      "source.organizeImports": "explicit"
     }
   },
   "python.testing.pytestArgs": [

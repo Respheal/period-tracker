@@ -1,11 +1,11 @@
 {
   "recommendations": [
     "alexcvzz.vscode-sqlite",
-    "charliermarsh.ruff",
     "dbaeumer.vscode-eslint",
     "editorconfig.editorconfig",
     "matangover.mypy",
     "ms-playwright.playwright",
+    "ms-python.black-formatter",
     "ms-python.debugpy",
     "ms-python.flake8",
     "ms-python.isort",
