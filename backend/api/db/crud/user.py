@@ -4,7 +4,7 @@ from api.db.models import User, UserCreate
 from api.utils import auth
 
 
-def get_user_by_id(session: Session, user_id: int) -> User | None:
+def get_user_by_id(session: Session, user_id: str) -> User | None:
     return session.get(User, user_id)
 
 

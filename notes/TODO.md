@@ -31,8 +31,7 @@
 
 - [ ] Build and publish images (frontend and backend) to GH repo
 - [ ] Semantic versioning of releases
-- [ ] Pylint as a pre-commit hook?
-- [ ] Pylint, Mypy, and Ruff checks
+- [x] Flake, Mypy, and Ruff checks
 
 ## Testing
 
@@ -48,18 +47,19 @@
 
 ### Framework
 
-- [ ] FastAPI
-- [ ] SQLModel
-- [ ] SQLlite
-- [ ] Pytest + Coverage
-- [ ] Pydantic Settings
+- [x] FastAPI
+- [x] SQLModel
+- [x] SQLite
+- [x] Pytest + Coverage
+- [x] Pydantic Settings
 
 ### Users
 
 ## User Data Model
 
-- [ ] Name
-- [ ] Password (hashed)
+- [x] Username
+- [x] Display Name
+- [x] Password (hashed)
 - [ ] Average menses length (average period length in days)
 - [ ] Average cycle length (average time between period start dates)
 - [ ] Partners (List of users with access to this User's calendar, many-many)
@@ -74,32 +74,15 @@
 
 #### Authentication
 
-- [ ] Function to generate access tokens (15 min)
-- [ ] Access token contains scopes (user:read, user:write, user:manage, admin same?)
-- [ ] Access token stored in memory or sessionStorage (NEVER in localStorage)
-- [ ] Function to generate refresh tokens (7 days)
-- [ ] Refresh token stored in HTTP-only cookie with SameSite attribute (strict or lax). Example:
-
-```python
-    response.set_cookie(
-        key="refresh_token",
-        value=refresh_token,
-        httponly=True,
-        secure=True,  # Set to True in production with HTTPS
-        samesite="lax",
-        max_age=60 * 60 * 24 * settings.REFRESH_TOKEN_EXPIRE_DAYS  # in seconds
-    )
-```
-
+- [x] Function to generate access tokens (15 min)
+- [x] Function to generate refresh tokens (7 days)
 - [ ] Endpoint to create a user
-- [ ] Endpoint to provide a password and receive both tokens
-- [ ] Access token stored in authorization header (automatic for fastapi)
-- [ ] Access token is validated by signature, expiration, and scopes for the request
-- [ ] Endpoint to log out(?)
-- [ ] Endpoint to issue new tokens using the refresh token
-- [ ] Using a refresh token stores its jti in redis to blacklist reuse
-- [ ] In React, if an api request with an access token fails for token expiration, refresh the token
-- [ ] Configure RS256 (min 2048 bits)
+- [x] Endpoint to provide a password and receive both tokens
+- [x] Access token stored in authorization header (automatic for fastapi)
+- [x] Access token is validated by signature, expiration
+- [x] Endpoint to issue new tokens using the refresh token
+- [x] Using a refresh token stores its jti in redis to blacklist reuse
+- [ ] Configure RSA256 (min 2048 bits)
 - [ ] Configure CORS policies
 - [ ] Offer Single Sign On via OAuth/OIDC as an _option_ (Signing in with Google defeats the point imo)
 
@@ -201,6 +184,11 @@
 
 - [ ] User creation page
 - [ ] User login page
+  - [ ] Access token stored in memory or sessionStorage (NEVER in localStorage)
+  - [ ] Access token sent to API in authorization header (automatic for fastapi)
+  - [ ] Refresh token stored in HTTP-only cookie with SameSite attribute (strict or lax).
+  - [ ] An unauthorized response triggers creating a new token from the refresh token
+- [ ] User log out (remove both tokens)
 - [ ] User settings page
 
 ### Calendar UI

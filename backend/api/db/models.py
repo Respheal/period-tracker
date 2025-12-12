@@ -1,14 +1,30 @@
+from datetime import datetime
+from typing import Literal
 from uuid import uuid4
 
 from sqlmodel import Field, SQLModel
 
 
+###
+# Token
+###
 class Token(SQLModel):
     access_token: str
     refresh_token: str
     token_type: str
 
 
+class TokenPayload(SQLModel):
+    token_type: Literal["access", "refresh"]
+    jti: str
+    sub: str
+    iat: datetime
+    exp: datetime
+
+
+###
+# User
+###
 class UserBase(SQLModel):
     username: str = Field(unique=True, index=True)
     display_name: str | None = None
@@ -25,6 +41,10 @@ class User(UserBase, table=True):
     hashed_password: str
     disabled: bool = False
 
+
+###
+# Metadata
+###
 
 NAMING_CONVENTION = {
     "ix": "ix_%(column_0_label)s",

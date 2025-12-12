@@ -32,7 +32,19 @@ async def login(
             headers={"WWW-Authenticate": "Bearer"},
         )
     return models.Token(
-        access_token=auth.create_access_token(settings, user.user_id),
-        refresh_token=auth.create_refresh_token(settings, user.user_id),
+        access_token=auth.create_token(
+            user_id=user.user_id, token_type="access", settings=settings
+        ),
+        refresh_token=auth.create_token(
+            user_id=user.user_id, token_type="refresh", settings=settings
+        ),
         token_type="bearer",  # nosec B106
     )
+
+
+@router.post("/refresh")
+async def refresh_token(
+    refresh_token: Annotated[str, Depends(oauth2_scheme)],
+    settings: Annotated[Settings, Depends(get_settings)],
+) -> models.Token:
+    return await auth.refresh_access_token(refresh_token=refresh_token, settings=settings)
