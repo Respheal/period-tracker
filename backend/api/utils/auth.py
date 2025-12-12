@@ -65,7 +65,7 @@ def create_token(
     else:
         raise ValueError("Invalid token type")
     to_encode = {
-        "type": token_type,
+        "token_type": token_type,
         "jti": str(uuid4()),
         "sub": user_id,
         "iat": now,
@@ -90,8 +90,8 @@ def validate_token(
         models.TokenPayload: The decoded token payload.
     """
     try:
-        payload: models.TokenPayload = jwt.decode(
-            token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM]
+        payload = models.TokenPayload.model_validate(
+            jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
         )
         if payload.sub is None or payload.token_type != token_type:
             raise credentials_exception

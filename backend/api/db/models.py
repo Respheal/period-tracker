@@ -4,6 +4,25 @@ from uuid import uuid4
 
 from sqlmodel import Field, SQLModel
 
+###
+# Utility Models
+###
+
+
+class ApplicationInfo(SQLModel):
+    app_name: str
+    version: str
+
+
+class HealthCheck(SQLModel):
+    status: str
+    timestamp: datetime
+
+
+class ResourceDeleteResponse(SQLModel):
+    resource_type: str
+    resource_id: str
+
 
 ###
 # Token
@@ -34,12 +53,27 @@ class UserCreate(UserBase):
     password: str
 
 
-class User(UserBase, table=True):
+class UserStats(UserBase):
     user_id: str = Field(
         default_factory=lambda: str(uuid4()), primary_key=True, index=True
     )
+    average_cycle_length: float | None = None
+    average_period_length: float | None = None
+
+
+class User(UserStats, table=True):
+    # username, display_name inherited from UserBase
+    # user_id, average_cycle_length, average_period_length inherited from UserStats
     hashed_password: str
     disabled: bool = False
+
+
+class UserUpdate(SQLModel):
+    display_name: str | None = None
+    password: str | None = None
+    average_cycle_length: float | None = None
+    average_period_length: float | None = None
+    disabled: bool | None = None
 
 
 ###
