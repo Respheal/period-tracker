@@ -115,10 +115,7 @@ files = [
 ]
 
 [package.dependencies]
-cffi = [
-    {version = ">=1.0.1", markers = "python_version < \"3.14\""},
-    {version = ">=2.0.0b1", markers = "python_version >= \"3.14\""},
-]
+cffi = {version = ">=2.0.0b1", markers = "python_version >= \"3.14\""}
 
 [[package]]
 name = "attrs"
@@ -2953,5 +2950,5 @@ files = [
 
 [metadata]
 lock-version = "2.1"
-python-versions = ">=3.13,<4.0"
-content-hash = "a3439ba43eb33a0ce532d8a31ece05923f9f975c8d0dece8893dd4084250ac98"
+python-versions = ">=3.14,<4.0"
+content-hash = "db67f598eca708e3c1593a02c69ed4d9d5210bebb9c110585df25ec80a70dcef"

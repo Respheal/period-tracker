@@ -17,7 +17,7 @@ app.include_router(users.router)
 
 @app.get("/")
 async def root(settings: Annotated[Settings, Depends(get_settings)]) -> ApplicationInfo:
-    return ApplicationInfo(name=settings.APP_NAME, version=settings.APP_VERSION)
+    return ApplicationInfo(app_name=settings.APP_NAME, version=settings.APP_VERSION)
 
 
 @app.get("/health")

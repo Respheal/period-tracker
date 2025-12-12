@@ -28,9 +28,15 @@ class ResourceDeleteResponse(SQLModel):
 # Token
 ###
 class Token(SQLModel):
-    access_token: str
-    refresh_token: str
     token_type: str
+
+
+class AccessToken(Token):
+    access_token: str
+
+
+class RefreshToken(Token):
+    refresh_token: str
 
 
 class TokenPayload(SQLModel):
@@ -39,6 +45,8 @@ class TokenPayload(SQLModel):
     sub: str
     iat: datetime
     exp: datetime
+    user: "UserState"
+    refreshed: bool = False  # require login to access secure resources if true
 
 
 ###
@@ -49,23 +57,88 @@ class UserBase(SQLModel):
     display_name: str | None = None
 
 
-class UserCreate(UserBase):
+class UserState(SQLModel):
+    is_disabled: bool = Field(default=False)
+    is_admin: bool = Field(default=False)
+
+
+class UserCreate(UserBase, UserState):
+    # username
+    # display_name
+    # is_disabled
+    # is_admin
     password: str
+    is_admin: bool = False
 
 
-class UserStats(UserBase):
+class UserSafe(UserBase, UserState):
+    """
+    Everything but the hashed password and period stats.
+    - user_id
+    - username
+    - display_name
+    - is_disabled
+    - is_admin
+
+    """
+
+    # username
+    # display_name
+    # is_disabled
+    # is_admin
     user_id: str = Field(
         default_factory=lambda: str(uuid4()), primary_key=True, index=True
     )
+
+
+class UserProfile(UserSafe):
+    """
+    Everything but the hashed password.
+    - user_id
+    - username
+    - display_name
+    - is_disabled
+    - is_admin
+
+    """
+
+    # username
+    # display_name
+    # is_disabled
+    # is_admin
+    # user_id
     average_cycle_length: float | None = None
     average_period_length: float | None = None
 
 
-class User(UserStats, table=True):
-    # username, display_name inherited from UserBase
-    # user_id, average_cycle_length, average_period_length inherited from UserStats
+class User(UserProfile, table=True):
+    """
+    User model.
+
+    This is the class representing the User table in the database.
+    This should never be part of a serialized response. User UserSafe or UserProfile
+    for that purpose.
+
+    - user_id
+    - username
+    - display_name
+    - is_disabled
+    - is_admin
+    - average_cycle_length
+    - average_period_length
+    - hashed_password
+
+    """
+
+    # username
+    # display_name
+    # is_disabled
+    # is_admin
+    # user_id
+    # average_cycle_length
+    # average_period_length
+
     hashed_password: str
-    disabled: bool = False
 
 
 class UserUpdate(SQLModel):
@@ -73,7 +146,8 @@ class UserUpdate(SQLModel):
     password: str | None = None
     average_cycle_length: float | None = None
     average_period_length: float | None = None
-    disabled: bool | None = None
+    is_disabled: bool | None = None
+    is_admin: bool | None = None
 
 
 ###

@@ -39,13 +39,16 @@ def authenticate_user(
 ) -> models.User | None:
     """Authenticate user by username and password."""
     user = user_crud.get_user_by_username(session=session, username=username)
-    if user and not user.disabled and verify_password(password, user.hashed_password):
+    if user and not user.is_disabled and verify_password(password, user.hashed_password):
         return user
     return None
 
 
 def create_token(
-    user_id: str, token_type: Literal["access", "refresh"], settings: Settings
+    user: models.User,
+    token_type: Literal["access", "refresh"],
+    settings: Settings,
+    refreshed: bool = False,
 ) -> str:
     """
     Create a JWT token with 'sub' matching the user_id.
@@ -58,18 +61,20 @@ def create_token(
         str: The encoded JWT token.
     """
     now = datetime.now(timezone.utc)
-    if token_type == "access":
+    if token_type == "access":  # nosec B105
         exp = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
-    elif token_type == "refresh":
+    elif token_type == "refresh":  # nosec B105
         exp = timedelta(days=settings.REFRESH_TOKEN_EXPIRE_DAYS)
     else:
         raise ValueError("Invalid token type")
     to_encode = {
         "token_type": token_type,
         "jti": str(uuid4()),
-        "sub": user_id,
+        "sub": user.user_id,
         "iat": now,
         "exp": now + exp,
+        "user": {"is_disabled": user.is_disabled, "is_admin": user.is_admin},
+        "refreshed": refreshed,
     }
     return jwt.encode(to_encode, key=settings.SECRET_KEY, algorithm=settings.ALGORITHM)
 
@@ -104,37 +109,58 @@ async def get_current_user(
     token: Annotated[str, Depends(oauth2_scheme)],
     session: Annotated[Session, Depends(get_session)],
     settings: Annotated[Settings, Depends(get_settings)],
-) -> models.User:
+) -> models.UserProfile:
     """Get the current user based on the provided JWT token payload."""
     payload: models.TokenPayload = validate_token(
-        token=token, token_type="access", settings=settings
+        token=token, token_type="access", settings=settings  # nosec B106
     )
-    user = user_crud.get_user_by_id(session=session, user_id=payload.sub)
-    if user is None or user.disabled:
+    user = session.get(models.User, payload.sub)
+    if user is None or user.is_disabled:
         raise credentials_exception
     return user
 
 
-async def refresh_access_token(
-    refresh_token: str,
+async def get_admin_user(
+    token: Annotated[str, Depends(oauth2_scheme)],
+    session: Annotated[Session, Depends(get_session)],
     settings: Annotated[Settings, Depends(get_settings)],
-) -> models.Token:
+) -> models.UserProfile:
+    """Verify if the current user is an admin."""
+    user = await get_current_user(token=token, session=session, settings=settings)
+    if user.is_admin is False:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="The user doesn't have enough privileges",
+        )
+    return user
+
+
+async def refresh_tokens(
+    refresh_token: str,
+    session: Annotated[Session, Depends(get_session)],
+    settings: Annotated[Settings, Depends(get_settings)],
+) -> dict[str, str]:
     """Refresh access and refresh tokens using a valid refresh token."""
     payload: models.TokenPayload = validate_token(
-        token=refresh_token, token_type="refresh", settings=settings
+        token=refresh_token, token_type="refresh", settings=settings  # nosec B106
     )
     redis_client = redis.Redis(
         host=settings.REDIS_HOST, port=settings.REDIS_PORT, db=settings.REDIS_DB
     )
-    if redis_client.get(f"{payload.jti}"):
+    user = session.get(models.User, payload.sub)
+    # Check if user is disabled or token is revoked
+    if user is None or user.is_disabled or redis_client.get(f"{payload.jti}"):
         raise credentials_exception
+    # Disable the used refresh token
     redis_client.set(f"{payload.jti}", 1, ex=settings.REFRESH_TOKEN_EXPIRE_DAYS * 86400)
-    return models.Token(
-        access_token=create_token(
-            user_id=payload.sub, token_type="access", settings=settings
+    return {
+        "access_token": create_token(
+            user=user,
+            token_type="access",  # nosec B106
+            settings=settings,
+            refreshed=True,
         ),
-        refresh_token=create_token(
-            user_id=payload.sub, token_type="refresh", settings=settings
-        ),
-        token_type="bearer",  # nosec B106
-    )
+        "refresh_token": create_token(
+            user=user, token_type="refresh", settings=settings
+        ),  # nosec B106
+    }

@@ -14,7 +14,7 @@ logger = logging.getLogger(__name__)
 def init_user(session: Session) -> None:
     if not user_crud.get_user_by_username(session=session, username=settings.FIRST_USER):
         user_in = UserCreate(
-            username=settings.FIRST_USER, password=settings.FIRST_USER_PASS
+            username=settings.FIRST_USER, password=settings.FIRST_USER_PASS, is_admin=True
         )
         user_crud.create_user(session=session, user=user_in)
 
