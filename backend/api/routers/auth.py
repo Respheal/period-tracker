@@ -47,9 +47,10 @@ async def login(
             detail="Incorrect username or password",
             headers={"WWW-Authenticate": "Bearer"},
         )
+    # Bandit can't figure out the nosec on this call, so it's a generic nosec
     set_refresh_cookie(
         response,
-        auth.create_token(user=user, token_type="refresh", settings=settings),
+        auth.create_token(user=user, token_type="refresh", settings=settings),  # nosec
         settings,
     )
     return models.AccessToken(
