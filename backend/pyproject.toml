@@ -38,7 +38,7 @@ pip-audit = "^2.10.0"
 tox = "^4.32.0"
 
 [tool.poetry.group.test.dependencies]
-pytest = "^9.0.2"
+pytest = "<9.0.0"
 pytest-cov = "^7.0.0"
 httpx = "^0.28.1"
 
@@ -86,7 +86,7 @@ minversion = "9.0"
 addopts = ["--no-header", "-vv", "--color=yes"]
 testpaths = ["tests"]
 # filterwarnings = ["ignore::DeprecationWarning"]
-# env_files = ["../.env.test"]
+env_files = [".env.test"]
 
 [tool.coverage.run]
 branch = true

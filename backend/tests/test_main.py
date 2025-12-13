@@ -1,11 +1,12 @@
 from fastapi.testclient import TestClient
 
-from api.main import app
-
-client = TestClient(app)
+from api.utils.config import Settings
 
 
-def test_read_root() -> None:
+def test_read_root(client: TestClient, settings: Settings) -> None:
     response = client.get("/")
     assert response.status_code == 200
-    assert response.json() == {"message": "Health Check"}
+    assert response.json() == {
+        "app_name": settings.APP_NAME,
+        "version": settings.APP_VERSION,
+    }
