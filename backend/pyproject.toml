@@ -86,7 +86,7 @@ minversion = "9.0"
 addopts = ["--no-header", "-vv", "--color=yes"]
 testpaths = ["tests"]
 # filterwarnings = ["ignore::DeprecationWarning"]
-# env_files = [".env/.env.pytest"]
+# env_files = ["../.env.test"]
 
 [tool.coverage.run]
 branch = true
