@@ -2,7 +2,9 @@ import os
 
 from sqlmodel import create_engine
 
-DATABASE_URL = os.environ.get("DATABASE_URL", "sqlite:///./local.db")
+from api.utils.config import settings
+
+DATABASE_URL = os.environ.get("DATABASE_URL", f"sqlite:///./{settings.DATABASE}")
 
 engine = create_engine(
     DATABASE_URL,
