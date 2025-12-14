@@ -36,6 +36,13 @@ def test_login(client: TestClient, session: Session) -> None:
     assert data["token_type"] == "bearer"
     assert r.cookies["refresh_token"]
 
+    # try using the refresh token as the access token
+    r = client.get(
+        "/users/me",
+        headers={"Authorization": f"Bearer {r.cookies['refresh_token']}"},
+    )
+    assert r.status_code == 401
+
 
 def test_refresh_tokens(client: TestClient, session: Session, settings: Settings) -> None:
     password = random_lower_string()
@@ -74,6 +81,8 @@ def test_refresh_tokens(client: TestClient, session: Session, settings: Settings
     assert new_refresh_jti != old_refresh_jti
 
     # TODO: Figure how to test that the old refresh token is revoked
+    # TODO: Test that disabled users cannot refresh tokens
+    # TODO: Test that deleted users cannot refresh tokens
 
     # Test with missing refresh token
     client.cookies.delete("refresh_token")

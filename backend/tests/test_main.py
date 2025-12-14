@@ -18,3 +18,11 @@ def test_health_check(client: TestClient) -> None:
     data = response.json()
     assert data["status"] == "ok"
     assert "timestamp" in data
+
+
+def test_invalid_token(client: TestClient) -> None:
+    response = client.get(
+        "/users/me",
+        headers={"Authorization": "Bearer invalidtoken"},
+    )
+    assert response.status_code == 401
