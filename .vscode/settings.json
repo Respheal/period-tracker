@@ -37,14 +37,8 @@
       "source.organizeImports": "explicit"
     }
   },
-  // "python.testing.pytestArgs": [
-  //   "--cov",
-  //   "api",
-  //   "--cov-report",
-  //   "xml:coverage.xml"
-  // ],
   "python.testing.cwd": "${workspaceFolder}/backend",
+  "python.testing.pytestArgs": ["--envfile=./../.env.test"],
   "python.testing.unittestEnabled": false,
   "python.testing.pytestEnabled": true
-  // "python.envFile": "${workspaceFolder}/.env.test"
 }

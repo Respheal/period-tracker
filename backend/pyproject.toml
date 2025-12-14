@@ -38,8 +38,9 @@ pip-audit = "^2.10.0"
 tox = "^4.32.0"
 
 [tool.poetry.group.test.dependencies]
-pytest = "<9.0.0"
+pytest = "^9.0.2"
 pytest-cov = "^7.0.0"
+pytest-dotenv = "^0.5.2"
 httpx = "^0.28.1"
 
 [tool.poetry.group.coverage.dependencies]
@@ -56,6 +57,7 @@ exclude_dirs = ["tests"]
 
 [tool.isort]
 profile = "black"
+known_third_party = ["alembic"]
 
 [tool.black]
 line-length = 90
@@ -73,14 +75,6 @@ exclude = ["alembic", "tests"]
 show_error_context = true
 explicit_package_bases=false
 
-# [[tool.mypy.overrides]]
-# # These modules don't have mypy stubs
-# module = [
-#     "authlib.jose",
-#     "authlib.jose.errors",
-# ]
-# ignore_missing_imports = true
-
 [tool.pytest]
 minversion = "9.0"
 addopts = ["--no-header", "-vv", "--color=yes"]
@@ -91,7 +85,19 @@ env_files = [".env.test"]
 [tool.coverage.run]
 branch = true
 source = ["api"]
-omit = ["*__init__.py"]
+omit = [
+    "*__init__.py",
+    "alembic/*",
+    "tests/*",
+    "api/backend_pre_start.py",
+    "api/initial_data.py",
+]
 
 [tool.coverage.report]
-omit = ["*__init__.py"]
+omit = [
+    "*__init__.py",
+    "alembic/*",
+    "tests/*",
+    "api/backend_pre_start.py",
+    "api/initial_data.py",
+]

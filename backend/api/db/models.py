@@ -68,7 +68,6 @@ class UserCreate(UserBase, UserState):
     # is_disabled
     # is_admin
     password: str
-    is_admin: bool = False
 
 
 class UserSafe(UserBase, UserState):

@@ -68,6 +68,7 @@ venv.bak/
 .env
 .env.*
 !.env.example
+!.env.test
 
 # Logs
 logs
