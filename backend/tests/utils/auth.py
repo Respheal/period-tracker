@@ -1,28 +1,11 @@
-import random
-import string
-
 from fastapi.testclient import TestClient
 from sqlmodel import Session
 
 from api.db import models
 from api.db.crud import user as user_crud
-from api.utils.config import Settings
-
-
-def settings() -> Settings:
-    return Settings()
-
-
-def random_lower_string() -> str:
-    return "".join(random.choices(string.ascii_lowercase, k=32))
-
-
-def create_random_user(db: Session) -> models.User:
-    user_in = models.UserCreate(
-        username=random_lower_string(),
-        password=random_lower_string(),
-    )
-    return user_crud.create_user(session=db, user_create=user_in)
+from api.utils.config import settings
+from tests.utils import random_lower_string
+from tests.utils.user import TEST_USERS
 
 
 def get_admin_headers(client: TestClient) -> dict[str, str]:
@@ -43,7 +26,17 @@ def get_user_headers(client: TestClient, db: Session, username: str) -> dict[str
     password = random_lower_string()
     user = user_crud.get_user_by_username(session=db, username=username)
     if not user:
-        user_in_create = models.UserCreate(username=username, password=password)
+        if username in TEST_USERS:
+            user_data = TEST_USERS[username]
+            user_in_create = models.UserCreate(
+                username=username,
+                password=password,
+                display_name=user_data["display_name"],
+                is_admin=user_data["is_admin"],
+                is_disabled=user_data["is_disabled"],
+            )
+        else:
+            user_in_create = models.UserCreate(username=username, password=password)
         user = user_crud.create_user(session=db, user=user_in_create)
     else:
         user = user_crud.update_user(

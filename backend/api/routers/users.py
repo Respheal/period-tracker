@@ -57,11 +57,9 @@ async def update_me(
     user_update: models.UserUpdate,
 ) -> models.UserProfile:
     user = session.get(models.User, current_user.user_id)
-    if not user:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="User not found."
-        )
-    return user_crud.update_user(session, user, user_update)
+    # If the user doesn't exist, we'll hit an auth error before we get here,
+    # so type ignore
+    return user_crud.update_user(session, user, user_update)  # type: ignore
 
 
 @router.delete("/me/")
@@ -73,10 +71,3 @@ async def delete_me(
     return models.ResourceDeleteResponse(
         resource_type="user", resource_id=current_user.user_id
     )
-
-
-@router.get("/me/items/")
-async def read_own_items(
-    current_user: Annotated[models.User, Depends(get_current_user)],
-) -> list[dict[str, str]]:
-    return [{"item_id": "Foo", "owner": current_user.username}]

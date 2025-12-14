@@ -10,7 +10,7 @@ from api.db.session import engine
 from api.initial_data import init
 from api.main import app
 from api.utils.config import Settings
-from tests.utils import get_admin_headers, get_user_headers
+from tests.utils.auth import get_admin_headers, get_user_headers
 
 # function: the default scope, the fixture is destroyed at the end of the test.
 # class: the fixture is destroyed during teardown of the last test in the class.
@@ -51,6 +51,7 @@ def apply_migrations() -> Generator:
     init()
     yield
     command.downgrade(config, "base")
+    # TODO: tests still seem to be using the local.db when run through vscode
 
 
 @pytest.fixture
@@ -60,4 +61,4 @@ def admin_headers(client: TestClient) -> dict[str, str]:
 
 @pytest.fixture
 def user_headers(client: TestClient, session: Session) -> dict[str, str]:
-    return get_user_headers(client=client, username="testjim", db=session)
+    return get_user_headers(client=client, username="jim", db=session)

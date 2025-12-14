@@ -145,6 +145,9 @@ class UserUpdate(SQLModel):
     password: str | None = None
     average_cycle_length: float | None = None
     average_period_length: float | None = None
+
+
+class UserAdminUpdate(UserUpdate):
     is_disabled: bool | None = None
     is_admin: bool | None = None
 

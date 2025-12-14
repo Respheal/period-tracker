@@ -77,10 +77,12 @@ explicit_package_bases=false
 
 [tool.pytest]
 minversion = "9.0"
-addopts = ["--no-header", "-vv", "--color=yes"]
+addopts = ["-vv", "--color=yes"]
 testpaths = ["tests"]
 # filterwarnings = ["ignore::DeprecationWarning"]
 env_files = [".env.test"]
+# redis_host = "192.168.1.44"
+# redis_port = "6379"
 
 [tool.coverage.run]
 branch = true

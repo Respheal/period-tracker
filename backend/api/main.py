@@ -4,14 +4,13 @@ from typing import Annotated
 from fastapi import Depends, FastAPI
 
 from api.db.models import ApplicationInfo, HealthCheck
-from api.routers import auth, items, users
+from api.routers import auth, users
 from api.utils.config import Settings
 from api.utils.dependencies import get_settings
 
 app = FastAPI()
 
 app.include_router(auth.router)
-app.include_router(items.router)
 app.include_router(users.router)
 
 
