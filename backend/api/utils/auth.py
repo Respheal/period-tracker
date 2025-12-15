@@ -3,7 +3,6 @@ from typing import Annotated, Literal
 from uuid import uuid4
 
 import jwt
-import redis
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from jwt.exceptions import InvalidTokenError
@@ -14,6 +13,7 @@ from api.db import models
 from api.db.crud import user as user_crud
 from api.utils.config import Settings
 from api.utils.dependencies import get_session, get_settings
+from api.utils.redis_client import get_redis_client
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth")
 password_hash = PasswordHash.recommended()
@@ -144,11 +144,9 @@ async def refresh_tokens(
     payload: models.TokenPayload = validate_token(
         token=refresh_token, token_type="refresh", settings=settings  # nosec B106
     )
-    redis_client = redis.Redis(
-        host=settings.REDIS_HOST, port=settings.REDIS_PORT, db=settings.REDIS_DB
-    )
     user = session.get(models.User, payload.sub)
     # Check if user is disabled or token is revoked
+    redis_client = get_redis_client()
     if user is None or user.is_disabled or redis_client.get(f"{payload.jti}"):
         raise credentials_exception
     # Disable the used refresh token
