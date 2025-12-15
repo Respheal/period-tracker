@@ -55,7 +55,7 @@
 
 ### Users
 
-## User Data Model
+#### User Data Model
 
 - [x] Username
 - [x] Display Name
@@ -65,7 +65,7 @@
 - [ ] Partners (List of users with access to this User's calendar, many-many)
   - Period Only option (only displays the user's period dates and stats for the partner)
 
-## User Stats
+#### User Stats
 
 - [ ] Endpoint to retrieve user stats
   - Median and Mean period length (exponential moving average)
@@ -82,8 +82,8 @@
 - [x] Access token is validated by signature, expiration
 - [x] Endpoint to issue new tokens using the refresh token
 - [x] Using a refresh token stores its jti in redis to blacklist reuse
-- [ ] Configure RSA256 (min 2048 bits)
-- [ ] Configure CORS policies
+- [x] Configure RSA256 (min 2048 bits)
+- [x] Configure CORS policies
 - [ ] Offer Single Sign On via OAuth/OIDC as an _option_ (Signing in with Google defeats the point imo)
 
 ### Events
