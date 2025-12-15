@@ -3,7 +3,7 @@ name: API Quality Control
 defaults:
   run:
     shell: bash
-    working-directory: ./server
+    working-directory: ./backend
 
 on:
   pull_request:
