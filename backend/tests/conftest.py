@@ -1,8 +1,10 @@
 from collections.abc import Generator
+from threading import Thread
 
 import pytest
 from alembic import command
 from alembic.config import Config
+from fakeredis import TcpFakeServer
 from fastapi.testclient import TestClient
 from sqlmodel import Session
 
@@ -43,6 +45,19 @@ def client() -> Generator:
         yield c
 
 
+@pytest.fixture(scope="session", autouse=True)
+def redis_server() -> Generator:
+    server = TcpFakeServer(
+        (Settings().REDIS_HOST, Settings().REDIS_PORT), server_type="redis"
+    )
+    thread = Thread(target=server.serve_forever, daemon=True)
+    thread.start()
+    try:
+        yield server
+    finally:
+        server.shutdown()
+
+
 # Apply migrations at beginning and end of testing session
 @pytest.fixture(autouse=True, scope="module")
 def apply_migrations() -> Generator:
@@ -51,7 +66,6 @@ def apply_migrations() -> Generator:
     init()
     yield
     command.downgrade(config, "base")
-    # TODO: tests still seem to be using the local.db when run through vscode
 
 
 @pytest.fixture

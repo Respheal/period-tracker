@@ -1,7 +1,4 @@
-from threading import Thread
-
 import pytest
-from fakeredis import TcpFakeServer
 from fastapi.testclient import TestClient
 from sqlmodel import Session
 
@@ -51,66 +48,56 @@ def test_login(client: TestClient, session: Session) -> None:
 
 # consider making this a pytest fixture
 def test_refresh_tokens(client: TestClient, session: Session, settings: Settings) -> None:
-    # Set up a fake Redis TCP server on the configured Redis host and port
-    server_address = (settings.REDIS_HOST, settings.REDIS_PORT)
-    fake_server = TcpFakeServer(server_address, server_type="redis")
-    server_thread = Thread(target=fake_server.serve_forever, daemon=True)
-    server_thread.start()
+    password = random_lower_string()
+    user = create_random_user(session, password=password)
+    r = client.post(
+        "/auth/",
+        data={"username": user.username, "password": password},
+    )
+    assert r.status_code == 200
 
-    try:
-        password = random_lower_string()
-        user = create_random_user(session, password=password)
-        r = client.post(
-            "/auth/",
-            data={"username": user.username, "password": password},
-        )
-        assert r.status_code == 200
+    refresh_token = r.cookies["refresh_token"]
+    access_token = r.json()["access_token"]
+    old_refresh_jti = auth.validate_token(
+        token=refresh_token,
+        token_type="refresh",
+        settings=settings,
+    ).jti
+    old_access_jti = auth.validate_token(
+        token=access_token,
+        token_type="access",
+        settings=settings,
+    ).jti
 
-        refresh_token = r.cookies["refresh_token"]
-        access_token = r.json()["access_token"]
-        old_refresh_jti = auth.validate_token(
-            token=refresh_token,
-            token_type="refresh",
-            settings=settings,
-        ).jti
-        old_access_jti = auth.validate_token(
-            token=access_token,
-            token_type="access",
-            settings=settings,
-        ).jti
+    # Ensure the old refresh token is in the client cookies, then attempt the refresh
+    client.cookies.set("refresh_token", refresh_token)
+    r = client.post("/auth/refresh")
+    assert r.status_code == 200
+    data = r.json()
+    assert "access_token" in data
+    assert r.cookies["refresh_token"]
+    new_refresh_token = r.cookies["refresh_token"]
+    new_refresh_jti = auth.validate_token(
+        token=new_refresh_token,
+        token_type="refresh",
+        settings=settings,
+    ).jti
+    new_access_jti = auth.validate_token(
+        token=data["access_token"],
+        token_type="access",
+        settings=settings,
+    ).jti
 
-        # Ensure the old refresh token is in the client cookies, then attempt the refresh
-        client.cookies.set("refresh_token", refresh_token)
-        r = client.post("/auth/refresh")
-        assert r.status_code == 200
-        data = r.json()
-        assert "access_token" in data
-        assert r.cookies["refresh_token"]
-        new_refresh_token = r.cookies["refresh_token"]
-        new_refresh_jti = auth.validate_token(
-            token=new_refresh_token,
-            token_type="refresh",
-            settings=settings,
-        ).jti
-        new_access_jti = auth.validate_token(
-            token=data["access_token"],
-            token_type="access",
-            settings=settings,
-        ).jti
+    assert new_access_jti != old_access_jti
+    assert new_refresh_jti != old_refresh_jti
 
-        assert new_access_jti != old_access_jti
-        assert new_refresh_jti != old_refresh_jti
+    # Verify that the old token is blacklisted in redis
+    assert get_redis_client().get(f"{old_refresh_jti}")
 
-        # Verify that the old token is blacklisted in redis
-        assert get_redis_client().get(f"{old_refresh_jti}")
-
-        # Test with missing refresh token
-        client.cookies.delete("refresh_token")
-        r = client.post("/auth/refresh")
-        assert r.status_code == 401
-    finally:
-        # Shut down the fake server
-        fake_server.shutdown()
+    # Test with missing refresh token
+    client.cookies.delete("refresh_token")
+    r = client.post("/auth/refresh")
+    assert r.status_code == 401
 
 
 def test_refresh_tokens_disabled_user(
