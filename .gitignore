@@ -125,3 +125,7 @@ MANIFEST
 
 # Notes
 notes/*.ods
+
+# JWT RSA keys (IMPORTANT: Never commit private keys!)
+keys/
+*.pem

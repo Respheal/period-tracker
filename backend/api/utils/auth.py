@@ -76,7 +76,14 @@ def create_token(
         "user": {"is_disabled": user.is_disabled, "is_admin": user.is_admin},
         "refreshed": refreshed,
     }
-    return jwt.encode(to_encode, key=settings.SECRET_KEY, algorithm=settings.ALGORITHM)
+
+    # Use RSA private key for RS256, or SECRET_KEY for HS256
+    signing_key = (
+        settings.get_private_key()
+        if settings.ALGORITHM == "RS256"
+        else settings.SECRET_KEY
+    )
+    return jwt.encode(to_encode, key=signing_key, algorithm=settings.ALGORITHM)
 
 
 def validate_token(
@@ -95,8 +102,14 @@ def validate_token(
         models.TokenPayload: The decoded token payload.
     """
     try:
+        # Use RSA public key for RS256, or SECRET_KEY for HS256
+        verification_key = (
+            settings.get_public_key()
+            if settings.ALGORITHM == "RS256"
+            else settings.SECRET_KEY
+        )
         payload = models.TokenPayload.model_validate(
-            jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
+            jwt.decode(token, verification_key, algorithms=[settings.ALGORITHM])
         )
         if payload.sub is None or payload.token_type != token_type:
             raise credentials_exception
