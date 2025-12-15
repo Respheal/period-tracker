@@ -9,10 +9,12 @@ on:
   pull_request:
     branches: ["main"]
     types: [opened, synchronize, reopened, ready_for_review]
-    # paths:
-    #   - "server/api/**/*.py"
-    #   - "server/poetry.lock"
-    #   - "server/pyproject.toml"
+  push:
+    branches: ["main"]
+    paths:
+      - "backend/api/**/*.py"
+      - "backend/poetry.lock"
+      - "backend/pyproject.toml"
 
 permissions:
   contents: read
