@@ -78,7 +78,7 @@ explicit_package_bases=false
 
 [tool.pytest]
 minversion = "9.0"
-addopts = ["-vv", "--color=yes", "--cache-clear"]
+addopts = ["--no-header", "-vv", "--color=yes", "--cache-clear"]
 testpaths = ["tests"]
 # filterwarnings = ["ignore::DeprecationWarning"]
 env = ["ENVIRONMENT = test"] # triggers alembic to read .env.test in test mode
