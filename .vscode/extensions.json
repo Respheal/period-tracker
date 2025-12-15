@@ -11,7 +11,6 @@
     "ms-python.isort",
     "ms-python.python",
     "ms-python.vscode-pylance",
-    "ms-python.vscode-python-envs",
     "prettier.prettier-vscode",
     "redhat.vscode-yaml",
     "tamasfe.even-better-toml"

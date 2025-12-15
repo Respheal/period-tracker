@@ -8,6 +8,7 @@
     "**/__pycache__/**": true,
     "**/.mypy_cache/**": true,
     "**/.pytest_cache/**": true,
+    "**/.ruff_cache/**": true,
     "**/.tox/**": true,
     "**/.venv/**": true
   },
@@ -17,16 +18,15 @@
   "editor.formatOnSave": true,
   "editor.defaultFormatter": "prettier.prettier-vscode",
   "python.analysis.autoFormatStrings": true,
-  "python.analysis.extraPaths": ["server"],
-  "flake8.args": ["--max-line-length=90"],
-  "flake8.cwd": "${workspaceFolder}/server",
+  "python.analysis.extraPaths": ["backend"],
+  "flake8.cwd": "${workspaceFolder}/backend",
   "mypy.enabled": true,
   "mypy.runUsingActiveInterpreter": true,
-  "mypy.configFile": "server/pyproject.toml",
-  "black-formatter.cwd": "${workspaceFolder}/server",
+  "mypy.configFile": "backend/pyproject.toml",
+  "black-formatter.cwd": "${workspaceFolder}/backend",
   "black-formatter.args": ["--config=./pyproject.toml"],
   "black-formatter.importStrategy": "fromEnvironment",
-  "isort.args": ["--settings-path", "server/pyproject.toml"],
+  "isort.args": ["--settings-path", "backend/pyproject.toml"],
   "isort.importStrategy": "fromEnvironment",
   "[python]": {
     "editor.tabSize": 4,
@@ -37,13 +37,8 @@
       "source.organizeImports": "explicit"
     }
   },
-  "python.testing.pytestArgs": [
-    "--cov",
-    "api",
-    "--cov-report",
-    "xml:coverage.xml"
-  ],
-  "python.testing.cwd": "${workspaceFolder}/server",
+  "python.testing.cwd": "${workspaceFolder}/backend",
+  "python.testing.pytestArgs": ["--envfile=./../.env.test"],
   "python.testing.unittestEnabled": false,
   "python.testing.pytestEnabled": true
 }

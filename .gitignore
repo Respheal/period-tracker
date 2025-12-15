@@ -68,6 +68,7 @@ venv.bak/
 .env
 .env.*
 !.env.example
+!.env.test
 
 # Logs
 logs
@@ -121,3 +122,6 @@ share/python-wheels/
 .installed.cfg
 *.egg
 MANIFEST
+
+# Notes
+notes/*.ods
