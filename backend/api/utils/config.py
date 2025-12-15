@@ -12,9 +12,10 @@ class Settings(BaseSettings):
     )
     APP_NAME: str = "Period Tracker API"
     APP_VERSION: str = "0.1.0"
+    ENVIRONMENT: str
     FIRST_USER: str  # = "admin"
     FIRST_USER_PASS: str  # = "adminpass"
-    DATABASE: str = "local.db"
+    DATABASE: str
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
     REFRESH_TOKEN_EXPIRE_DAYS: int = 7
     ALGORITHM: str = "HS256"
