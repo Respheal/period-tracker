@@ -39,7 +39,7 @@
 
 ### Stack
 
-- [ ] Set up Redis docker container
+- [x] Set up Redis docker container
 - [ ] Automatic data backup?
 - [ ] Configure traefik, enforce https
 
@@ -76,7 +76,7 @@
 
 - [x] Function to generate access tokens (15 min)
 - [x] Function to generate refresh tokens (7 days)
-- [ ] Endpoint to create a user
+- [x] Endpoint to create a user
 - [x] Endpoint to provide a password and receive both tokens
 - [x] Access token stored in authorization header (automatic for fastapi)
 - [x] Access token is validated by signature, expiration

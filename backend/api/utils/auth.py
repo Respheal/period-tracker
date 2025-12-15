@@ -15,7 +15,7 @@ from api.utils.config import Settings
 from api.utils.dependencies import get_session, get_settings
 from api.utils.redis_client import get_redis_client
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/")
 password_hash = PasswordHash.recommended()
 credentials_exception = HTTPException(
     status_code=status.HTTP_401_UNAUTHORIZED,

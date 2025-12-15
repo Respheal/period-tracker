@@ -18,11 +18,11 @@ ENV VIRTUAL_ENV=/poetry/.venv \
     PATH="/poetry/.venv/bin:$PATH"
 COPY --from=builder ${VIRTUAL_ENV} ${VIRTUAL_ENV}
 
-# COPY ./commands /commands
-# # nuke windows line endings
-# RUN sed -i 's/\r$//g' /commands/api
-# RUN chmod -R +x /commands
+COPY ./scripts /scripts
+# nuke windows line endings
+RUN sed -i 's/\r$//g' /scripts/prestart.sh
+RUN chmod -R +x /scripts
 
-# COPY ./alembic.ini /alembic.ini
-# COPY ./alembic /alembic
+COPY ./alembic.ini /alembic.ini
+COPY ./alembic /alembic
 COPY ./api ./api

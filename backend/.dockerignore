@@ -17,7 +17,6 @@
 !alembic/**/*.md
 !alembic/**/*.py
 !alembic/script.py.mako
-!tests/
-!tests/**/
-!tests/**/*.md
-!tests/**/*.py
+!scripts/
+!scripts/**/
+!scripts/**/*.sh

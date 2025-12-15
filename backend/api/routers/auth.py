@@ -1,7 +1,7 @@
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException, Request, Response, status
-from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
+from fastapi.security import OAuth2PasswordRequestForm
 from sqlmodel import Session
 
 from api.db import models
@@ -14,8 +14,6 @@ router = APIRouter(
     tags=["auth"],
     responses={404: {"description": "Not found"}},
 )
-
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/", refreshUrl="auth/refresh/")
 
 
 def set_refresh_cookie(
