@@ -55,7 +55,7 @@
 
 ### Users
 
-## User Data Model
+#### User Data Model
 
 - [x] Username
 - [x] Display Name
@@ -65,7 +65,7 @@
 - [ ] Partners (List of users with access to this User's calendar, many-many)
   - Period Only option (only displays the user's period dates and stats for the partner)
 
-## User Stats
+#### User Stats
 
 - [ ] Endpoint to retrieve user stats
   - Median and Mean period length (exponential moving average)
@@ -82,8 +82,8 @@
 - [x] Access token is validated by signature, expiration
 - [x] Endpoint to issue new tokens using the refresh token
 - [x] Using a refresh token stores its jti in redis to blacklist reuse
-- [ ] Configure RSA256 (min 2048 bits)
-- [ ] Configure CORS policies
+- [x] Configure RSA256 (min 2048 bits)
+- [x] Configure CORS policies
 - [ ] Offer Single Sign On via OAuth/OIDC as an _option_ (Signing in with Google defeats the point imo)
 
 ### Events
@@ -99,7 +99,7 @@
 
 #### Period Events
 
-- [ ] Period Model
+- [x] Period Model
   - Start Date (required)
   - End Date (Optional)
   - Length (Optional, updated when both start/end known)
@@ -121,7 +121,7 @@
 
 #### Symptom Events
 
-- [ ] Symptom Event Model
+- [x] Symptom Event Model
   - User.id
   - Datetime (required)
   - Flow intensity (none, spotting, light, medium, heavy; int: 0-4)
@@ -145,19 +145,20 @@
 
 #### Temperature Events
 
-- [ ] Temperature Event Model
+- [x] Temperature Event Model
   - User.id
   - Datetime (required)
   - Reading (convert to C for storage)
-- [ ] Endpoint to retrieve all temperature events
+- [x] Endpoint to retrieve all temperature events
   - Filter by:
     - Date Range
     - Skip/Limit (default: 0/100)
     - Also display count (refer to Netbox's API response)
 - [ ] Endpoint to retrieve temperature events as CSV
   - Same filters as above
+  - I have a rough draft of this but I could probably do better
 - [ ] Endpoint to retrieve a specific temperature event
-- [ ] Endpoint to create a temperature event
+- [x] Endpoint to create a temperature event
 - [ ] Endpoint to update a temperature event
 - [ ] Endpoint to delete a temperature event
 
