@@ -99,7 +99,7 @@
 
 #### Period Events
 
-- [ ] Period Model
+- [x] Period Model
   - Start Date (required)
   - End Date (Optional)
   - Length (Optional, updated when both start/end known)
@@ -121,7 +121,7 @@
 
 #### Symptom Events
 
-- [ ] Symptom Event Model
+- [x] Symptom Event Model
   - User.id
   - Datetime (required)
   - Flow intensity (none, spotting, light, medium, heavy; int: 0-4)
@@ -145,19 +145,20 @@
 
 #### Temperature Events
 
-- [ ] Temperature Event Model
+- [x] Temperature Event Model
   - User.id
   - Datetime (required)
   - Reading (convert to C for storage)
-- [ ] Endpoint to retrieve all temperature events
+- [x] Endpoint to retrieve all temperature events
   - Filter by:
     - Date Range
     - Skip/Limit (default: 0/100)
     - Also display count (refer to Netbox's API response)
 - [ ] Endpoint to retrieve temperature events as CSV
   - Same filters as above
+  - I have a rough draft of this but I could probably do better
 - [ ] Endpoint to retrieve a specific temperature event
-- [ ] Endpoint to create a temperature event
+- [x] Endpoint to create a temperature event
 - [ ] Endpoint to update a temperature event
 - [ ] Endpoint to delete a temperature event
 

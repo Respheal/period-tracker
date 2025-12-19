@@ -1,21 +1,18 @@
-from typing import Annotated, Sequence
+from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException, status
-from fastapi.security import OAuth2PasswordBearer
 from sqlmodel import Session
 
 from api.db import models
 from api.db.crud import user as user_crud
 from api.utils.auth import get_admin_user, get_current_user
-from api.utils.dependencies import get_session
+from api.utils.dependencies import CommonUserParams, get_session
 
 router = APIRouter(
     prefix="/users",
     tags=["users"],
     responses={404: {"description": "Not found"}},
 )
-
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth")
 
 
 @router.post("/")
@@ -33,14 +30,16 @@ async def create_user(
 @router.get("/", dependencies=[Depends(get_admin_user)])
 async def get_users(
     session: Annotated[Session, Depends(get_session)],
-) -> Sequence[models.UserSafe]:
+    params: Annotated[CommonUserParams, Depends()],
+) -> models.UserResponse:
     """
     Endpoint to retrieve users for admin moderation. Admin-only.
 
     :return: A list of safe user representations (sans sensitive info)
     :rtype: Sequence[UserSafe]
     """
-    return user_crud.get_users(session=session)
+    users = user_crud.get_users(session=session, offset=params.offset, limit=params.limit)
+    return models.UserResponse(users=users, count=users.__len__())
 
 
 @router.get("/me/")

@@ -1,32 +1,37 @@
-# https://stackoverflow.com/a/50854247
+from datetime import datetime
+from typing import Sequence
 
-SMOOTHING_FACTOR = (
-    3  # Example smoothing factor (probably make this a fractional range 0-1?)
-)
-counter = 0
-average = 1.0
+from sqlmodel import Session, desc, select
 
-counter += 1
-value = 50.0  # Example new temperature value
-average = average + (value - average) / min(counter, SMOOTHING_FACTOR)
-print(f"Updated average temperature: {average}")
+from api.db import models
 
-counter += 1
-value = 99.6  # Example new temperature value
-average = average + (value - average) / min(counter, SMOOTHING_FACTOR)
-print(f"Updated average temperature: {average}")
 
-counter += 1
-value = 22.6  # Example new temperature value
-average = average + (value - average) / min(counter, SMOOTHING_FACTOR)
-print(f"Updated average temperature: {average}")
+def create_temp_reading(
+    session: Session, reading: models.CreateTempRead
+) -> models.Temperature:
+    db_reading = models.Temperature.model_validate(reading)
+    session.add(db_reading)
+    session.commit()
+    session.refresh(db_reading)
+    return db_reading
 
-counter += 1
-value = 99.6  # Example new temperature value
-average = average + (value - average) / min(counter, SMOOTHING_FACTOR)
-print(f"Updated average temperature: {average}")
 
-counter += 1
-value = 33.0  # Example new temperature value
-average = average + (value - average) / min(counter, SMOOTHING_FACTOR)
-print(f"Updated average temperature: {average}")
+def get_temp_readings(
+    session: Session,
+    user_id: str | None = None,
+    start_date: datetime | None = None,
+    end_date: datetime | None = None,
+    order: str = "desc",
+    offset: int = 0,
+    limit: int = 100,
+) -> Sequence[models.Temperature]:
+    statement = select(models.Temperature)
+    if user_id:
+        statement = statement.where(models.Temperature.user_id == user_id)
+    if start_date:
+        statement = statement.where(models.Temperature.timestamp >= start_date)
+    if end_date:
+        statement = statement.where(models.Temperature.timestamp <= end_date)
+    if order == "desc":
+        statement = statement.order_by(desc(models.Temperature.timestamp))
+    return session.exec(statement.offset(offset).limit(limit)).all()

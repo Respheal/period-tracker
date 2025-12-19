@@ -1,8 +1,8 @@
-from datetime import datetime
+from datetime import UTC, datetime
 from typing import Literal
 from uuid import uuid4
 
-from sqlmodel import Field, SQLModel
+from sqlmodel import JSON, Column, Enum, Field, SQLModel
 
 ###
 # Utility Models
@@ -22,6 +22,12 @@ class HealthCheck(SQLModel):
 class ResourceDeleteResponse(SQLModel):
     resource_type: str
     resource_id: str
+
+
+class Response(SQLModel):
+    """Base response model with count field used for list endpoints."""
+
+    count: int
 
 
 ###
@@ -52,6 +58,11 @@ class TokenPayload(SQLModel):
 ###
 # User
 ###
+class UserResponse(Response):
+    # count
+    users: list["UserSafe"]
+
+
 class UserBase(SQLModel):
     username: str = Field(unique=True, index=True)
     display_name: str | None = None
@@ -108,6 +119,7 @@ class UserProfile(UserSafe):
     # user_id
     average_cycle_length: float | None = None
     average_period_length: float | None = None
+    average_temperature: float | None = None
 
 
 class User(UserProfile, table=True):
@@ -125,6 +137,7 @@ class User(UserProfile, table=True):
     - is_admin
     - average_cycle_length
     - average_period_length
+    - average_temperature
     - hashed_password
 
     """
@@ -136,6 +149,7 @@ class User(UserProfile, table=True):
     # user_id
     # average_cycle_length
     # average_period_length
+    # average_temperature
 
     hashed_password: str
 
@@ -150,6 +164,118 @@ class UserUpdate(SQLModel):
 class UserAdminUpdate(UserUpdate):
     is_disabled: bool | None = None
     is_admin: bool | None = None
+
+
+###
+# Events
+###
+
+
+class EventBase(SQLModel):
+    user_id: str = Field(foreign_key="user.user_id", index=True)
+
+
+class CreateTempRead(EventBase):
+    # user_id
+    temperature: float  # Celsius
+
+
+class Temperature(CreateTempRead, table=True):
+    """
+    Temperature Event model.
+
+    This is the class representing the Temperature table in the database.
+
+    - user_id
+    - temperature
+    - id
+    - timestamp
+    """
+
+    # user_id
+    # temperature
+    timestamp: datetime = Field(default_factory=lambda: datetime.now(UTC), index=True)
+    id: int | None = Field(default=None, primary_key=True, index=True)
+
+
+class TempEMAverage(SQLModel):
+    timestamp: datetime
+    temperature: float
+    average_temperature: float
+
+
+class CreatePeriod(EventBase):
+    # user_id
+    start_date: datetime
+    end_date: datetime | None = None
+    duration: int | None = None  # in days
+
+
+class Period(CreatePeriod, table=True):
+    """
+    Period Event model.
+
+    This is the class representing the Period table in the database.
+
+    - user_id
+    - start_date
+    - end_date
+    - duration
+    """
+
+    # user_id
+    # start_date
+    # end_date
+    # duration
+    id: int = Field(default=None, primary_key=True, index=True)
+
+
+class CreateSymptomEvent(EventBase):
+    # user_id
+    date: datetime
+    flow_intensity: Literal["none", "spotting", "light", "medium", "heavy"] | None = (
+        Field(
+            sa_column=Column(
+                Enum("none", "spotting", "light", "medium", "heavy"), nullable=True
+            )
+        )
+    )
+    symptoms: list[str] | None = Field(sa_column=Column(JSON), unique_items=True)
+    mood: list[str] | None = Field(sa_column=Column(JSON), unique_items=True)
+    ovulation_test: bool | None = None
+    discharge: list[str] | None = Field(sa_column=Column(JSON), unique_items=True)
+    sex: list[str] | None = Field(sa_column=Column(JSON), unique_items=True)
+
+
+class SymptomEvent(CreateSymptomEvent, table=True):
+    """
+    Symptom Event model.
+
+    This is the class representing the Symptom Event table in the database.
+    - user_id
+    - date
+    - flow_intensity
+    - symptoms
+    - mood
+    - ovulation_test
+    - discharge
+    - sex
+    """
+
+    # user_id
+    # date
+    # flow_intensity
+    # symptoms
+    # mood
+    # ovulation_test
+    # discharge
+    # sex
+    id: int = Field(default=None, primary_key=True, index=True)
+
+
+class EventResponse(Response):
+    # count
+    events: list[Temperature | Period | SymptomEvent | TempEMAverage]
 
 
 ###

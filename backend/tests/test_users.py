@@ -36,11 +36,13 @@ def test_get_users(
     # Should succeed for admin
     response = client.get("/users/", headers=admin_headers)
     assert response.status_code == 200
-    users = response.json()
-    assert isinstance(users, list)
+    data = response.json()
+    assert "count" in data
+    assert data["count"] >= 1
+    assert isinstance(data["users"], list)
     # Each user should have expected keys (UserSafe)
-    if users:
-        user = users[0]
+    if data["users"]:
+        user = data["users"][0]
         assert "user_id" in user
         assert "username" in user
         assert "display_name" in user
@@ -70,9 +72,7 @@ def test_read_me(client: TestClient, user_headers: dict[str, str]) -> None:
     assert is_valid_uuid(current_user["user_id"])
 
 
-def test_update_me(
-    client: TestClient, user_headers: dict[str, str], session: Session
-) -> None:
+def test_update_me(client: TestClient, user_headers: dict[str, str]) -> None:
     # Update display_name and check response
     update_data = {"display_name": "Jimbo"}
     response = client.patch("/users/me/", json=update_data, headers=user_headers)

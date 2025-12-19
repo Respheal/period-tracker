@@ -26,6 +26,7 @@ class Settings(BaseSettings):
     APP_NAME: str = "Period Tracker API"
     APP_VERSION: str = "0.1.0"
     ENVIRONMENT: Literal["local", "test", "production"]
+    SMOOTHING_FACTOR: int = 3  # Higher values reduce data noise but are less responsive
     FIRST_USER: str  # = "admin"
     FIRST_USER_PASS: str  # = "adminpass"
     DATABASE: str
@@ -47,9 +48,12 @@ class Settings(BaseSettings):
     def _check_default_secret(self, var_name: str, value: str | None) -> None:
         if value == "changethis":
             message = f'The value of {var_name} is "changethis"'
-            if self.ENVIRONMENT != "production":
+            if self.ENVIRONMENT == "local":
                 warnings.warn(message, stacklevel=1)
+            elif self.ENVIRONMENT == "test":
+                print(f"WARNING: {message}")
             else:
+                # In production, raise an error
                 raise ValueError(message)
 
     @model_validator(mode="after")
