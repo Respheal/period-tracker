@@ -6,6 +6,7 @@ from api.db.crud import user as user_crud
 from api.db.models import UserCreate
 from api.db.session import engine
 from api.utils.config import settings
+from tests.utils.temp import create_temp_readings
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -16,7 +17,8 @@ def init_user(session: Session) -> None:
         user_in = UserCreate(
             username=settings.FIRST_USER, password=settings.FIRST_USER_PASS, is_admin=True
         )
-        user_crud.create_user(session=session, user=user_in)
+        user = user_crud.create_user(session=session, user=user_in)
+        create_temp_readings(session=session, user=user)
 
 
 def init() -> None:

@@ -1,8 +1,9 @@
+import enum
 from datetime import UTC, datetime
 from typing import Literal
 from uuid import uuid4
 
-from sqlmodel import JSON, Column, Enum, Field, SQLModel
+from sqlmodel import JSON, Column, Enum, Field, Relationship, SQLModel
 
 ###
 # Utility Models
@@ -60,7 +61,7 @@ class TokenPayload(SQLModel):
 ###
 class UserResponse(Response):
     # count
-    users: list["UserSafe"]
+    users: list[UserSafe]
 
 
 class UserBase(SQLModel):
@@ -117,12 +118,10 @@ class UserProfile(UserSafe):
     # is_disabled
     # is_admin
     # user_id
-    average_cycle_length: float | None = None
-    average_period_length: float | None = None
-    average_temperature: float | None = None
+    temp_state: TemperatureState | None = None
 
 
-class User(UserProfile, table=True):
+class User(UserSafe, table=True):
     """
     User model.
 
@@ -135,9 +134,6 @@ class User(UserProfile, table=True):
     - display_name
     - is_disabled
     - is_admin
-    - average_cycle_length
-    - average_period_length
-    - average_temperature
     - hashed_password
 
     """
@@ -147,18 +143,15 @@ class User(UserProfile, table=True):
     # is_disabled
     # is_admin
     # user_id
-    # average_cycle_length
-    # average_period_length
-    # average_temperature
-
+    temp_state: TemperatureState = Relationship(
+        back_populates="user", sa_relationship_kwargs={"uselist": False}
+    )
     hashed_password: str
 
 
 class UserUpdate(SQLModel):
     display_name: str | None = None
     password: str | None = None
-    average_cycle_length: float | None = None
-    average_period_length: float | None = None
 
 
 class UserAdminUpdate(UserUpdate):
@@ -178,6 +171,7 @@ class EventBase(SQLModel):
 class CreateTempRead(EventBase):
     # user_id
     temperature: float  # Celsius
+    timestamp: datetime = Field(default_factory=lambda: datetime.now(UTC), index=True)
 
 
 class Temperature(CreateTempRead, table=True):
@@ -194,14 +188,23 @@ class Temperature(CreateTempRead, table=True):
 
     # user_id
     # temperature
-    timestamp: datetime = Field(default_factory=lambda: datetime.now(UTC), index=True)
-    id: int | None = Field(default=None, primary_key=True, index=True)
+    pid: int | None = Field(default=None, primary_key=True, index=True)
 
 
-class TempEMAverage(SQLModel):
-    timestamp: datetime
-    temperature: float
-    average_temperature: float
+class TempPhase(str, enum.Enum):
+    LEARNING = "learning"
+    LOW = "low_phase"
+    ELEVATED = "elevated_phase"
+    UNKNOWN = "unknown"
+
+
+class TemperatureState(SQLModel, table=True):
+    pid: int | None = Field(default=None, primary_key=True, index=True)
+    user_id: str = Field(foreign_key="user.user_id", index=True)
+    phase: TempPhase = Field(default=TempPhase.LEARNING)
+    baseline: float | None = None
+    last_evaluated: datetime | None = None
+    user: User = Relationship(back_populates="temp_state")
 
 
 class CreatePeriod(EventBase):
@@ -230,15 +233,19 @@ class Period(CreatePeriod, table=True):
     id: int = Field(default=None, primary_key=True, index=True)
 
 
+class FlowIntensity(str, enum.Enum):
+    NONE = "none"
+    SPOTTING = "spotting"
+    LIGHT = "light"
+    MEDIUM = "medium"
+    HEAVY = "heavy"
+
+
 class CreateSymptomEvent(EventBase):
     # user_id
     date: datetime
-    flow_intensity: Literal["none", "spotting", "light", "medium", "heavy"] | None = (
-        Field(
-            sa_column=Column(
-                Enum("none", "spotting", "light", "medium", "heavy"), nullable=True
-            )
-        )
+    flow_intensity: FlowIntensity | None = Field(
+        sa_column=Column(Enum(FlowIntensity), nullable=True)
     )
     symptoms: list[str] | None = Field(sa_column=Column(JSON), unique_items=True)
     mood: list[str] | None = Field(sa_column=Column(JSON), unique_items=True)
@@ -275,7 +282,7 @@ class SymptomEvent(CreateSymptomEvent, table=True):
 
 class EventResponse(Response):
     # count
-    events: list[Temperature | Period | SymptomEvent | TempEMAverage]
+    events: list[Temperature | Period | SymptomEvent]
 
 
 ###

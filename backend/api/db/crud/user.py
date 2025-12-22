@@ -2,7 +2,7 @@ from typing import Sequence
 
 from sqlmodel import Session, select
 
-from api.db.models import User, UserCreate, UserUpdate
+from api.db.models import TemperatureState, User, UserCreate, UserUpdate
 from api.utils import auth
 
 
@@ -18,6 +18,8 @@ def create_user(session: Session, user: UserCreate) -> User:
         user, update={"hashed_password": auth.get_password_hash(user.password)}
     )
     session.add(db_user)
+    # initialize temp state
+    db_user.temp_state = TemperatureState(user_id=db_user.user_id)
     session.commit()
     session.refresh(db_user)
     return db_user
@@ -43,3 +45,11 @@ def delete_user(session: Session, user_id: str) -> None:
     user = session.get(User, user_id)
     session.delete(user)
     session.commit()
+
+
+def update_temp_state(session: Session, user: User, new_state: TemperatureState) -> User:
+    user.temp_state = new_state
+    session.add(user)
+    session.commit()
+    session.refresh(user)
+    return user
