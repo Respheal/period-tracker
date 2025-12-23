@@ -4,6 +4,7 @@ from sqlmodel import Session, select
 
 from api.db.models import TemperatureState, User, UserCreate, UserUpdate
 from api.utils import auth
+from api.utils.stats import evaluate_temperature_state
 
 
 def get_users(session: Session, offset: int = 0, limit: int = 100) -> Sequence[User]:
@@ -18,8 +19,8 @@ def create_user(session: Session, user: UserCreate) -> User:
         user, update={"hashed_password": auth.get_password_hash(user.password)}
     )
     session.add(db_user)
-    # initialize temp state
-    db_user.temp_state = TemperatureState(user_id=db_user.user_id)
+    # Initialize temp state
+    db_user.temp_state = evaluate_temperature_state([])
     session.commit()
     session.refresh(db_user)
     return db_user

@@ -1,7 +1,7 @@
 from typing import Annotated
 
 # import pandas as pd
-from fastapi import APIRouter, Body, Depends
+from fastapi import APIRouter, BackgroundTasks, Body, Depends
 
 # from fastapi.responses import StreamingResponse
 from sqlmodel import Session
@@ -26,13 +26,18 @@ async def create_temp_reading(
         float, Body(embed=True, ge=30, le=40, description="Temperature in Celsius")
     ],
     session: Annotated[Session, Depends(get_session)],
+    background_tasks: BackgroundTasks,
 ) -> models.Temperature:
-    return temp_crud.create_temp_reading(
+    new_temp = temp_crud.create_temp_reading(
         session=session,
         reading=models.CreateTempRead(
             user_id=current_user.user_id, temperature=temperature
         ),
     )
+    background_tasks.add_task(
+        temp_crud.update_temperature_state, session, current_user.user_id
+    )
+    return new_temp
 
 
 @router.get("/", dependencies=[Depends(get_admin_user)])

@@ -5,6 +5,7 @@ from sqlmodel import Session, asc, desc, select
 
 from api.db import models
 from api.db.crud import user as user_crud
+from api.utils.config import settings
 from api.utils.stats import evaluate_temperature_state
 
 
@@ -15,7 +16,6 @@ def create_temp_reading(
     session.add(db_reading)
     session.commit()
     session.refresh(db_reading)
-    update_temperature_state(session, reading.user_id)
     return db_reading
 
 
@@ -62,7 +62,9 @@ def update_temperature_state(session: Session, user_id: str) -> None:
     user = session.get(models.User, user_id)
     if not user:
         return None
-    readings = get_temp_readings(session=session, user_id=user_id)
+    readings = get_temp_readings(
+        session=session, user_id=user_id, limit=settings.BASELINE_SPAN_DAYS
+    )
     prev_state = get_temp_state(session=session, user_id=user_id)
     new_state = evaluate_temperature_state(
         temperatures=readings, previous_state=prev_state

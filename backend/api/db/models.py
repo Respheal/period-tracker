@@ -3,6 +3,7 @@ from datetime import UTC, datetime
 from typing import Literal
 from uuid import uuid4
 
+from sqlalchemy import DateTime
 from sqlmodel import JSON, Column, Enum, Field, Relationship, SQLModel
 
 ###
@@ -144,7 +145,9 @@ class User(UserSafe, table=True):
     # is_admin
     # user_id
     temp_state: TemperatureState = Relationship(
-        back_populates="user", sa_relationship_kwargs={"uselist": False}
+        back_populates="user",
+        cascade_delete=True,
+        sa_relationship_kwargs={"uselist": False},
     )
     hashed_password: str
 
@@ -165,13 +168,16 @@ class UserAdminUpdate(UserUpdate):
 
 
 class EventBase(SQLModel):
-    user_id: str = Field(foreign_key="user.user_id", index=True)
+    user_id: str = Field(foreign_key="user.user_id", index=True, ondelete="CASCADE")
 
 
 class CreateTempRead(EventBase):
     # user_id
     temperature: float  # Celsius
-    timestamp: datetime = Field(default_factory=lambda: datetime.now(UTC), index=True)
+    timestamp: datetime = Field(
+        default_factory=lambda: datetime.now(UTC),
+        sa_column=Column(DateTime(timezone=True), index=True),
+    )
 
 
 class Temperature(CreateTempRead, table=True):
@@ -182,7 +188,7 @@ class Temperature(CreateTempRead, table=True):
 
     - user_id
     - temperature
-    - id
+    - pid
     - timestamp
     """
 
@@ -200,17 +206,21 @@ class TempPhase(str, enum.Enum):
 
 class TemperatureState(SQLModel, table=True):
     pid: int | None = Field(default=None, primary_key=True, index=True)
-    user_id: str = Field(foreign_key="user.user_id", index=True)
+    user_id: str = Field(foreign_key="user.user_id", index=True, ondelete="CASCADE")
     phase: TempPhase = Field(default=TempPhase.LEARNING)
     baseline: float | None = None
-    last_evaluated: datetime | None = None
+    last_evaluated: datetime | None = Field(
+        default=None, sa_column=Column(DateTime(timezone=True))
+    )
     user: User = Relationship(back_populates="temp_state")
 
 
 class CreatePeriod(EventBase):
     # user_id
-    start_date: datetime
-    end_date: datetime | None = None
+    start_date: datetime = Field(sa_column=Column(DateTime(timezone=True)))
+    end_date: datetime | None = Field(
+        default=None, sa_column=Column(DateTime(timezone=True), nullable=True)
+    )
     duration: int | None = None  # in days
 
 
@@ -243,7 +253,7 @@ class FlowIntensity(str, enum.Enum):
 
 class CreateSymptomEvent(EventBase):
     # user_id
-    date: datetime
+    date: datetime = Field(sa_column=Column(DateTime(timezone=True)))
     flow_intensity: FlowIntensity | None = Field(
         sa_column=Column(Enum(FlowIntensity), nullable=True)
     )
