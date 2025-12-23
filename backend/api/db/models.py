@@ -171,9 +171,12 @@ class EventBase(SQLModel):
     user_id: str = Field(foreign_key="user.user_id", index=True, ondelete="CASCADE")
 
 
-class CreateTempRead(EventBase):
+class CreateTempParams(SQLModel):
+    temperature: float = Field(ge=30.0, le=40.0)  # Celsius
+
+
+class CreateTempRead(EventBase, CreateTempParams):
     # user_id
-    temperature: float  # Celsius
     timestamp: datetime = Field(
         default_factory=lambda: datetime.now(UTC),
         sa_column=Column(DateTime(timezone=True), index=True),
@@ -213,6 +216,13 @@ class TemperatureState(SQLModel, table=True):
         default=None, sa_column=Column(DateTime(timezone=True))
     )
     user: User = Relationship(back_populates="temp_state")
+
+
+class TemperatureEMA(SQLModel):
+    timestamp: str
+    temperature: float
+    ewm: float
+    baseline: float
 
 
 class CreatePeriod(EventBase):
