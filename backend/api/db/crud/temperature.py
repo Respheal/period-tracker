@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import Sequence
 
-from sqlmodel import Session, asc, desc, select
+from sqlmodel import Session, desc, select
 
 from api.db import models
 from api.db.crud import user as user_crud
@@ -25,7 +25,6 @@ def get_temp_readings(
     start_date: datetime | None = None,
     end_date: datetime | None = None,
     order: str = "desc",
-    reorder: str | None = None,
     offset: int = 0,
     limit: int = 100,
 ) -> Sequence[models.Temperature]:
@@ -40,12 +39,6 @@ def get_temp_readings(
     if order == "desc":
         statement = statement.order_by(desc(models.Temperature.timestamp))
     statement = statement.offset(offset).limit(limit)
-    if reorder == "asc":
-        statement = (
-            select(models.Temperature)
-            .where(models.Temperature.pid == statement.c.pid)
-            .order_by(asc(models.Temperature.timestamp))
-        )
     return session.exec(statement).all()
 
 
@@ -59,9 +52,6 @@ def get_temp_state(
 
 
 def update_temperature_state(session: Session, user_id: str) -> None:
-    user = session.get(models.User, user_id)
-    if not user:
-        return None
     readings = get_temp_readings(
         session=session, user_id=user_id, limit=settings.BASELINE_SPAN_DAYS
     )
@@ -69,4 +59,4 @@ def update_temperature_state(session: Session, user_id: str) -> None:
     new_state = evaluate_temperature_state(
         temperatures=readings, previous_state=prev_state
     )
-    user_crud.update_temp_state(session=session, user=user, new_state=new_state)
+    user_crud.update_temp_state(session=session, user_id=user_id, new_state=new_state)

@@ -48,7 +48,12 @@ def delete_user(session: Session, user_id: str) -> None:
     session.commit()
 
 
-def update_temp_state(session: Session, user: User, new_state: TemperatureState) -> User:
+def update_temp_state(
+    session: Session, user_id: str, new_state: TemperatureState
+) -> User | None:
+    user = session.get(User, user_id)
+    if not user:  # pragma: no cover
+        return None
     user.temp_state = new_state
     session.add(user)
     session.commit()
