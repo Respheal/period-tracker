@@ -58,9 +58,9 @@ def redis_server() -> Generator:
         server.shutdown()
 
 
-# Apply migrations at beginning and end of testing session
-@pytest.fixture(autouse=True, scope="module")
-def apply_migrations() -> Generator:
+# Apply migrations at beginning and end of each test class
+@pytest.fixture(autouse=True, scope="class")
+def setup() -> Generator:
     config = Config("alembic.ini")
     command.upgrade(config, "head")
     init()

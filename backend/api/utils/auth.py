@@ -122,7 +122,7 @@ async def get_current_user(
     token: Annotated[str, Depends(oauth2_scheme)],
     session: Annotated[Session, Depends(get_session)],
     settings: Annotated[Settings, Depends(get_settings)],
-) -> models.UserProfile:
+) -> models.User:
     """Get the current user based on the provided JWT token payload."""
     payload: models.TokenPayload = validate_token(
         token=token, token_type="access", settings=settings  # nosec B106
@@ -137,7 +137,7 @@ async def get_admin_user(
     token: Annotated[str, Depends(oauth2_scheme)],
     session: Annotated[Session, Depends(get_session)],
     settings: Annotated[Settings, Depends(get_settings)],
-) -> models.UserProfile:
+) -> models.User:
     """Verify if the current user is an admin."""
     user = await get_current_user(token=token, session=session, settings=settings)
     if user.is_admin is False:

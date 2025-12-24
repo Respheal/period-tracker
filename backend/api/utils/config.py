@@ -26,7 +26,14 @@ class Settings(BaseSettings):
     APP_NAME: str = "Period Tracker API"
     APP_VERSION: str = "0.1.0"
     ENVIRONMENT: Literal["local", "test", "production"]
-    SMOOTHING_FACTOR: int = 3  # Higher values reduce data noise but are less responsive
+    # Constants for temperature analysis
+    SMOOTHING_SPAN_DAYS: int = 5
+    BASELINE_SPAN_DAYS: int = 30
+    MIN_POINTS_FOR_BASELINE: int = 10
+    ELEVATION_MIN_DELTA: float = 0.15  # °C, absolute floor
+    ELEVATION_DAYS_REQUIRED: int = 3
+    MAX_MISSING_DAYS: int = 6
+    # Authentication settings
     FIRST_USER: str  # = "admin"
     FIRST_USER_PASS: str  # = "adminpass"
     DATABASE: str
