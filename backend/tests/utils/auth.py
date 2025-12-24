@@ -1,3 +1,5 @@
+from typing import Any
+
 from fastapi.testclient import TestClient
 from sqlmodel import Session
 
@@ -5,7 +7,7 @@ from api.db import models
 from api.db.crud import user as user_crud
 from api.utils.config import settings
 from tests.utils import random_lower_string
-from tests.utils.user import TEST_USERS
+from tests.utils.user import TEST_USERS, create_random_user
 
 
 def get_admin_headers(client: TestClient) -> dict[str, str]:
@@ -45,3 +47,23 @@ def get_user_headers(client: TestClient, db: Session, username: str) -> dict[str
     r = client.post("/auth/", data={"username": username, "password": password})
     response = r.json()
     return {"Authorization": f"Bearer {response["access_token"]}"}
+
+
+def login_user(
+    client: TestClient,
+    session: Session,
+    user: models.User | None = None,
+    password: str | None = None,
+) -> dict[str, Any]:
+    """Helper function to log in a user for testing authentication endpoints."""
+    if not password:
+        password = random_lower_string()
+    if not user:
+        user = create_random_user(session, password=password)
+    response = client.post(
+        "/auth/", data={"username": user.username, "password": password}
+    )
+    return {
+        "user": user,
+        "response": response,
+    }
