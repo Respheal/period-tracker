@@ -43,15 +43,16 @@ pytest-env = "^1.2.0"
 coverage = "^7.13.0"
 pytest-cov = "^7.0.0"
 
+[tool.poetry.group.tox.dependencies]
+tox = "^4.32.0"
+
 [tool.poetry.group.dev]
 include-groups = [
+    "tox",
     "lint",
     "security",
     "test",
 ]
-
-[tool.poetry.group.dev.dependencies]
-tox = "^4.32.0"
 
 [build-system]
 requires = ["poetry-core>=2.0.0,<3.0.0"]
