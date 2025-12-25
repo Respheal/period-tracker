@@ -12,7 +12,6 @@
     "ms-python.python",
     "ms-python.vscode-pylance",
     "prettier.prettier-vscode",
-    "redhat.vscode-yaml",
-    "tamasfe.even-better-toml"
+    "redhat.vscode-yaml"
   ]
 }
