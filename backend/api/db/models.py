@@ -1,8 +1,9 @@
 import enum
-from datetime import UTC, datetime
-from typing import Literal
+from datetime import UTC, datetime, timedelta
+from typing import Annotated, Literal
 from uuid import uuid4
 
+from fastapi import Body
 from sqlalchemy import DateTime
 from sqlmodel import JSON, Column, Enum, Field, Relationship, SQLModel
 
@@ -120,6 +121,7 @@ class UserProfile(UserSafe):
     # is_admin
     # user_id
     temp_state: TemperatureState | None = None
+    cycle_state: Cycle | None = None
 
 
 class User(UserSafe, table=True):
@@ -149,6 +151,11 @@ class User(UserSafe, table=True):
         cascade_delete=True,
         sa_relationship_kwargs={"uselist": False},
     )
+    cycle_state: Cycle = Relationship(
+        back_populates="user",
+        cascade_delete=True,
+        sa_relationship_kwargs={"uselist": False},
+    )
     hashed_password: str
 
 
@@ -169,6 +176,9 @@ class UserAdminUpdate(UserUpdate):
 
 class EventBase(SQLModel):
     user_id: str = Field(foreign_key="user.user_id", index=True, ondelete="CASCADE")
+
+
+# Temperature
 
 
 class CreateTempParams(SQLModel):
@@ -225,6 +235,28 @@ class TemperatureEMA(SQLModel):
     baseline: float
 
 
+# Period
+
+
+class CreatePeriodParams(SQLModel):
+    start_date: Annotated[
+        str,
+        Body(
+            default=str((datetime.now(UTC) - timedelta(days=3)).date()),
+            description="Start date",
+            pattern=r"^\d{4}-\d{2}-\d{2}$",
+        ),
+    ]
+    end_date: Annotated[
+        str | None,
+        Body(
+            default=str(datetime.now(UTC).date()),
+            description="End date (Optional)",
+            pattern=r"^\d{4}-\d{2}-\d{2}$",
+        ),
+    ] = str(datetime.now(UTC).date())
+
+
 class CreatePeriod(EventBase):
     # user_id
     start_date: datetime = Field(sa_column=Column(DateTime(timezone=True)))
@@ -251,6 +283,25 @@ class Period(CreatePeriod, table=True):
     # end_date
     # duration
     id: int = Field(default=None, primary_key=True, index=True)
+
+
+class CycleState(str, enum.Enum):
+    LEARNING = "learning"
+    STABLE = "stable"
+    UNSTABLE = "unstable"
+
+
+class Cycle(SQLModel, table=True):
+    pid: int | None = Field(default=None, primary_key=True, index=True)
+    user_id: str = Field(foreign_key="user.user_id", index=True, ondelete="CASCADE")
+    state: CycleState = Field(default=CycleState.LEARNING)
+    avg_cycle_length: int | None = None
+    avg_period_length: int | None = None
+    last_period_start: datetime | None = None
+    last_evaluated: datetime | None = Field(
+        default=None, sa_column=Column(DateTime(timezone=True))
+    )
+    user: User = Relationship(back_populates="cycle_state")
 
 
 class FlowIntensity(str, enum.Enum):

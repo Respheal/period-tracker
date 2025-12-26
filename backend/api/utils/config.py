@@ -33,6 +33,12 @@ class Settings(BaseSettings):
     ELEVATION_MIN_DELTA: float = 0.15  # °C, absolute floor
     ELEVATION_DAYS_REQUIRED: int = 3
     MAX_MISSING_DAYS: int = 6
+    # Constants for period analysis
+    CYCLE_EWM_SPAN: int = 6
+    MIN_CYCLES_FOR_STABLE: int = 3
+    MIN_PLAUSIBLE_CYCLE: int = 20
+    MAX_PLAUSIBLE_CYCLE: int = 90
+    LONG_GAP_MULTIPLIER: float = 1.75
     # Authentication settings
     FIRST_USER: str  # = "admin"
     FIRST_USER_PASS: str  # = "adminpass"

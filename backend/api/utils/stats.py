@@ -1,5 +1,5 @@
-from datetime import UTC, datetime
-from typing import Sequence
+from datetime import UTC, datetime, timedelta
+from typing import Sequence, Tuple
 
 import pandas as pd
 
@@ -9,6 +9,9 @@ from api.utils.dependencies import get_settings
 settings = get_settings()
 
 
+###
+# Temperature
+###
 def temperatures_to_frame(temps: Sequence[models.Temperature]) -> pd.DataFrame:
     """Convert Temperatures to a time-indexed DataFrame."""
     df = pd.DataFrame(
@@ -62,12 +65,11 @@ def evaluate_temperature_state(
     Given all known temperatures for a user and their previous TemperatureState,
     return an updated TemperatureState.
     """
-    now = datetime.now(UTC)
     df = temperatures_to_frame(temperatures)
 
     # Initialize state if missing
     state = previous_state or models.TemperatureState(phase=models.TempPhase.LEARNING)
-    state.last_evaluated = now
+    state.last_evaluated = datetime.now(UTC)
 
     if df.empty:
         state.phase = models.TempPhase.LEARNING
@@ -96,3 +98,137 @@ def evaluate_temperature_state(
         state.phase = models.TempPhase.LOW
 
     return state
+
+
+###
+# Period
+###
+def periods_to_frame(periods: Sequence[models.Period]) -> pd.DataFrame:
+    """Convert Periods to a DataFrame."""
+    df = pd.DataFrame([{"start": p.start_date, "end": p.end_date} for p in periods])
+    if df.empty:
+        return df
+    df = df.sort_values("start")
+    return df
+
+
+def compute_cycle_lengths(df: pd.DataFrame) -> pd.Series:
+    return pd.to_datetime(df["start"]).diff().dt.days
+
+
+def compute_period_lengths(df: pd.DataFrame) -> pd.Series:
+    return (pd.to_datetime(df["end"]) - pd.to_datetime(df["start"])).dt.days
+
+
+def classify_cycle_lengths(cycle_lengths: pd.Series) -> pd.Series:
+    """
+    Generate a Series of booleans indicating whether each cycle length is valid.
+    This will be used to filter out outliers when computing averages.
+    """
+    # Immediately filter out cycles with biologically implausible lengths.
+    # These are likely missing data or input errors.
+    valid = cycle_lengths.between(
+        settings.MIN_PLAUSIBLE_CYCLE, settings.MAX_PLAUSIBLE_CYCLE, inclusive="both"
+    )
+    # Grab the most recent cycles to check for cycles that are longer than expected
+    # based on the user's actual entered data to filter out outliers.
+    # Outliers may be caused by stress, illness, or other factors and should not be
+    # used to compute the typical cycle length for a user.
+    recent = cycle_lengths.dropna().tail(settings.CYCLE_EWM_SPAN)
+    if len(recent) >= 3:
+        mean = recent.mean()
+        max_allowed = mean * settings.LONG_GAP_MULTIPLIER
+        # Mark cycles that are implausibly long for anyone and also longer than expected
+        # for this specific user as invalid. Everything else is valid.
+        # Because cycles are stored regardless of current validity, the system may later
+        # reclassify longer-than-usual cycles as valid if the trend continues.
+        valid &= cycle_lengths <= max_allowed
+    return valid
+
+
+def compute_cycle_average(cycle_lengths: pd.Series, valid_mask: pd.Series) -> int | None:
+    """
+    With the mask generated from classify_cycle_lengths,
+    compute the EWM average of valid cycle lengths in days.
+    """
+    usable = cycle_lengths[valid_mask].dropna()
+    if len(usable) < 1:
+        return None
+    avg_cycle: int | None = (
+        usable.ewm(span=settings.CYCLE_EWM_SPAN, adjust=False)
+        .mean()
+        .iloc[-1]
+        .round()
+        .astype(int)
+    )
+    return avg_cycle
+
+
+def compute_period_average(period_lengths: pd.Series) -> int | None:
+    """
+    Compute the EWM average of period lengths in days.
+    Periods with no end dates are ignored as data entry errors.
+    """
+    usable = period_lengths.dropna()
+    if len(usable) < 1:
+        return None
+    avg_period: int | None = (
+        usable.ewm(span=settings.CYCLE_EWM_SPAN, adjust=False)
+        .mean()
+        .iloc[-1]
+        .round()
+        .astype(int)
+    )
+    return avg_period
+
+
+def evaluate_cycle_state(
+    periods: Sequence[models.Period],
+    previous_state: models.Cycle | None = None,
+) -> models.Cycle:
+    df = periods_to_frame(periods)
+    cycle_data = previous_state or models.Cycle(state=models.CycleState.LEARNING)
+    cycle_data.last_evaluated = datetime.now(UTC)
+
+    if df.empty or len(df) < 2:
+        cycle_data.state = models.CycleState.LEARNING
+        return cycle_data
+
+    cycle_lengths = compute_cycle_lengths(df)
+    valid_mask = classify_cycle_lengths(cycle_lengths)
+    avg_cycle = compute_cycle_average(cycle_lengths, valid_mask)
+
+    period_lengths = compute_period_lengths(df)
+    avg_period = compute_period_average(period_lengths)
+
+    cycle_data.avg_cycle_length = avg_cycle
+    cycle_data.avg_period_length = avg_period
+    cycle_data.last_period_start = df["start"].iloc[-1]
+
+    if avg_cycle is None:
+        cycle_data.state = models.CycleState.LEARNING
+    elif (
+        valid_mask.tail(settings.MIN_CYCLES_FOR_STABLE).sum()
+        >= settings.MIN_CYCLES_FOR_STABLE
+    ):
+        cycle_data.state = models.CycleState.STABLE
+    else:
+        cycle_data.state = models.CycleState.UNSTABLE
+
+    return cycle_data
+
+
+def predict_next_period(cycle_state: models.Cycle) -> Tuple[datetime, datetime] | None:
+    if (
+        cycle_state.state != models.CycleState.STABLE
+        or not cycle_state.last_period_start
+        or not cycle_state.avg_cycle_length
+    ):
+        return None
+
+    expected_start = cycle_state.last_period_start + timedelta(
+        days=round(cycle_state.avg_cycle_length)
+    )
+    expected_end = expected_start + timedelta(days=cycle_state.avg_period_length or 0)
+
+    return expected_start, expected_end

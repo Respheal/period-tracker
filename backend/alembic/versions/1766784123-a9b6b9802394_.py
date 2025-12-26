@@ -1,8 +1,8 @@
 """empty message.
 
-Revision ID: 5e40f00805be
+Revision ID: a9b6b9802394
 Revises:
-Create Date: 2025-12-23 20:14:13.404317+00:00
+Create Date: 2025-12-26 21:22:03.208717+00:00
 
 """
 
@@ -13,7 +13,7 @@ import sqlmodel.sql.sqltypes
 from alembic import op
 
 # revision identifiers, used by Alembic.
-revision: str = "5e40f00805be"
+revision: str = "a9b6b9802394"
 down_revision: str | Sequence[str] | None = None
 branch_labels: str | Sequence[str] | None = None
 depends_on: str | Sequence[str] | None = None
@@ -35,6 +35,26 @@ def upgrade() -> None:
     with op.batch_alter_table("user", schema=None) as batch_op:
         batch_op.create_index(batch_op.f("ix_user_user_id"), ["user_id"], unique=False)
         batch_op.create_index(batch_op.f("ix_user_username"), ["username"], unique=True)
+
+    op.create_table(
+        "cycle",
+        sa.Column("pid", sa.Integer(), nullable=False),
+        sa.Column("user_id", sqlmodel.sql.sqltypes.AutoString(), nullable=False),
+        sa.Column(
+            "state",
+            sa.Enum("LEARNING", "STABLE", "UNSTABLE", name="cyclestate"),
+            nullable=False,
+        ),
+        sa.Column("avg_cycle_length", sa.Integer(), nullable=True),
+        sa.Column("avg_period_length", sa.Integer(), nullable=True),
+        sa.Column("last_period_start", sa.DateTime(), nullable=True),
+        sa.Column("last_evaluated", sa.DateTime(timezone=True), nullable=True),
+        sa.ForeignKeyConstraint(["user_id"], ["user.user_id"], ondelete="CASCADE"),
+        sa.PrimaryKeyConstraint("pid"),
+    )
+    with op.batch_alter_table("cycle", schema=None) as batch_op:
+        batch_op.create_index(batch_op.f("ix_cycle_pid"), ["pid"], unique=False)
+        batch_op.create_index(batch_op.f("ix_cycle_user_id"), ["user_id"], unique=False)
 
     op.create_table(
         "period",
@@ -141,6 +161,11 @@ def downgrade() -> None:
         batch_op.drop_index(batch_op.f("ix_period_id"))
 
     op.drop_table("period")
+    with op.batch_alter_table("cycle", schema=None) as batch_op:
+        batch_op.drop_index(batch_op.f("ix_cycle_user_id"))
+        batch_op.drop_index(batch_op.f("ix_cycle_pid"))
+
+    op.drop_table("cycle")
     with op.batch_alter_table("user", schema=None) as batch_op:
         batch_op.drop_index(batch_op.f("ix_user_username"))
         batch_op.drop_index(batch_op.f("ix_user_user_id"))

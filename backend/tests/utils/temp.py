@@ -27,3 +27,24 @@ def create_temperature_readings(
 
     session.commit()
     return readings
+
+
+def create_period_events(
+    session: Session,
+    user: models.User,
+    periods: list[tuple[datetime, datetime | None]],
+) -> list[models.Period]:
+    """Helper function to create period events for testing."""
+    events = []
+    for start_date, end_date in periods:
+        event = models.Period(
+            user_id=user.user_id,
+            start_date=start_date,
+            end_date=end_date,
+            duration=(end_date - start_date).days if end_date else None,
+        )
+        session.add(event)
+        events.append(event)
+
+    session.commit()
+    return events
