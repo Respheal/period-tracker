@@ -1,14 +1,15 @@
 from typing import Annotated
 
 from fastapi import APIRouter, BackgroundTasks, Depends
+from fastapi.responses import StreamingResponse
 from sqlmodel import Session
 
 from api.db import models
 from api.db.crud import period as period_crud
 from api.utils import convert_dates_to_range
-from api.utils.auth import get_current_user
-from api.utils.dependencies import get_session
-from api.utils.stats import predict_next_period
+from api.utils.auth import get_admin_user, get_current_user
+from api.utils.dependencies import CommonEventParams, get_session
+from api.utils.stats import periods_to_frame, predict_next_period
 
 router = APIRouter(
     prefix="/period",
@@ -42,7 +43,76 @@ async def create_period_event(
     return db_period
 
 
-@router.get("/next")
+@router.get("/", dependencies=[Depends(get_admin_user)])
+async def get_all_periods(
+    session: Annotated[Session, Depends(get_session)],
+    params: Annotated[CommonEventParams, Depends()],
+) -> models.EventResponse:
+    start_datetime, end_datetime = convert_dates_to_range(
+        params.start_date, params.end_date
+    )
+    periods = period_crud.get_periods(
+        session=session,
+        start_date=start_datetime,
+        end_date=end_datetime,
+        offset=params.offset,
+        limit=params.limit,
+    )
+    return models.EventResponse(events=periods, count=periods.__len__())
+
+
+@router.get("/me/", dependencies=[Depends(get_current_user)])
+async def get_my_periods(
+    current_user: Annotated[models.UserProfile, Depends(get_current_user)],
+    session: Annotated[Session, Depends(get_session)],
+    params: Annotated[CommonEventParams, Depends()],
+) -> models.EventResponse:
+    start_datetime, end_datetime = convert_dates_to_range(
+        params.start_date, params.end_date
+    )
+    periods = period_crud.get_periods(
+        session=session,
+        user_id=current_user.user_id,
+        start_date=start_datetime,
+        end_date=end_datetime,
+        offset=params.offset,
+        limit=params.limit,
+    )
+    return models.EventResponse(events=periods, count=periods.__len__())
+
+
+@router.get("/me/csv/", dependencies=[Depends(get_current_user)])
+async def get_my_periods_csv(
+    current_user: Annotated[models.UserProfile, Depends(get_current_user)],
+    session: Annotated[Session, Depends(get_session)],
+    params: Annotated[CommonEventParams, Depends()],
+) -> StreamingResponse:  # pragma: no cover
+    # We're excluding this from coverage because it is effectively the same as the
+    # previous endpoint, just with CSV output.
+    start_datetime, end_datetime = convert_dates_to_range(
+        params.start_date, params.end_date
+    )
+    periods = period_crud.get_periods(
+        session=session,
+        user_id=current_user.user_id,
+        start_date=start_datetime,
+        end_date=end_datetime,
+        offset=params.offset,
+        limit=params.limit,
+    )
+    df = periods_to_frame(periods)
+    df["start"] = df["start"].dt.strftime("%Y-%m-%d")
+    df["end"] = df["end"].dt.strftime("%Y-%m-%d")
+    df["luteal_length"] = df["luteal_length"].round(0)
+    stream = StreamingResponse(
+        iter([df.to_csv(index=False)]),
+        media_type="text/csv",
+        headers={"Content-Disposition": "attachment; filename=periods.csv"},
+    )
+    return stream
+
+
+@router.get("/me/next")
 async def get_next_period(
     current_user: Annotated[models.UserProfile, Depends(get_current_user)],
     session: Annotated[Session, Depends(get_session)],

@@ -286,6 +286,12 @@ class Period(CreatePeriod, table=True):
     luteal_length: int | None = None  # in days
 
 
+class PeriodMetrics(SQLModel):
+    start: str
+    end: str | None = None
+    luteal_length: int | None = None
+
+
 class CycleState(str, enum.Enum):
     LEARNING = "learning"
     STABLE = "stable"
