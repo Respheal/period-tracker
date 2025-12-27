@@ -15,21 +15,22 @@ user = models.User(
 )
 periods: list[models.Period] = []
 period_dates = [
-    (["2025-05-01", "2025-05-04"]),
+    (["2025-05-01", "2025-05-04", None]),
     (["2025-06-01", None]),
-    (["2025-08-01", "2025-08-04"]),
-    (["2025-09-01", "2025-09-05"]),
-    (["2025-10-01", "2025-10-05"]),
-    (["2025-11-01", "2025-11-04"]),
-    (["2025-12-01", "2025-12-03"]),
+    (["2025-08-01", "2025-08-04", 14]),
+    (["2025-09-01", "2025-09-05", 14]),
+    (["2025-10-01", "2025-10-05", 14]),
+    (["2025-11-01", "2025-11-04", None]),
+    (["2025-12-01", "2025-12-03", None]),
 ]
-for start_str, end_str in period_dates:
+for start_str, end_str, length in period_dates:
     start_date, end_date = convert_dates_to_range(start_str, end_str)
     period = models.Period(
         user_id=user.user_id,
         start_date=start_date,
         end_date=end_date,
         duration=(end_date - start_date).days if end_date else None,
+        luteal_length=length,
     )
     periods.append(period)
 

@@ -1,8 +1,8 @@
 """empty message.
 
-Revision ID: a9b6b9802394
+Revision ID: 36e997c57513
 Revises:
-Create Date: 2025-12-26 21:22:03.208717+00:00
+Create Date: 2025-12-27 20:26:45.958595+00:00
 
 """
 
@@ -13,7 +13,7 @@ import sqlmodel.sql.sqltypes
 from alembic import op
 
 # revision identifiers, used by Alembic.
-revision: str = "a9b6b9802394"
+revision: str = "36e997c57513"
 down_revision: str | Sequence[str] | None = None
 branch_labels: str | Sequence[str] | None = None
 depends_on: str | Sequence[str] | None = None
@@ -62,12 +62,13 @@ def upgrade() -> None:
         sa.Column("start_date", sa.DateTime(timezone=True), nullable=True),
         sa.Column("end_date", sa.DateTime(timezone=True), nullable=True),
         sa.Column("duration", sa.Integer(), nullable=True),
-        sa.Column("id", sa.Integer(), nullable=False),
+        sa.Column("pid", sa.Integer(), nullable=False),
+        sa.Column("luteal_length", sa.Integer(), nullable=True),
         sa.ForeignKeyConstraint(["user_id"], ["user.user_id"], ondelete="CASCADE"),
-        sa.PrimaryKeyConstraint("id"),
+        sa.PrimaryKeyConstraint("pid"),
     )
     with op.batch_alter_table("period", schema=None) as batch_op:
-        batch_op.create_index(batch_op.f("ix_period_id"), ["id"], unique=False)
+        batch_op.create_index(batch_op.f("ix_period_pid"), ["pid"], unique=False)
         batch_op.create_index(batch_op.f("ix_period_user_id"), ["user_id"], unique=False)
 
     op.create_table(
@@ -158,7 +159,7 @@ def downgrade() -> None:
     op.drop_table("symptomevent")
     with op.batch_alter_table("period", schema=None) as batch_op:
         batch_op.drop_index(batch_op.f("ix_period_user_id"))
-        batch_op.drop_index(batch_op.f("ix_period_id"))
+        batch_op.drop_index(batch_op.f("ix_period_pid"))
 
     op.drop_table("period")
     with op.batch_alter_table("cycle", schema=None) as batch_op:

@@ -1,5 +1,5 @@
 from datetime import UTC, datetime, timedelta
-from typing import Sequence, Tuple
+from typing import Sequence
 
 import pandas as pd
 
@@ -12,7 +12,9 @@ settings = get_settings()
 ###
 # Temperature
 ###
-def temperatures_to_frame(temps: Sequence[models.Temperature]) -> pd.DataFrame:
+def temperatures_to_frame(
+    temps: Sequence[models.Temperature], index: bool = True
+) -> pd.DataFrame:
     """Convert Temperatures to a time-indexed DataFrame."""
     df = pd.DataFrame(
         [
@@ -25,8 +27,11 @@ def temperatures_to_frame(temps: Sequence[models.Temperature]) -> pd.DataFrame:
     )
     if df.empty:
         return df
-    # sort by timestamp, set the index, and average duplicates by day
-    df = df.sort_values("timestamp").set_index("timestamp").resample("D").mean()
+    df = df.sort_values("timestamp")
+    if index:
+        df = df.set_index("timestamp").resample("D").mean()
+    else:
+        df = df.resample("D", on="timestamp").mean()
     return df
 
 
@@ -105,11 +110,15 @@ def evaluate_temperature_state(
 ###
 def periods_to_frame(periods: Sequence[models.Period]) -> pd.DataFrame:
     """Convert Periods to a DataFrame."""
-    df = pd.DataFrame([{"start": p.start_date, "end": p.end_date} for p in periods])
+    df = pd.DataFrame(
+        [
+            {"start": p.start_date, "end": p.end_date, "luteal_length": p.luteal_length}
+            for p in periods
+        ]
+    )
     if df.empty:
         return df
-    df = df.sort_values("start")
-    return df
+    return df.sort_values("start")
 
 
 def compute_cycle_lengths(df: pd.DataFrame) -> pd.Series:
@@ -203,8 +212,6 @@ def evaluate_cycle_state(
 
     cycle_data.avg_cycle_length = avg_cycle
     cycle_data.avg_period_length = avg_period
-    # TODO: instead of storing this, we could just get it from the periods directly
-    cycle_data.last_period_start = df["start"].iloc[-1]
 
     if avg_cycle is None:
         cycle_data.state = models.CycleState.LEARNING
@@ -219,17 +226,95 @@ def evaluate_cycle_state(
     return cycle_data
 
 
-def predict_next_period(cycle_state: models.Cycle) -> Tuple[datetime, datetime] | None:
+def detect_elevated_phase_start(
+    temperatures: Sequence[models.Temperature],
+    period: models.Period,
+) -> datetime | None:
+    """
+    Returns the first day of an elevated phase preceding the given period,
+    or None if not found.
+    """
+    df = temperatures_to_frame(temperatures, index=False)
+    # Get the subset of data before the period, within the lookback window
+    window_start = period.start_date - timedelta(days=settings.MAX_LOOKBACK_DAYS)
+    subset = df[
+        (df["timestamp"] < period.start_date) & (df["timestamp"] >= window_start)
+    ].copy()
+    if subset.empty:
+        return None
+
+    # With the computed temperature baseline, find the first day of a sustained
+    # elevation above the baseline within the subset.
+    baseline_series = compute_baseline(df)
+    subset["baseline"] = baseline_series.loc[subset.index]
+    subset["is_elevated"] = (
+        subset["temperature"] >= subset["baseline"] + settings.ELEVATION_MIN_DELTA
+    )
+
+    # Find consecutive elevated runs
+    consecutive = 0
+    for _, row in subset.iterrows():
+        if row["is_elevated"]:
+            consecutive += 1
+            if consecutive == settings.ELEVATION_DAYS_REQUIRED:
+                # First day of the elevated run
+                first_day: datetime = (
+                    row["timestamp"]
+                    - timedelta(days=settings.ELEVATION_DAYS_REQUIRED - 1)
+                ).date()
+                return first_day
+        else:
+            consecutive = 0
+    return None
+
+
+def compute_luteal_length(elevated_phase_start: datetime, period_start: datetime) -> int:
+    luteal_start = elevated_phase_start - timedelta(days=1)
+    return (period_start - luteal_start).days
+
+
+def is_valid_luteal_length(length: int) -> bool:
+    return settings.MIN_LUTEAL <= length <= settings.MAX_LUTEAL
+
+
+def compute_average_luteal_length(df: pd.DataFrame) -> int | None:
+    """
+    Returns EWM-smoothed average luteal length, or None if insufficient data.
+    """
+    if (
+        "luteal_length" not in df.columns
+        or len(df) < 2
+        or df["luteal_length"].isna().all()
+    ):
+        return None
+    return int(df["luteal_length"].ewm(span=3).mean().iloc[-1].round())
+
+
+def predict_next_period(
+    cycle_state: models.Cycle, periods: Sequence[models.Period]
+) -> models.Period | None:
+    # If we have the temperature data, use that and the historical luteal length to
+    # predict the next period start date. If not, fall back to cycle averages.
+    df = periods_to_frame(periods)
+    last_period: datetime | None = df["start"].iloc[-1].date() if not df.empty else None
     if (
         cycle_state.state != models.CycleState.STABLE
-        or not cycle_state.last_period_start
         or not cycle_state.avg_cycle_length
+        or not last_period
     ):
         return None
 
-    expected_start = cycle_state.last_period_start + timedelta(
-        days=round(cycle_state.avg_cycle_length)
-    )
+    # Check if we can get an average luteal length from provided data
+    avg_luteal = compute_average_luteal_length(df)
+    if avg_luteal:
+        expected_start = last_period + timedelta(
+            days=cycle_state.avg_cycle_length - avg_luteal
+        )
+    else:
+        # Fallback to cycle-based prediction
+        expected_start = last_period + timedelta(days=round(cycle_state.avg_cycle_length))
     expected_end = expected_start + timedelta(days=cycle_state.avg_period_length or 0)
 
-    return expected_start, expected_end
+    return models.Period(
+        user_id=cycle_state.user_id, start_date=expected_start, end_date=expected_end
+    )

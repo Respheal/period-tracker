@@ -39,6 +39,10 @@ class Settings(BaseSettings):
     MIN_PLAUSIBLE_CYCLE: int = 20
     MAX_PLAUSIBLE_CYCLE: int = 90
     LONG_GAP_MULTIPLIER: float = 1.75
+    # Constants for luteal phase analysis
+    MAX_LOOKBACK_DAYS: int = 25
+    MIN_LUTEAL: int = 9
+    MAX_LUTEAL: int = 18
     # Authentication settings
     FIRST_USER: str  # = "admin"
     FIRST_USER_PASS: str  # = "adminpass"

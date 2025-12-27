@@ -282,7 +282,8 @@ class Period(CreatePeriod, table=True):
     # start_date
     # end_date
     # duration
-    id: int = Field(default=None, primary_key=True, index=True)
+    pid: int = Field(default=None, primary_key=True, index=True)
+    luteal_length: int | None = None  # in days
 
 
 class CycleState(str, enum.Enum):
