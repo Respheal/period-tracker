@@ -203,6 +203,7 @@ def evaluate_cycle_state(
 
     cycle_data.avg_cycle_length = avg_cycle
     cycle_data.avg_period_length = avg_period
+    # TODO: instead of storing this, we could just get it from the periods directly
     cycle_data.last_period_start = df["start"].iloc[-1]
 
     if avg_cycle is None:
