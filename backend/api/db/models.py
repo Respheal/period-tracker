@@ -210,6 +210,18 @@ class Temperature(CreateTempRead, table=True):
     pid: int | None = Field(default=None, primary_key=True, index=True)
 
 
+class TempUpdate(SQLModel):
+    temperature: float | None = Field(ge=30.0, le=40.0)  # Celsius
+    timestamp: Annotated[
+        str | None,
+        Body(
+            default=None,
+            description="YYYY-MM-DD format",
+            pattern=r"^\d{4}-\d{2}-\d{2}$",
+        ),
+    ] = None
+
+
 class TempPhase(str, enum.Enum):
     LEARNING = "learning"
     LOW = "low_phase"
@@ -284,6 +296,21 @@ class Period(CreatePeriod, table=True):
     # duration
     pid: int = Field(default=None, primary_key=True, index=True)
     luteal_length: int | None = None  # in days
+
+
+class PeriodUpdate(SQLModel):
+    start_date: Annotated[
+        str | None,
+        Body(
+            default=None, description="YYYY-MM-DD format", pattern=r"^\d{4}-\d{2}-\d{2}$"
+        ),
+    ] = None
+    end_date: Annotated[
+        str | None,
+        Body(
+            default=None, description="YYYY-MM-DD format", pattern=r"^\d{4}-\d{2}-\d{2}$"
+        ),
+    ] = None
 
 
 class PeriodMetrics(SQLModel):

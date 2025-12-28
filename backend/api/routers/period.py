@@ -1,6 +1,6 @@
 from typing import Annotated
 
-from fastapi import APIRouter, BackgroundTasks, Depends
+from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, status
 from fastapi.responses import StreamingResponse
 from sqlmodel import Session
 
@@ -79,6 +79,72 @@ async def get_my_periods(
         limit=params.limit,
     )
     return models.EventResponse(events=periods, count=periods.__len__())
+
+
+@router.get("/me/{period_id}")
+async def get_single_period(
+    period_id: int,
+    current_user: Annotated[models.UserProfile, Depends(get_current_user)],
+    session: Annotated[Session, Depends(get_session)],
+) -> models.Period:
+    period = period_crud.get_single_period(
+        session=session,
+        period_id=period_id,
+        user_id=current_user.user_id,
+    )
+    if period is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Period not found."
+        )
+    return period
+
+
+@router.patch("/me/{period_id}")
+async def update_period(
+    period_id: int,
+    period_update: models.PeriodUpdate,
+    current_user: Annotated[models.UserProfile, Depends(get_current_user)],
+    session: Annotated[Session, Depends(get_session)],
+    background_tasks: BackgroundTasks,
+) -> models.Period:
+    period = period_crud.get_single_period(
+        session=session,
+        period_id=period_id,
+        user_id=current_user.user_id,
+    )
+    if period is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Period not found."
+        )
+    period = period_crud.update_period(session=session, period=period, data=period_update)
+    # Update luteal length after updating the period if necessary
+    if (
+        period_update.start_date is not None
+        and current_user.temp_state
+        and current_user.temp_state.phase
+        in [models.TempPhase.LOW, models.TempPhase.ELEVATED]
+    ):
+        background_tasks.add_task(period_crud.update_luteal_length, session, period)
+    return period
+
+
+@router.delete("/me/{period_id}")
+async def delete_period(
+    period_id: int,
+    current_user: Annotated[models.UserProfile, Depends(get_current_user)],
+    session: Annotated[Session, Depends(get_session)],
+) -> models.ResourceDeleteResponse:
+    period = period_crud.get_single_period(
+        session=session, period_id=period_id, user_id=current_user.user_id
+    )
+    if period is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Period not found."
+        )
+    period_crud.delete_period(session=session, period=period)
+    return models.ResourceDeleteResponse(
+        resource_type="period", resource_id=str(period_id)
+    )
 
 
 @router.get("/me/csv/", dependencies=[Depends(get_current_user)])

@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import UTC, datetime, time, timedelta
 from typing import Sequence
 
 from sqlmodel import Session, desc, select
@@ -19,6 +19,50 @@ def create_period_event(session: Session, period: models.CreatePeriod) -> models
     session.commit()
     session.refresh(db_period)
     return db_period
+
+
+def get_single_period(
+    session: Session,
+    period_id: int,
+    user_id: str | None = None,
+) -> models.Period | None:
+    if user_id is None:
+        return session.get(models.Period, period_id)
+    return session.exec(
+        select(models.Period).where(
+            models.Period.pid == period_id,
+            models.Period.user_id == user_id,
+        )
+    ).first()
+
+
+def update_period(
+    session: Session, period: models.Period, data: models.PeriodUpdate
+) -> models.Period:
+    period_data = data.model_dump(exclude_unset=True)
+    # Convert date strings to datetime objects
+    if "start_date" in period_data and period_data["start_date"] is not None:
+        min_date = datetime.strptime(period_data["start_date"], "%Y-%m-%d").replace(
+            tzinfo=UTC
+        )
+        start_datetime = datetime.combine(min_date, time.min)
+        period_data["start_date"] = start_datetime
+    if "end_date" in period_data and period_data["end_date"] is not None:
+        max_date = datetime.strptime(period_data["end_date"], "%Y-%m-%d").replace(
+            tzinfo=UTC
+        )
+        end_datetime = datetime.combine(max_date, time.max)
+        period_data["end_date"] = end_datetime
+    period.sqlmodel_update(period_data)
+    session.add(period)
+    session.commit()
+    session.refresh(period)
+    return period
+
+
+def delete_period(session: Session, period: models.Period) -> None:
+    session.delete(period)
+    session.commit()
 
 
 def get_periods(
