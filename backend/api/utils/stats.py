@@ -194,7 +194,7 @@ def evaluate_cycle_state(
     cycle_data = previous_state or models.Cycle(state=models.CycleState.LEARNING)
     cycle_data.last_evaluated = datetime.now(UTC)
 
-    if df.empty or len(df) < 2:
+    if df.empty or len(df) <= settings.MIN_CYCLES_FOR_STABLE:
         cycle_data.state = models.CycleState.LEARNING
         return cycle_data
 
@@ -208,7 +208,8 @@ def evaluate_cycle_state(
     cycle_data.avg_cycle_length = int(avg_cycle) if avg_cycle is not None else None
     cycle_data.avg_period_length = int(avg_period) if avg_period is not None else None
 
-    if avg_cycle is None:
+    if avg_cycle is None:  # pragma: no cover
+        # We likely already hit this case above, but just in case
         cycle_data.state = models.CycleState.LEARNING
     elif (
         valid_mask.tail(settings.MIN_CYCLES_FOR_STABLE).sum()
@@ -294,22 +295,28 @@ def predict_next_period(
     # predict the next period start date. If not, fall back to cycle averages.
     df = periods_to_frame(periods)
     last_period: datetime | None = df["start"].iloc[-1].date() if not df.empty else None
-    if (
-        cycle_state.state != models.CycleState.STABLE
-        or not cycle_state.avg_cycle_length
-        or not last_period
-    ):
+    if not last_period:
         return None
-
+    if cycle_state.state == models.CycleState.UNSTABLE:
+        # Don't make an attempt if the state is unstable
+        return None
     # Check if we can get an average luteal length from provided data
     avg_luteal = compute_average_luteal_length(df)
-    if avg_luteal:
+    if avg_luteal and cycle_state.avg_cycle_length:
         expected_start = last_period + timedelta(
             days=cycle_state.avg_cycle_length - avg_luteal
         )
-    else:
+        confidence = 0.8  # High confidence with luteal-based prediction
+    elif cycle_state.avg_cycle_length:
         # Fallback to cycle-based prediction
         expected_start = last_period + timedelta(days=round(cycle_state.avg_cycle_length))
+        confidence = 0.5  # Lower confidence without luteal data
+    else:
+        # Fallback to a statistically average cycle length
+        expected_start = last_period + timedelta(days=28)
+        confidence = 0.2  # Low confidence with generic average
     expected_end = expected_start + timedelta(days=cycle_state.avg_period_length or 0)
 
-    return models.PredictedPeriod(start_date=expected_start, end_date=expected_end)
+    return models.PredictedPeriod(
+        start_date=expected_start, end_date=expected_end, confidence=confidence
+    )
