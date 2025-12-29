@@ -31,7 +31,7 @@ else
         openssl rsa -in "$KEYS_DIR/private.pem" -out "$KEYS_DIR/public.pem" -pubout
     fi
 
-    echo "Keys created successfully"
+    echo "Keys found successfully"
 fi
 
 # Let the DB start

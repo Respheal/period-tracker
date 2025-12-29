@@ -302,6 +302,7 @@ class Period(CreatePeriod, table=True):
 class PredictedPeriod(SQLModel):
     start_date: date
     end_date: date
+    confidence: float | None = None
 
 
 class PeriodUpdate(SQLModel):

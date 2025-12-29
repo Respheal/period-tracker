@@ -924,13 +924,16 @@ class TestPeriodPrediction:
     def test_predict_next_period_learning_state(self, session: Session) -> None:
         user = create_random_user(session)
         now = datetime.now(UTC)
+        # Create a period 28 days ago
         periods = create_period_events(
-            session, user, [(now - timedelta(days=30), now - timedelta(days=25))]
+            session, user, [(now - timedelta(days=28), now - timedelta(days=25))]
         )
         cycle_state = models.Cycle(user_id=user.user_id, state=models.CycleState.LEARNING)
         prediction = predict_next_period(cycle_state, periods)
-        # Should not predict in LEARNING state
-        assert prediction is None
+        # In LEARNING state, prediction is a raw +28 days from last period
+        assert prediction is not None
+        assert prediction.start_date == now.date()
+        assert prediction.confidence == 0.2
 
     def test_predict_next_period_unstable_state(self, session: Session) -> None:
         user = create_random_user(session)
