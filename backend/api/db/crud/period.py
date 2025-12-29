@@ -46,14 +46,12 @@ def update_period(
         min_date = datetime.strptime(period_data["start_date"], "%Y-%m-%d").replace(
             tzinfo=UTC
         )
-        start_datetime = datetime.combine(min_date, time.min, tzinfo=UTC)
-        period_data["start_date"] = start_datetime
+        period_data["start_date"] = datetime.combine(min_date, time.min, tzinfo=UTC)
     if "end_date" in period_data and period_data["end_date"] is not None:
         max_date = datetime.strptime(period_data["end_date"], "%Y-%m-%d").replace(
             tzinfo=UTC
         )
-        end_datetime = datetime.combine(max_date, time.max, tzinfo=UTC)
-        period_data["end_date"] = end_datetime
+        period_data["end_date"] = datetime.combine(max_date, time.max, tzinfo=UTC)
     period.sqlmodel_update(period_data)
     session.add(period)
     session.commit()

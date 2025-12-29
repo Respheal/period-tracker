@@ -1,5 +1,5 @@
 import enum
-from datetime import UTC, datetime, timedelta
+from datetime import UTC, date, datetime, timedelta
 from typing import Annotated, Literal
 from uuid import uuid4
 
@@ -189,7 +189,7 @@ class CreateTempRead(EventBase, CreateTempParams):
     # user_id
     timestamp: datetime = Field(
         default_factory=lambda: datetime.now(UTC),
-        sa_column=Column(DateTime(timezone=True), index=True),
+        sa_column=Column(DateTime(timezone=True)),
     )
 
 
@@ -202,16 +202,17 @@ class Temperature(CreateTempRead, table=True):
     - user_id
     - temperature
     - pid
-    - timestamp
+    - timestamp, assume TZ-naive on read due to SQLite limitations
     """
 
     # user_id
     # temperature
+    timestamp: datetime = Field(sa_column=Column(DateTime(), index=True))
     pid: int | None = Field(default=None, primary_key=True, index=True)
 
 
 class TempUpdate(SQLModel):
-    temperature: float | None = Field(ge=30.0, le=40.0)  # Celsius
+    temperature: Annotated[float | None, Body(default=None, ge=30.0, le=40.0)] = None
     timestamp: Annotated[
         str | None,
         Body(
@@ -234,9 +235,7 @@ class TemperatureState(SQLModel, table=True):
     user_id: str = Field(foreign_key="user.user_id", index=True, ondelete="CASCADE")
     phase: TempPhase = Field(default=TempPhase.LEARNING)
     baseline: float | None = None
-    last_evaluated: datetime | None = Field(
-        default=None, sa_column=Column(DateTime(timezone=True))
-    )
+    last_evaluated: datetime | None = Field(default=None, sa_column=Column(DateTime()))
     user: User = Relationship(back_populates="temp_state")
 
 
@@ -254,7 +253,7 @@ class CreatePeriodParams(SQLModel):
     start_date: Annotated[
         str,
         Body(
-            default=str((datetime.now(UTC) - timedelta(days=3)).date()),
+            default=str((datetime.now(UTC) - timedelta(days=3)).date().isoformat()),
             description="Start date",
             pattern=r"^\d{4}-\d{2}-\d{2}$",
         ),
@@ -262,11 +261,11 @@ class CreatePeriodParams(SQLModel):
     end_date: Annotated[
         str | None,
         Body(
-            default=str(datetime.now(UTC).date()),
+            default=str(datetime.now(UTC).date().isoformat()),
             description="End date (Optional)",
             pattern=r"^\d{4}-\d{2}-\d{2}$",
         ),
-    ] = str(datetime.now(UTC).date())
+    ] = str(datetime.now(UTC).date().isoformat())
 
 
 class CreatePeriod(EventBase):
@@ -285,17 +284,24 @@ class Period(CreatePeriod, table=True):
     This is the class representing the Period table in the database.
 
     - user_id
-    - start_date
-    - end_date
+    - start_date, assume TZ-naive on read due to SQLite limitations
+    - end_date, assume TZ-naive on read due to SQLite limitations
     - duration
     """
 
     # user_id
-    # start_date
-    # end_date
     # duration
+    start_date: datetime = Field(sa_column=Column(DateTime()))
+    end_date: datetime | None = Field(
+        default=None, sa_column=Column(DateTime(), nullable=True)
+    )
     pid: int = Field(default=None, primary_key=True, index=True)
     luteal_length: int | None = None  # in days
+
+
+class PredictedPeriod(SQLModel):
+    start_date: date
+    end_date: date
 
 
 class PeriodUpdate(SQLModel):
@@ -332,9 +338,7 @@ class Cycle(SQLModel, table=True):
     avg_cycle_length: int | None = None
     avg_period_length: int | None = None
     last_period_start: datetime | None = None
-    last_evaluated: datetime | None = Field(
-        default=None, sa_column=Column(DateTime(timezone=True))
-    )
+    last_evaluated: datetime | None = Field(default=None, sa_column=Column(DateTime()))
     user: User = Relationship(back_populates="cycle_state")
 
 
@@ -382,7 +386,8 @@ class SymptomEvent(CreateSymptomEvent, table=True):
     # ovulation_test
     # discharge
     # sex
-    id: int = Field(default=None, primary_key=True, index=True)
+    date: datetime = Field(sa_column=Column(DateTime(), index=True))
+    pid: int = Field(default=None, primary_key=True, index=True)
 
 
 class EventResponse(Response):
@@ -404,4 +409,4 @@ NAMING_CONVENTION = {
 
 metadata = SQLModel.metadata
 metadata.naming_convention = NAMING_CONVENTION
-target_metadata = [metadata, User.metadata, Token.metadata]
+target_metadata = [metadata]

@@ -10,22 +10,16 @@ TEST_USERS = {
         "display_name": "Jim Hawkins",
         "is_admin": False,
         "is_disabled": False,
-        "average_period_length": 5.0,
-        "average_cycle_length": 28.0,
     },
     "sarah": {
         "display_name": "Sarah Connor",
         "is_admin": False,
         "is_disabled": False,
-        "average_period_length": 4.0,
-        "average_cycle_length": 30.0,
     },
     "coco": {
         "display_name": None,
         "is_admin": False,
         "is_disabled": True,
-        "average_period_length": None,
-        "average_cycle_length": None,
     },
 }
 

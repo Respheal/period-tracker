@@ -11,7 +11,10 @@ def create_temperature_readings(
     temps: list[float],
     start_date: datetime | None = None,
 ) -> list[models.Temperature]:
-    """Helper function to create temperature readings for testing."""
+    """
+    Helper function to create temperature readings for testing. Temperatures are created
+    starting from start_date going backwards in time as far as the length of temps.
+    """
     if start_date is None:
         start_date = datetime.now(UTC)
     readings = []
@@ -24,7 +27,6 @@ def create_temperature_readings(
         )
         session.add(reading)
         readings.append(reading)
-
     session.commit()
     return readings
 
@@ -45,6 +47,5 @@ def create_period_events(
         )
         session.add(event)
         events.append(event)
-
     session.commit()
     return events

@@ -37,7 +37,7 @@ async def create_period_event(
     background_tasks.add_task(
         period_crud.eval_cycle_metrics, session, current_user.user_id
     )
-    # If we have consistent temperature data, update the length of the luteal phase with
+    # If we have reliable temperature data, update the length of the luteal phase with
     # this period as the end of the phase
     if current_user.temp_state and current_user.temp_state.phase in [
         models.TempPhase.LOW,
@@ -194,7 +194,7 @@ async def get_my_periods_csv(
 async def get_next_period(
     current_user: Annotated[models.UserProfile, Depends(get_current_user)],
     session: Annotated[Session, Depends(get_session)],
-) -> models.Period | None:
+) -> models.PredictedPeriod | None:
     if current_user.cycle_state is None:
         return None
     periods = period_crud.get_periods(

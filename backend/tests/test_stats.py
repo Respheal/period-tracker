@@ -660,35 +660,15 @@ class TestLutealPhaseDetection:
     def test_detect_elevated_phase_start(
         self, session: Session, settings: Settings
     ) -> None:
-        """Test detecting the start of elevated temperature phase.
-
-        Note: There appears to be a bug in detect_elevated_phase_start
-        where it calls temperatures_to_frame with index=False but then uses
-        operations expecting an index. This causes KeyError: 'timestamp'.
-        For now, we test that the function is callable and catches errors.
-        """
         user = create_random_user(session)
         now = datetime.now(UTC)
         temp_values = [36.5] * 30 + [37.5] * (settings.ELEVATION_DAYS_REQUIRED + 2)
-        temps = create_temperature_readings(
-            session, user, temp_values, start_date=now - timedelta(days=len(temp_values))
-        )
-        period = models.Period(
-            user_id=user.user_id,
-            start_date=now + timedelta(days=1),
-            end_date=now + timedelta(days=6),
-        )
-        # Due to implementation bug, this currently raises KeyError
-        # Testing that function can be called
-        try:
-            elevated_start = detect_elevated_phase_start(temps, period)
-            # If it doesn't raise, verify return type
-            assert elevated_start is None or isinstance(
-                elevated_start, (datetime, type(now.date()))
-            )
-        except KeyError as e:
-            # Document known bug
-            assert "timestamp" in str(e)
+        temps = create_temperature_readings(session, user, temp_values, start_date=now)
+        period = create_period_events(session, user=user, periods=[(now, None)])
+        elevated_start = detect_elevated_phase_start(temps, period[0])
+        expected_start = (now - timedelta(days=4)).date()
+        assert elevated_start is not None
+        assert elevated_start == expected_start
 
     def test_detect_elevated_phase_start_no_elevation(self, session: Session) -> None:
         """Test that no elevation is detected with consistent low temperatures.
@@ -698,60 +678,39 @@ class TestLutealPhaseDetection:
         user = create_random_user(session)
         now = datetime.now(UTC)
         temp_values = [36.5] * 40
-        temps = create_temperature_readings(
-            session, user, temp_values, start_date=now - timedelta(days=40)
-        )
-        period = models.Period(
-            user_id=user.user_id,
-            start_date=now + timedelta(days=1),
-            end_date=now + timedelta(days=6),
-        )
-        try:
-            elevated_start = detect_elevated_phase_start(temps, period)
-            assert elevated_start is None
-        except KeyError as e:
-            # Document known bug
-            assert "timestamp" in str(e)
+        temps = create_temperature_readings(session, user, temp_values, start_date=now)
+        period = create_period_events(session, user=user, periods=[(now, None)])
+        elevated_start = detect_elevated_phase_start(temps, period[0])
+        assert elevated_start is None
 
     def test_detect_elevated_phase_start_empty_temps(self, session: Session) -> None:
-        """Test that function handles empty temperature list.
-
-        Note: Currently raises KeyError due to implementation bug when df is empty.
-        """
-        user = create_random_user(session)
-        now = datetime.now(UTC)
-        period = models.Period(
-            user_id=user.user_id,
-            start_date=now,
-            end_date=now + timedelta(days=5),
+        period = create_period_events(
+            session, user=create_random_user(session), periods=[(datetime.now(UTC), None)]
         )
-        try:
-            elevated_start = detect_elevated_phase_start([], period)
-            assert elevated_start is None
-        except KeyError as e:
-            # Document known bug
-            assert "timestamp" in str(e)
+        elevated_start = detect_elevated_phase_start([], period[0])
+        assert elevated_start is None
 
+
+class TestLutealLengthCalculations:
     def test_compute_luteal_length(self) -> None:
         now = datetime.now(UTC)
         elevated_start = now - timedelta(days=15)
         period_start = now
         length = compute_luteal_length(elevated_start, period_start)
-        # Luteal length = period_start - (elevated_start - 1 day)
-        # = period_start - elevated_start + 1 day
-        # = 15 + 1 = 16 days
+        # Time between period_start and the day before elevated_start
         assert length == 16
 
     def test_is_valid_luteal_length(self, settings: Settings) -> None:
-        # Test valid range (9-18 days typically)
-        assert is_valid_luteal_length(10)
-        assert is_valid_luteal_length(14)
-        assert is_valid_luteal_length(16)
-        # Test invalid (too short or too long)
-        assert not is_valid_luteal_length(8)
-        assert not is_valid_luteal_length(19)
-        assert not is_valid_luteal_length(5)
-        assert not is_valid_luteal_length(25)
+        now = datetime.now(UTC)
+        period_start = now
+        # Too long
+        elevated_start = now - timedelta(days=settings.MAX_LUTEAL_DAYS + 5)
+        length = compute_luteal_length(elevated_start, period_start)
+        assert not is_valid_luteal_length(length)
+        # Too short
+        elevated_start = now - timedelta(days=settings.MIN_LUTEAL_DAYS - 5)
+        length = compute_luteal_length(elevated_start, period_start)
+        assert not is_valid_luteal_length(length)
 
     def test_compute_average_luteal_length(self, session: Session) -> None:
         user = create_random_user(session)
@@ -787,7 +746,7 @@ class TestLutealPhaseDetection:
                 (now - timedelta(days=30), now - timedelta(days=25)),
             ],
         )
-        # Don't set luteal_length (remains None)
+        # Without temperature data, luteal lengths will not be computed
         df = periods_to_frame(periods)
         avg = compute_average_luteal_length(df)
         assert avg is None

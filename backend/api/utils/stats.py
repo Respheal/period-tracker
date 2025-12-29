@@ -18,10 +18,7 @@ def temperatures_to_frame(
     """Convert Temperatures to a time-indexed DataFrame."""
     df = pd.DataFrame(
         [
-            {
-                "timestamp": pd.to_datetime(t.timestamp, utc=True),
-                "temperature": t.temperature,
-            }
+            {"timestamp": pd.to_datetime(t.timestamp), "temperature": t.temperature}
             for t in temps
         ]
     )
@@ -274,7 +271,7 @@ def compute_luteal_length(elevated_phase_start: datetime, period_start: datetime
 
 
 def is_valid_luteal_length(length: int) -> bool:
-    return settings.MIN_LUTEAL <= length <= settings.MAX_LUTEAL
+    return settings.MIN_LUTEAL_DAYS <= length <= settings.MAX_LUTEAL_DAYS
 
 
 def compute_average_luteal_length(df: pd.DataFrame) -> int | None:
@@ -292,7 +289,7 @@ def compute_average_luteal_length(df: pd.DataFrame) -> int | None:
 
 def predict_next_period(
     cycle_state: models.Cycle, periods: Sequence[models.Period]
-) -> models.Period | None:
+) -> models.PredictedPeriod | None:
     # If we have the temperature data, use that and the historical luteal length to
     # predict the next period start date. If not, fall back to cycle averages.
     df = periods_to_frame(periods)
@@ -315,6 +312,4 @@ def predict_next_period(
         expected_start = last_period + timedelta(days=round(cycle_state.avg_cycle_length))
     expected_end = expected_start + timedelta(days=cycle_state.avg_period_length or 0)
 
-    return models.Period(
-        user_id=cycle_state.user_id, start_date=expected_start, end_date=expected_end
-    )
+    return models.PredictedPeriod(start_date=expected_start, end_date=expected_end)

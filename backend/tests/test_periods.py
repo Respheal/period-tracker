@@ -49,7 +49,6 @@ class TestPeriodRetrieval:
 
         response = client.get("/period/me/", headers=user_headers)
         assert response.status_code == 200
-
         data = response.json()
         assert "count" in data
         assert data["count"] >= 3
@@ -272,32 +271,38 @@ class TestPeriodPrediction:
         user_headers: dict[str, str],
     ) -> None:
         # Create a user and set a cycle_state
+        today = datetime.now(UTC)
+        last_period_start = today - timedelta(days=28)
+        last_period_end = last_period_start + timedelta(days=3)
         response = client.post(
             "/period/",
             headers=user_headers,
-            json={"start_date": "2025-01-01", "end_date": "2025-01-05"},
+            json={
+                "start_date": last_period_start.date().isoformat(),
+                "end_date": last_period_end.date().isoformat(),
+            },
         )
         assert response.status_code == 200
 
         # Manually update the user's cycle_state to have average cycle length
         user_response = client.get("/users/me", headers=user_headers)
         user_id = user_response.json()["user_id"]
-
         user = session.get(models.User, user_id)
         user.cycle_state = models.Cycle(
             state=models.CycleState.STABLE,
-            average_cycle_length=28,
-            average_period_length=5,
-            last_period_start_date=datetime(2025, 1, 1, tzinfo=UTC),
+            avg_cycle_length=28,
+            avg_period_length=3,
+            last_period_start=last_period_start,
             last_evaluated=datetime.now(UTC),
         )
         session.add(user)
         session.commit()
+        session.refresh(user)
 
         # Now request the next period prediction
         response = client.get("/period/me/next/", headers=user_headers)
         assert response.status_code == 200
         data = response.json()
         assert data is not None
-        assert "predicted_start_date" in data
-        assert "predicted_end_date" in data
+        assert data["start_date"] == today.date().isoformat()
+        assert data["end_date"] == (today + timedelta(days=3)).date().isoformat()

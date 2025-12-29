@@ -72,7 +72,6 @@ class TestTemperatureRetrieval:
         # Retrieve the specific reading
         response = client.get(f"/temp/me/{temp_id}", headers=user_headers)
         assert response.status_code == 200
-
         data = response.json()
         assert data["pid"] == temp_id
         assert data["temperature"] == 36.5
@@ -300,7 +299,6 @@ class TestTemperatureDateFiltering:
         # Test start_date filter
         response = client.get("/temp/?start_date=2025-01-01", headers=admin_headers)
         assert response.status_code == 200
-
         data = response.json()
         for event in data["events"]:
             assert event["timestamp"] >= "2025-01-01T00:00:00"
