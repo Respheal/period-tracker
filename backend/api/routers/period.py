@@ -33,6 +33,10 @@ async def create_period_event(
         duration=(end_date - start_date).days if end_date and start_date else None,
     )
     db_period = period_crud.create_period_event(session, period)
+    # Update cycle metrics
+    background_tasks.add_task(
+        period_crud.eval_cycle_metrics, session, current_user.user_id
+    )
     # If we have consistent temperature data, update the length of the luteal phase with
     # this period as the end of the phase
     if current_user.temp_state and current_user.temp_state.phase in [
@@ -117,6 +121,9 @@ async def update_period(
             status_code=status.HTTP_404_NOT_FOUND, detail="Period not found."
         )
     period = period_crud.update_period(session=session, period=period, data=period_update)
+    background_tasks.add_task(
+        period_crud.eval_cycle_metrics, session, current_user.user_id
+    )
     # Update luteal length after updating the period if necessary
     if (
         period_update.start_date is not None
@@ -133,6 +140,7 @@ async def delete_period(
     period_id: int,
     current_user: Annotated[models.UserProfile, Depends(get_current_user)],
     session: Annotated[Session, Depends(get_session)],
+    background_tasks: BackgroundTasks,
 ) -> models.ResourceDeleteResponse:
     period = period_crud.get_single_period(
         session=session, period_id=period_id, user_id=current_user.user_id
@@ -142,6 +150,9 @@ async def delete_period(
             status_code=status.HTTP_404_NOT_FOUND, detail="Period not found."
         )
     period_crud.delete_period(session=session, period=period)
+    background_tasks.add_task(
+        period_crud.eval_cycle_metrics, session, current_user.user_id
+    )
     return models.ResourceDeleteResponse(
         resource_type="period", resource_id=str(period_id)
     )
@@ -167,9 +178,10 @@ async def get_my_periods_csv(
         limit=params.limit,
     )
     df = periods_to_frame(periods)
-    df["start"] = df["start"].dt.strftime("%Y-%m-%d")
-    df["end"] = df["end"].dt.strftime("%Y-%m-%d")
-    df["luteal_length"] = df["luteal_length"].round(0)
+    if not df.empty:
+        df["start"] = df["start"].dt.strftime("%Y-%m-%d")
+        df["end"] = df["end"].dt.strftime("%Y-%m-%d")
+        df["luteal_length"] = df["luteal_length"].round(0)
     stream = StreamingResponse(
         iter([df.to_csv(index=False)]),
         media_type="text/csv",
@@ -178,7 +190,7 @@ async def get_my_periods_csv(
     return stream
 
 
-@router.get("/me/next")
+@router.get("/me/next/")
 async def get_next_period(
     current_user: Annotated[models.UserProfile, Depends(get_current_user)],
     session: Annotated[Session, Depends(get_session)],

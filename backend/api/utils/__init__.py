@@ -11,10 +11,10 @@ def convert_dates_to_range(
     try:
         if start_date:
             min_date = datetime.strptime(start_date, "%Y-%m-%d").replace(tzinfo=UTC)
-            start_datetime = datetime.combine(min_date, time.min)
+            start_datetime = datetime.combine(min_date, time.min, tzinfo=UTC)
         if end_date:
             max_date = datetime.strptime(end_date, "%Y-%m-%d").replace(tzinfo=UTC)
-            end_datetime = datetime.combine(max_date, time.max)
+            end_datetime = datetime.combine(max_date, time.max, tzinfo=UTC)
     except ValueError:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,

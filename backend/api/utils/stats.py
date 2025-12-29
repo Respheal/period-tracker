@@ -27,11 +27,9 @@ def temperatures_to_frame(
     )
     if df.empty:
         return df
-    df = df.sort_values("timestamp")
-    if index:
-        df = df.set_index("timestamp").resample("D").mean()
-    else:
-        df = df.resample("D", on="timestamp").mean()
+    df = df.sort_values("timestamp").set_index("timestamp").resample("D").mean()
+    if not index:
+        df = df.reset_index()
     return df
 
 
@@ -210,8 +208,8 @@ def evaluate_cycle_state(
     period_lengths = compute_period_lengths(df)
     avg_period = compute_period_average(period_lengths)
 
-    cycle_data.avg_cycle_length = avg_cycle
-    cycle_data.avg_period_length = avg_period
+    cycle_data.avg_cycle_length = int(avg_cycle) if avg_cycle is not None else None
+    cycle_data.avg_period_length = int(avg_period) if avg_period is not None else None
 
     if avg_cycle is None:
         cycle_data.state = models.CycleState.LEARNING
@@ -235,6 +233,8 @@ def detect_elevated_phase_start(
     or None if not found.
     """
     df = temperatures_to_frame(temperatures, index=False)
+    if df.empty:
+        return None
     # Get the subset of data before the period, within the lookback window
     window_start = period.start_date - timedelta(days=settings.MAX_LOOKBACK_DAYS)
     subset = df[

@@ -54,7 +54,7 @@ class TokenPayload(SQLModel):
     sub: str
     iat: datetime
     exp: datetime
-    user: "UserState"
+    user: UserState
     refreshed: bool = False  # require login to access secure resources if true
 
 
