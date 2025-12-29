@@ -1,7 +1,7 @@
 import json
 from typing import Annotated
 
-from fastapi import APIRouter, BackgroundTasks, Depends, Query
+from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Query, status
 from fastapi.responses import StreamingResponse
 from sqlmodel import Session
 
@@ -78,6 +78,77 @@ async def get_my_readings(
         limit=params.limit,
     )
     return models.EventResponse(events=readings, count=readings.__len__())
+
+
+@router.get("/me/{temperature_id}")
+async def get_single_reading(
+    temperature_id: int,
+    current_user: Annotated[models.UserProfile, Depends(get_current_user)],
+    session: Annotated[Session, Depends(get_session)],
+) -> models.Temperature:
+    temp_reading = temp_crud.get_single_reading(
+        session=session,
+        temperature_id=temperature_id,
+        user_id=current_user.user_id,
+    )
+    if temp_reading is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Temperature reading not found."
+        )
+    return temp_reading
+
+
+@router.patch("/me/{temperature_id}")
+async def update_reading(
+    temperature_id: int,
+    temp_update: models.TempUpdate,
+    current_user: Annotated[models.UserProfile, Depends(get_current_user)],
+    session: Annotated[Session, Depends(get_session)],
+    background_tasks: BackgroundTasks,
+) -> models.Temperature:
+    temp_reading = temp_crud.get_single_reading(
+        session=session,
+        temperature_id=temperature_id,
+        user_id=current_user.user_id,
+    )
+    if temp_reading is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Temperature reading not found."
+        )
+    updated_temp = temp_crud.update_temp(
+        session=session, temp=temp_reading, data=temp_update
+    )
+    # Recalculate temperature state in the background
+    background_tasks.add_task(
+        temp_crud.update_temperature_state, session, current_user.user_id
+    )
+    return updated_temp
+
+
+@router.delete("/me/{temperature_id}")
+async def delete_temp(
+    temperature_id: int,
+    current_user: Annotated[models.UserProfile, Depends(get_current_user)],
+    session: Annotated[Session, Depends(get_session)],
+    background_tasks: BackgroundTasks,
+) -> models.ResourceDeleteResponse:
+    temp_reading = temp_crud.get_single_reading(
+        session=session,
+        temperature_id=temperature_id,
+        user_id=current_user.user_id,
+    )
+    if temp_reading is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Temperature reading not found."
+        )
+    temp_crud.delete_temp(session=session, temperature=temp_reading)
+    # Recalculate temperature state in the background
+    background_tasks.add_task(
+        temp_crud.update_temperature_state, session, current_user.user_id
+    )
+    return models.ResourceDeleteResponse(
+        resource_type="temperature", resource_id=str(temperature_id)
+    )
 
 
 @router.get("/me/averages/", dependencies=[Depends(get_current_user)])
