@@ -5,7 +5,7 @@ from fastapi import Depends, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from api.db.models import ApplicationInfo, HealthCheck
-from api.routers import auth, temperature, users
+from api.routers import auth, period, temperature, users
 from api.utils.config import Settings
 from api.utils.dependencies import get_settings
 
@@ -27,6 +27,7 @@ app.add_middleware(
 
 app.include_router(auth.router)
 app.include_router(users.router)
+app.include_router(period.router)
 app.include_router(temperature.router)
 
 

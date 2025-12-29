@@ -1,8 +1,8 @@
 """empty message.
 
-Revision ID: 5e40f00805be
+Revision ID: a884a2645893
 Revises:
-Create Date: 2025-12-23 20:14:13.404317+00:00
+Create Date: 2025-12-29 17:11:00.845003+00:00
 
 """
 
@@ -13,7 +13,7 @@ import sqlmodel.sql.sqltypes
 from alembic import op
 
 # revision identifiers, used by Alembic.
-revision: str = "5e40f00805be"
+revision: str = "a884a2645893"
 down_revision: str | Sequence[str] | None = None
 branch_labels: str | Sequence[str] | None = None
 depends_on: str | Sequence[str] | None = None
@@ -37,23 +37,44 @@ def upgrade() -> None:
         batch_op.create_index(batch_op.f("ix_user_username"), ["username"], unique=True)
 
     op.create_table(
+        "cycle",
+        sa.Column("pid", sa.Integer(), nullable=False),
+        sa.Column("user_id", sqlmodel.sql.sqltypes.AutoString(), nullable=False),
+        sa.Column(
+            "state",
+            sa.Enum("LEARNING", "STABLE", "UNSTABLE", name="cyclestate"),
+            nullable=False,
+        ),
+        sa.Column("avg_cycle_length", sa.Integer(), nullable=True),
+        sa.Column("avg_period_length", sa.Integer(), nullable=True),
+        sa.Column("last_period_start", sa.DateTime(), nullable=True),
+        sa.Column("last_evaluated", sa.DateTime(), nullable=True),
+        sa.ForeignKeyConstraint(["user_id"], ["user.user_id"], ondelete="CASCADE"),
+        sa.PrimaryKeyConstraint("pid"),
+    )
+    with op.batch_alter_table("cycle", schema=None) as batch_op:
+        batch_op.create_index(batch_op.f("ix_cycle_pid"), ["pid"], unique=False)
+        batch_op.create_index(batch_op.f("ix_cycle_user_id"), ["user_id"], unique=False)
+
+    op.create_table(
         "period",
         sa.Column("user_id", sqlmodel.sql.sqltypes.AutoString(), nullable=False),
-        sa.Column("start_date", sa.DateTime(timezone=True), nullable=True),
-        sa.Column("end_date", sa.DateTime(timezone=True), nullable=True),
+        sa.Column("start_date", sa.DateTime(), nullable=True),
+        sa.Column("end_date", sa.DateTime(), nullable=True),
         sa.Column("duration", sa.Integer(), nullable=True),
-        sa.Column("id", sa.Integer(), nullable=False),
+        sa.Column("pid", sa.Integer(), nullable=False),
+        sa.Column("luteal_length", sa.Integer(), nullable=True),
         sa.ForeignKeyConstraint(["user_id"], ["user.user_id"], ondelete="CASCADE"),
-        sa.PrimaryKeyConstraint("id"),
+        sa.PrimaryKeyConstraint("pid"),
     )
     with op.batch_alter_table("period", schema=None) as batch_op:
-        batch_op.create_index(batch_op.f("ix_period_id"), ["id"], unique=False)
+        batch_op.create_index(batch_op.f("ix_period_pid"), ["pid"], unique=False)
         batch_op.create_index(batch_op.f("ix_period_user_id"), ["user_id"], unique=False)
 
     op.create_table(
         "symptomevent",
         sa.Column("user_id", sqlmodel.sql.sqltypes.AutoString(), nullable=False),
-        sa.Column("date", sa.DateTime(timezone=True), nullable=True),
+        sa.Column("date", sa.DateTime(), nullable=True),
         sa.Column(
             "flow_intensity",
             sa.Enum("NONE", "SPOTTING", "LIGHT", "MEDIUM", "HEAVY", name="flowintensity"),
@@ -64,12 +85,13 @@ def upgrade() -> None:
         sa.Column("ovulation_test", sa.Boolean(), nullable=True),
         sa.Column("discharge", sa.JSON(), nullable=True),
         sa.Column("sex", sa.JSON(), nullable=True),
-        sa.Column("id", sa.Integer(), nullable=False),
+        sa.Column("pid", sa.Integer(), nullable=False),
         sa.ForeignKeyConstraint(["user_id"], ["user.user_id"], ondelete="CASCADE"),
-        sa.PrimaryKeyConstraint("id"),
+        sa.PrimaryKeyConstraint("pid"),
     )
     with op.batch_alter_table("symptomevent", schema=None) as batch_op:
-        batch_op.create_index(batch_op.f("ix_symptomevent_id"), ["id"], unique=False)
+        batch_op.create_index(batch_op.f("ix_symptomevent_date"), ["date"], unique=False)
+        batch_op.create_index(batch_op.f("ix_symptomevent_pid"), ["pid"], unique=False)
         batch_op.create_index(
             batch_op.f("ix_symptomevent_user_id"), ["user_id"], unique=False
         )
@@ -78,7 +100,7 @@ def upgrade() -> None:
         "temperature",
         sa.Column("temperature", sa.Float(), nullable=False),
         sa.Column("user_id", sqlmodel.sql.sqltypes.AutoString(), nullable=False),
-        sa.Column("timestamp", sa.DateTime(timezone=True), nullable=True),
+        sa.Column("timestamp", sa.DateTime(), nullable=True),
         sa.Column("pid", sa.Integer(), nullable=False),
         sa.ForeignKeyConstraint(["user_id"], ["user.user_id"], ondelete="CASCADE"),
         sa.PrimaryKeyConstraint("pid"),
@@ -102,7 +124,7 @@ def upgrade() -> None:
             nullable=False,
         ),
         sa.Column("baseline", sa.Float(), nullable=True),
-        sa.Column("last_evaluated", sa.DateTime(timezone=True), nullable=True),
+        sa.Column("last_evaluated", sa.DateTime(), nullable=True),
         sa.ForeignKeyConstraint(["user_id"], ["user.user_id"], ondelete="CASCADE"),
         sa.PrimaryKeyConstraint("pid"),
     )
@@ -133,14 +155,20 @@ def downgrade() -> None:
     op.drop_table("temperature")
     with op.batch_alter_table("symptomevent", schema=None) as batch_op:
         batch_op.drop_index(batch_op.f("ix_symptomevent_user_id"))
-        batch_op.drop_index(batch_op.f("ix_symptomevent_id"))
+        batch_op.drop_index(batch_op.f("ix_symptomevent_pid"))
+        batch_op.drop_index(batch_op.f("ix_symptomevent_date"))
 
     op.drop_table("symptomevent")
     with op.batch_alter_table("period", schema=None) as batch_op:
         batch_op.drop_index(batch_op.f("ix_period_user_id"))
-        batch_op.drop_index(batch_op.f("ix_period_id"))
+        batch_op.drop_index(batch_op.f("ix_period_pid"))
 
     op.drop_table("period")
+    with op.batch_alter_table("cycle", schema=None) as batch_op:
+        batch_op.drop_index(batch_op.f("ix_cycle_user_id"))
+        batch_op.drop_index(batch_op.f("ix_cycle_pid"))
+
+    op.drop_table("cycle")
     with op.batch_alter_table("user", schema=None) as batch_op:
         batch_op.drop_index(batch_op.f("ix_user_username"))
         batch_op.drop_index(batch_op.f("ix_user_user_id"))
