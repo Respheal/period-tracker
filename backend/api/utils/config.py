@@ -47,7 +47,7 @@ class Settings(BaseSettings):
     FIRST_USER: str  # = "admin"
     FIRST_USER_PASS: str  # = "adminpass"
     DATABASE: str
-    ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = 15
     REFRESH_TOKEN_EXPIRE_DAYS: int = 7
     ALGORITHM: str
     SECRET_KEY: str = secrets.token_urlsafe(32)  # Deprecated, use RSA keys instead

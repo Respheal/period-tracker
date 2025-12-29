@@ -10,7 +10,7 @@ ENV POETRY_NO_INTERACTION=1 \
 WORKDIR /poetry
 
 COPY ./poetry.lock ./pyproject.toml ./
-RUN poetry install --only main,server --no-root && rm -rf $POETRY_CACHE_DIR
+RUN poetry install --only main --no-root && rm -rf $POETRY_CACHE_DIR
 
 FROM python:3.14-slim-bookworm AS runtime
 
