@@ -3,6 +3,8 @@ from datetime import UTC, datetime, timedelta
 from sqlmodel import Session
 
 from api.db import models
+from api.db.crud import period as period_crud
+from api.db.crud import temperature as temp_crud
 
 
 def create_temperature_readings(
@@ -19,15 +21,15 @@ def create_temperature_readings(
         start_date = datetime.now(UTC)
     readings = []
     for i, temp in enumerate(temps):
-        timestamp = start_date - timedelta(days=len(temps) - i - 1)
-        reading = models.Temperature(
-            user_id=user.user_id,
-            temperature=temp,
-            timestamp=timestamp,
+        db_temp = temp_crud.create_temp_reading(
+            session,
+            models.CreateTempRead(
+                user_id=user.user_id,
+                temperature=temp,
+                timestamp=start_date - timedelta(days=len(temps) - i - 1),
+            ),
         )
-        session.add(reading)
-        readings.append(reading)
-    session.commit()
+        readings.append(db_temp)
     return readings
 
 
@@ -39,13 +41,14 @@ def create_period_events(
     """Helper function to create period events for testing."""
     events = []
     for start_date, end_date in periods:
-        event = models.Period(
-            user_id=user.user_id,
-            start_date=start_date,
-            end_date=end_date,
-            duration=(end_date - start_date).days if end_date else None,
+        db_period = period_crud.create_period_event(
+            session,
+            models.CreatePeriod(
+                user_id=user.user_id,
+                start_date=start_date,
+                end_date=end_date,
+                duration=(end_date - start_date).days if end_date else None,
+            ),
         )
-        session.add(event)
-        events.append(event)
-    session.commit()
+        events.append(db_period)
     return events

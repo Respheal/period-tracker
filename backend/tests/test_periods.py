@@ -93,7 +93,7 @@ class TestPeriodUpdate:
         create_response = client.post(
             "/period/",
             headers=user_headers,
-            json={"start_date": "2025-01-01", "end_date": "2025-01-05"},
+            json={"start_date": "2025-03-01", "end_date": "2025-03-05"},
         )
         assert create_response.status_code == 200
         period_id = create_response.json()["pid"]
@@ -102,11 +102,12 @@ class TestPeriodUpdate:
         response = client.patch(
             f"/period/me/{period_id}",
             headers=user_headers,
-            json={"end_date": "2025-01-06"},
+            json={"start_date": "2025-01-01", "end_date": "2025-01-05"},
         )
         assert response.status_code == 200
         data = response.json()
-        assert "2025-01-06" in data["end_date"]
+        assert "2025-01-01" in data["start_date"]
+        assert "2025-01-05" in data["end_date"]
 
     def test_update_period_not_found(
         self,

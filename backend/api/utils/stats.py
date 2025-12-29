@@ -1,4 +1,4 @@
-from datetime import UTC, datetime, timedelta
+from datetime import UTC, date, datetime, timedelta
 from typing import Sequence
 
 import pandas as pd
@@ -224,7 +224,7 @@ def evaluate_cycle_state(
 def detect_elevated_phase_start(
     temperatures: Sequence[models.Temperature],
     period: models.Period,
-) -> datetime | None:
+) -> date | None:
     """
     Returns the first day of an elevated phase preceding the given period,
     or None if not found.
@@ -255,7 +255,7 @@ def detect_elevated_phase_start(
             consecutive += 1
             if consecutive == settings.ELEVATION_DAYS_REQUIRED:
                 # First day of the elevated run
-                first_day: datetime = (
+                first_day: date = (
                     row["timestamp"]
                     - timedelta(days=settings.ELEVATION_DAYS_REQUIRED - 1)
                 ).date()
@@ -265,9 +265,9 @@ def detect_elevated_phase_start(
     return None
 
 
-def compute_luteal_length(elevated_phase_start: datetime, period_start: datetime) -> int:
+def compute_luteal_length(elevated_phase_start: date, period_start: datetime) -> int:
     luteal_start = elevated_phase_start - timedelta(days=1)
-    return (period_start - luteal_start).days
+    return (period_start.date() - luteal_start).days
 
 
 def is_valid_luteal_length(length: int) -> bool:

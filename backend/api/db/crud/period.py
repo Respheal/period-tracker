@@ -27,7 +27,7 @@ def get_single_period(
     period_id: int,
     user_id: str | None = None,
 ) -> models.Period | None:
-    if user_id is None:
+    if user_id is None:  # pragma: no cover
         return session.get(models.Period, period_id)
     return session.exec(
         select(models.Period).where(

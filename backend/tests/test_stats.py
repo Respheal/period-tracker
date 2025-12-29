@@ -4,6 +4,7 @@ import pandas as pd
 from sqlmodel import Session
 
 from api.db import models
+from api.db.crud.period import update_luteal_length
 from api.utils.config import Settings
 from api.utils.stats import (
     classify_cycle_lengths,
@@ -694,7 +695,7 @@ class TestLutealPhaseDetection:
 class TestLutealLengthCalculations:
     def test_compute_luteal_length(self) -> None:
         now = datetime.now(UTC)
-        elevated_start = now - timedelta(days=15)
+        elevated_start = (now - timedelta(days=15)).date()
         period_start = now
         length = compute_luteal_length(elevated_start, period_start)
         # Time between period_start and the day before elevated_start
@@ -704,11 +705,11 @@ class TestLutealLengthCalculations:
         now = datetime.now(UTC)
         period_start = now
         # Too long
-        elevated_start = now - timedelta(days=settings.MAX_LUTEAL_DAYS + 5)
+        elevated_start = (now - timedelta(days=settings.MAX_LUTEAL_DAYS + 5)).date()
         length = compute_luteal_length(elevated_start, period_start)
         assert not is_valid_luteal_length(length)
         # Too short
-        elevated_start = now - timedelta(days=settings.MIN_LUTEAL_DAYS - 5)
+        elevated_start = (now - timedelta(days=settings.MIN_LUTEAL_DAYS - 5)).date()
         length = compute_luteal_length(elevated_start, period_start)
         assert not is_valid_luteal_length(length)
 
@@ -750,6 +751,26 @@ class TestLutealLengthCalculations:
         df = periods_to_frame(periods)
         avg = compute_average_luteal_length(df)
         assert avg is None
+
+    def test_update_luteal_length(self, session: Session) -> None:
+        user = create_random_user(session)
+        now = datetime.now(UTC)
+        # Create temperatures with an elevated phase leading up to the period
+        create_temperature_readings(
+            session,
+            user,
+            [36.5] * 30 + [37.5] * 14,
+            start_date=now,
+        )
+        periods = create_period_events(
+            session,
+            user,
+            [(now - timedelta(days=3), now)],
+        )
+        period = periods[0]
+        update_luteal_length(session, period)
+        session.refresh(period)
+        assert period.luteal_length == 11
 
 
 class TestPeriodPrediction:

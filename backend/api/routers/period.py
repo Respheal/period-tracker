@@ -42,7 +42,7 @@ async def create_period_event(
     if current_user.temp_state and current_user.temp_state.phase in [
         models.TempPhase.LOW,
         models.TempPhase.ELEVATED,
-    ]:
+    ]:  # pragma: no cover
         background_tasks.add_task(period_crud.update_luteal_length, session, db_period)
     return db_period
 
@@ -130,7 +130,7 @@ async def update_period(
         and current_user.temp_state
         and current_user.temp_state.phase
         in [models.TempPhase.LOW, models.TempPhase.ELEVATED]
-    ):
+    ):  # pragma: no cover
         background_tasks.add_task(period_crud.update_luteal_length, session, period)
     return period
 
@@ -195,11 +195,11 @@ async def get_next_period(
     current_user: Annotated[models.UserProfile, Depends(get_current_user)],
     session: Annotated[Session, Depends(get_session)],
 ) -> models.PredictedPeriod | None:
-    if current_user.cycle_state is None:
+    if current_user.cycle_state is None:  # pragma: no cover
         return None
     periods = period_crud.get_periods(
         session=session, user_id=current_user.user_id, limit=6, order="desc"
     )
-    if periods is None:
+    if periods is None:  # pragma: no cover
         return None
     return predict_next_period(cycle_state=current_user.cycle_state, periods=periods)

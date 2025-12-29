@@ -1,3 +1,4 @@
+# type: ignore
 from datetime import UTC, datetime, timedelta
 
 from api.db import models

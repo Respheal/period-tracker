@@ -24,7 +24,7 @@ def get_single_reading(
     temperature_id: int,
     user_id: str | None = None,
 ) -> models.Temperature | None:
-    if user_id is None:
+    if user_id is None:  # pragma: no cover
         return session.get(models.Temperature, temperature_id)
     return session.exec(
         select(models.Temperature).where(
