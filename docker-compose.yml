@@ -19,7 +19,7 @@ services:
       - .env
     environment:
       - REDIS_HOST=redis
-      - ALGORITHM = "RS256"
+      - ALGORITHM="RS256"
       - PRIVATE_KEY_PATH=/keys/private.pem
       - PUBLIC_KEY_PATH=/keys/public.pem
   redis:
