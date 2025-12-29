@@ -583,6 +583,22 @@ class TestCycleAverages:
         assert avg is not None
         assert avg == 5
 
+    def test_compute_period_average_oops_all_nones(self, session: Session) -> None:
+        user = create_random_user(session)
+        now = datetime.now(UTC)
+        # Create periods with no end dates
+        periods_data = [
+            (now - timedelta(days=60), None),
+            (now - timedelta(days=30), None),
+            (now - timedelta(days=5), None),
+        ]
+        periods = create_period_events(session, user, periods_data)
+        df = periods_to_frame(periods)
+        period_lengths = compute_period_lengths(df)
+        avg = compute_period_average(period_lengths)
+        # All values are None, so average should be None
+        assert avg is None
+
 
 class TestCycleStateEvaluation:
     def test_empty_periods_learning(self) -> None:
@@ -655,6 +671,19 @@ class TestCycleStateEvaluation:
         new_state = evaluate_cycle_state(periods, previous_state)
         assert new_state.pid == previous_state.pid
         assert new_state.user_id == user.user_id
+
+    def test_cycle_state_with_no_valid_cycles(self, session: Session) -> None:
+        user = create_random_user(session)
+        now = datetime.now(UTC)
+        # Create periods with invalid cycle lengths
+        periods_data = [
+            (now - timedelta(days=40), now - timedelta(days=35)),
+            (now - timedelta(days=25), now - timedelta(days=20)),  # 15 days - too short
+        ]
+        periods = create_period_events(session, user, periods_data)
+        state = evaluate_cycle_state(periods)
+        # Should remain in LEARNING or become UNSTABLE due to no valid cycles
+        assert state.state in [models.CycleState.LEARNING, models.CycleState.UNSTABLE]
 
 
 class TestLutealPhaseDetection:
@@ -771,6 +800,47 @@ class TestLutealLengthCalculations:
         update_luteal_length(session, period)
         session.refresh(period)
         assert period.luteal_length == 11
+
+    def test_update_luteal_length_no_elevation(self, session: Session) -> None:
+        user = create_random_user(session)
+        now = datetime.now(UTC)
+        # Create temperatures without an elevated phase
+        create_temperature_readings(
+            session,
+            user,
+            [36.5] * 30,
+            start_date=now,
+        )
+        periods = create_period_events(
+            session,
+            user,
+            [(now - timedelta(days=3), now)],
+        )
+        period = periods[0]
+        update_luteal_length(session, period)
+        session.refresh(period)
+        assert period.luteal_length is None
+
+    def test_invalid_elevated_phase(self, session: Session, settings: Settings) -> None:
+        user = create_random_user(session)
+        now = datetime.now(UTC)
+        # Create an unusually long elevated phase
+        create_temperature_readings(
+            session,
+            user,
+            [36.5] * 30 + [37.5] * (settings.MAX_LUTEAL_DAYS + 5),
+            start_date=now,
+        )
+        periods = create_period_events(
+            session,
+            user,
+            [(now - timedelta(days=3), now)],
+        )
+        period = periods[0]
+        update_luteal_length(session, period)
+        session.refresh(period)
+        # Luteal length should not be set due to invalid elevated phase
+        assert period.luteal_length is None
 
 
 class TestPeriodPrediction:

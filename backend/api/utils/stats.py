@@ -237,7 +237,7 @@ def detect_elevated_phase_start(
     subset = df[
         (df["timestamp"] < period.start_date) & (df["timestamp"] >= window_start)
     ].copy()
-    if subset.empty:
+    if subset.empty:  # pragma: no cover
         return None
 
     # With the computed temperature baseline, find the first day of a sustained

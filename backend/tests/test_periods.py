@@ -109,6 +109,16 @@ class TestPeriodUpdate:
         assert "2025-01-01" in data["start_date"]
         assert "2025-01-05" in data["end_date"]
 
+        # Test that we can remove an end date
+        response = client.patch(
+            f"/period/me/{period_id}",
+            headers=user_headers,
+            json={"end_date": None},
+        )
+        assert response.status_code == 200
+        data = response.json()
+        assert data["end_date"] is None
+
     def test_update_period_not_found(
         self,
         client: TestClient,

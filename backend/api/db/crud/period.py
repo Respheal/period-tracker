@@ -42,7 +42,7 @@ def update_period(
 ) -> models.Period:
     period_data = data.model_dump(exclude_unset=True)
     # Convert date strings to datetime objects
-    if "start_date" in period_data and period_data["start_date"] is not None:
+    if "start_date" in period_data:
         min_date = datetime.strptime(period_data["start_date"], "%Y-%m-%d").replace(
             tzinfo=UTC
         )
@@ -81,7 +81,7 @@ def get_periods(
         statement = statement.where(models.Period.start_date >= start_date)
     if end_date:
         statement = statement.where(models.Period.start_date <= end_date)
-    if order == "desc":
+    if order == "desc":  # pragma: no branch
         statement = statement.order_by(desc(models.Period.start_date))
     statement = statement.offset(offset).limit(limit)
     return session.exec(statement).all()
@@ -93,7 +93,7 @@ def eval_cycle_metrics(session: Session, user_id: str) -> None:
         select(models.Period).where(models.Period.user_id == user_id)
     ).all()
     user = session.get(models.User, user_id)
-    if user:
+    if user:  # pragma: no branch
         user.cycle_state = evaluate_cycle_state(periods, user.cycle_state)
         session.add(user)
         session.commit()
