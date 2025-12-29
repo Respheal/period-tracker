@@ -31,6 +31,9 @@ poetry run uvicorn api.main:app --reload
 
 ## To Run (Docker)
 
+> [!WARNING]
+> Persistent volumes have not been configured yet. Data will be lost if the container is deleted.
+
 Copy `.env.sample` to `.env` and update the values for your personal use. Most analysis variables can be finetuned as needed through the environmental variable configuration.
 
 ```bash

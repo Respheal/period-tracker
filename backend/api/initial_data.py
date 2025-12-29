@@ -129,13 +129,14 @@ def create_temp_readings(session: Session, user: models.User) -> None:
     session.commit()
 
 
-def init_user(session: Session) -> None:
+def init_user(session: Session, temp_readings: bool = False) -> None:
     if not user_crud.get_user_by_username(session=session, username=settings.FIRST_USER):
         user_in = UserCreate(
             username=settings.FIRST_USER, password=settings.FIRST_USER_PASS, is_admin=True
         )
         user = user_crud.create_user(session=session, user=user_in)
-        create_temp_readings(session=session, user=user)
+        if temp_readings:
+            create_temp_readings(session=session, user=user)
 
 
 def init() -> None:
