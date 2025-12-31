@@ -68,7 +68,7 @@ def create_symptom_events(
             session,
             models.CreateSymptomEvent(
                 user_id=user.user_id,
-                date=symptom.get("date", None),
+                date=symptom.get("date", datetime.now(UTC)),
                 flow_intensity=symptom.get("flow_intensity", None),
                 symptoms=symptom.get("symptoms", None),
                 mood=symptom.get("mood", None),

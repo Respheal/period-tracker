@@ -88,7 +88,7 @@
 
 ### Events
 
-- [ ] Endpoint to retrieve all events
+- [x] Endpoint to retrieve all events
   - User.id
   - Date Range
   - Event Type
