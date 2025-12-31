@@ -1,8 +1,16 @@
+from datetime import UTC, datetime, timedelta
+
 from fastapi.testclient import TestClient
 from sqlmodel import Session
 
 from api.db import models
 from tests.utils import is_valid_uuid
+from tests.utils.auth import get_user_headers
+from tests.utils.events import (
+    create_period_events,
+    create_symptom_events,
+    create_temperature_readings,
+)
 from tests.utils.user import create_random_user
 
 
@@ -45,11 +53,12 @@ class TestUserRetrieval:
         data = response.json()
         assert "count" in data
         assert data["count"] >= 1
-        assert isinstance(data["users"], list)
+        assert "events" in data
+        assert "users" in data["events"]
 
         # Verify user structure (UserSafe)
-        if data["users"]:
-            user = data["users"][0]
+        if data["events"]["users"]:
+            user = data["events"]["users"][0]
             assert "user_id" in user
             assert "username" in user
             assert "display_name" in user
@@ -121,4 +130,49 @@ class TestCurrentUser:
 
     def test_delete_me_unauthenticated(self, client: TestClient) -> None:
         response = client.delete("/users/me/")
+        assert response.status_code == 401
+
+
+class TestGetMyEvents:
+    def test_get_my_events(self, client: TestClient, session: Session) -> None:
+        user = create_random_user(session)
+        user_headers = get_user_headers(client, session, user.username)
+        today = datetime.now(UTC)
+        yesterday = today - timedelta(days=1)
+        create_period_events(session, user, [(yesterday, today)])
+        create_symptom_events(session, user, [{"symptoms": ["cramps"]}])
+        create_temperature_readings(session, user, [36.5])
+
+        response = client.get("/users/me/events/", headers=user_headers)
+        assert response.status_code == 200
+        data = response.json()
+        assert "count" in data
+        assert data["count"] == 3
+        assert "events" in data
+        assert "periods" in data["events"]
+        assert "symptoms" in data["events"]
+        assert "temperatures" in data["events"]
+        assert yesterday.date().isoformat() in data["events"]["periods"][0]["start_date"]
+        assert today.date().isoformat() in data["events"]["periods"][0]["end_date"]
+        assert data["events"]["symptoms"][0]["symptoms"] == ["cramps"]
+        assert data["events"]["temperatures"][0]["temperature"] == 36.5
+
+    def test_get_my_events_no_events(
+        self,
+        client: TestClient,
+        user_headers: dict[str, str],
+    ) -> None:
+        response = client.get("/users/me/events/", headers=user_headers)
+        assert response.status_code == 200
+        data = response.json()
+        assert data["count"] == 0
+        assert "periods" in data["events"]
+        assert "symptoms" in data["events"]
+        assert "temperatures" in data["events"]
+        assert data["events"]["periods"] == []
+        assert data["events"]["symptoms"] == []
+        assert data["events"]["temperatures"] == []
+
+    def test_get_my_events_unauthenticated(self, client: TestClient) -> None:
+        response = client.get("/users/me/events/")
         assert response.status_code == 401

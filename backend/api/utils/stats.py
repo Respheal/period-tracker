@@ -320,3 +320,57 @@ def predict_next_period(
     return models.PredictedPeriod(
         start_date=expected_start, end_date=expected_end, confidence=confidence
     )
+
+
+def combine_events(
+    periods: Sequence[models.Period],
+    temperatures: Sequence[models.Temperature],
+    symptoms: Sequence[models.SymptomEvent],
+) -> pd.DataFrame:  # pragma: no cover
+    """Combine period, temperature, and symptom events into a single DataFrame."""
+    # Get periods and reformat to fit logically with the rest of the data
+    period_df = periods_to_frame(periods)
+    period_df["period_start"] = period_df["start"]
+    period_df = period_df.rename(columns={"start": "date", "end": "period_end"})
+    period_df["period_end"] = period_df["period_end"].dt.date
+    period_df = period_df[["date", "period_start", "period_end", "luteal_length"]]
+    # Get temperatures
+    temp_df = temperatures_to_frame(temperatures, index=False)
+    temp_df = temp_df.rename(columns={"timestamp": "date"})
+    # For symptoms, we'll need to group the fields by date.
+    # For each date, we'll aggregate the symptoms, mood, sex, and discharge lists.
+    # For ovulation_test, any True on that date overrides any Falses on that date
+    # For flow_intensity, we'll take the max intensity on that date.
+    symptom_records: dict[str, models.SymptomSummary] = {}
+    for symptom in symptoms:
+        date_str = symptom.date.date().isoformat()
+        if date_str not in symptom_records:
+            symptom_records[date_str] = models.SymptomSummary()
+        symptom_records[date_str].symptoms.update(symptom.symptoms or [])
+        symptom_records[date_str].mood.update(symptom.mood or [])
+        symptom_records[date_str].sex.update(symptom.sex or [])
+        symptom_records[date_str].discharge.update(symptom.discharge or [])
+        if symptom.ovulation_test:
+            symptom_records[date_str].ovulation_test = True
+        if symptom.flow_intensity is not None:
+            symptom_records[date_str].flow_intensity = max(
+                symptom_records[date_str].flow_intensity, symptom.flow_intensity
+            )
+    symptom_df = pd.DataFrame(
+        [
+            {"date": datetime.fromisoformat(date_str), **data.model_dump()}
+            for date_str, data in symptom_records.items()
+        ]
+    )
+    # Join all the lists into comma-separated strings for CSV output
+    symptom_df["symptoms"] = [", ".join(map(str, sym)) for sym in symptom_df["symptoms"]]
+    symptom_df["mood"] = [", ".join(map(str, mood)) for mood in symptom_df["mood"]]
+    symptom_df["sex"] = [", ".join(map(str, sex)) for sex in symptom_df["sex"]]
+    symptom_df["discharge"] = [
+        ", ".join(map(str, discharge)) for discharge in symptom_df["discharge"]
+    ]
+    # Now merge all three DataFrames on date
+    combined_df = pd.merge(period_df, temp_df, how="outer", on="date")
+    combined_df = pd.merge(combined_df, symptom_df, how="outer", on="date")
+    combined_df = combined_df.sort_values("date").reset_index(drop=True)
+    return combined_df

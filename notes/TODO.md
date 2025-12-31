@@ -67,7 +67,7 @@
 
 #### User Stats
 
-- [ ] Endpoint to retrieve user stats
+- [x] Endpoint to retrieve user stats
   - Median and Mean period length (exponential moving average)
   - Median and mean cycle length (exponential moving average)
   - Median and mean temperature (exponential moving average)
@@ -88,13 +88,13 @@
 
 ### Events
 
-- [ ] Endpoint to retrieve all events
+- [x] Endpoint to retrieve all events
   - User.id
   - Date Range
   - Event Type
   - Skip/Limit (default: 0/100)
   - Also display count (refer to Netbox's API response)
-- [ ] Endpoint to retrieve all events as csv
+- [x] Endpoint to retrieve all events as csv
   - Same filters as above
 
 #### Period Events
@@ -130,18 +130,18 @@
   - Ovulation test (none, positive, negative)
   - Discharge (none, creamy, sticky, unusual)
   - Sex (protected, unprotected, morning-after pill)
-- [ ] Endpoint to retrieve all symptom events
+- [x] Endpoint to retrieve all symptom events
   - Filter by:
     - Date Range
     - Symptom (list[str], and\_)
     - Skip/Limit (default: 0/100)
     - Also display count (refer to Netbox's API response)
-- [ ] Endpoint to retrieve symptom events as CSV
+- [x] Endpoint to retrieve symptom events as CSV
   - Same filters as above
-- [ ] Endpoint to retrieve a specific symptom event
-- [ ] Endpoint to create a symptom event
-- [ ] Endpoint to update a symptom event
-- [ ] Endpoint to delete a symptom event
+- [x] Endpoint to retrieve a specific symptom event
+- [x] Endpoint to create a symptom event
+- [x] Endpoint to update a symptom event
+- [x] Endpoint to delete a symptom event
 
 #### Temperature Events
 

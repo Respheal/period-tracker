@@ -40,5 +40,8 @@
   "python.testing.cwd": "${workspaceFolder}/backend",
   "python.testing.pytestArgs": ["--envfile=./../.env.test"],
   "python.testing.unittestEnabled": false,
-  "python.testing.pytestEnabled": true
+  "python.testing.pytestEnabled": true,
+  "[json]": {
+    "editor.defaultFormatter": "prettier.prettier-vscode"
+  }
 }

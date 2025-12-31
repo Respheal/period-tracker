@@ -51,9 +51,11 @@ class TestTemperatureRetrieval:
         data = response.json()
         assert "count" in data
         assert data["count"] >= 3
-        assert isinstance(data["events"], list)
+        assert "events" in data
+        assert "temperatures" in data["events"]
+        assert len(data["events"]["temperatures"]) >= 3
 
-        temperatures = [event["temperature"] for event in data["events"]]
+        temperatures = [event["temperature"] for event in data["events"]["temperatures"]]
         for temp in temps:
             assert temp in temperatures
 
@@ -252,9 +254,10 @@ class TestTemperatureAdminAccess:
         data = response.json()
         assert "count" in data
         assert data["count"] >= 6
-        assert isinstance(data["events"], list)
+        assert "events" in data
+        assert "temperatures" in data["events"]
 
-        temperatures = [event["temperature"] for event in data["events"]]
+        temperatures = [event["temperature"] for event in data["events"]["temperatures"]]
         for temp in [36.5, 37.0, 36.8, 37.2]:
             assert temp in temperatures
 
@@ -300,7 +303,7 @@ class TestTemperatureDateFiltering:
         response = client.get("/temp/?start_date=2025-01-01", headers=admin_headers)
         assert response.status_code == 200
         data = response.json()
-        for event in data["events"]:
+        for event in data["events"]["temperatures"]:
             assert event["timestamp"] >= "2025-01-01T00:00:00"
 
     def test_filter_by_end_date(
@@ -322,7 +325,7 @@ class TestTemperatureDateFiltering:
         response = client.get("/temp/?end_date=2025-01-01", headers=admin_headers)
         assert response.status_code == 200
         data = response.json()
-        for event in data["events"]:
+        for event in data["events"]["temperatures"]:
             assert event["timestamp"] <= "2025-01-01T00:00:00"
 
     def test_filter_by_date_range(
@@ -346,7 +349,7 @@ class TestTemperatureDateFiltering:
         )
         assert response.status_code == 200
         data = response.json()
-        for event in data["events"]:
+        for event in data["events"]["temperatures"]:
             assert event["timestamp"] <= "2024-09-01T00:00:00"
             assert event["timestamp"] >= "2024-01-01T00:00:00"
 

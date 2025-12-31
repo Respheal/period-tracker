@@ -1,9 +1,11 @@
 from datetime import UTC, datetime, timedelta
+from typing import Any
 
 from sqlmodel import Session
 
 from api.db import models
 from api.db.crud import period as period_crud
+from api.db.crud import symptoms as symptom_crud
 from api.db.crud import temperature as temp_crud
 
 
@@ -51,4 +53,29 @@ def create_period_events(
             ),
         )
         events.append(db_period)
+    return events
+
+
+def create_symptom_events(
+    session: Session,
+    user: models.User,
+    symptoms: list[dict[str, Any]],
+) -> list[models.SymptomEvent]:
+    """Helper function to create symptom events for testing."""
+    events = []
+    for symptom in symptoms:
+        db_symptom = symptom_crud.create_symptom_event(
+            session,
+            models.CreateSymptomEvent(
+                user_id=user.user_id,
+                date=symptom.get("date", datetime.now(UTC)),
+                flow_intensity=symptom.get("flow_intensity", None),
+                symptoms=symptom.get("symptoms", None),
+                mood=symptom.get("mood", None),
+                ovulation_test=symptom.get("ovulation_test", None),
+                discharge=symptom.get("discharge", None),
+                sex=symptom.get("sex", None),
+            ),
+        )
+        events.append(db_symptom)
     return events
