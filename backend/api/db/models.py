@@ -377,8 +377,8 @@ class CreateSymptomEvent(EventBase):
     sex: list[str] | None = Field(sa_column=Column(JSON), unique_items=True)
 
 
-class UpdateSymptomEvent(EventBase):
-    timestamp: Annotated[
+class UpdateSymptomEvent(SQLModel):
+    date: Annotated[
         str | None,
         Body(
             default=None,

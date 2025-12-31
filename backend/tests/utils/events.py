@@ -1,4 +1,5 @@
 from datetime import UTC, datetime, timedelta
+from typing import Any
 
 from sqlmodel import Session
 
@@ -58,22 +59,22 @@ def create_period_events(
 def create_symptom_events(
     session: Session,
     user: models.User,
-    symptoms: list[tuple[datetime, dict]],
+    symptoms: list[dict[str, Any]],
 ) -> list[models.SymptomEvent]:
     """Helper function to create symptom events for testing."""
     events = []
-    for date, symptom_data in symptoms:
+    for symptom in symptoms:
         db_symptom = symptom_crud.create_symptom_event(
             session,
             models.CreateSymptomEvent(
                 user_id=user.user_id,
-                date=date,
-                flow_intensity=symptom_data.get("flow_intensity"),
-                symptoms=symptom_data.get("symptoms"),
-                mood=symptom_data.get("mood"),
-                ovulation_test=symptom_data.get("ovulation_test"),
-                discharge=symptom_data.get("discharge"),
-                sex=symptom_data.get("sex"),
+                date=symptom.get("date", None),
+                flow_intensity=symptom.get("flow_intensity", None),
+                symptoms=symptom.get("symptoms", None),
+                mood=symptom.get("mood", None),
+                ovulation_test=symptom.get("ovulation_test", None),
+                discharge=symptom.get("discharge", None),
+                sex=symptom.get("sex", None),
             ),
         )
         events.append(db_symptom)

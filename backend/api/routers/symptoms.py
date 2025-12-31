@@ -1,3 +1,4 @@
+from datetime import UTC, datetime
 from typing import Annotated
 
 import pandas as pd
@@ -24,6 +25,8 @@ async def create_symptom_event(
     params: models.CreateSymptomParams,
     session: Annotated[Session, Depends(get_session)],
 ) -> models.SymptomEvent:
+    if not params.date:
+        params.date = datetime.now(UTC).isoformat()
     symptom = models.CreateSymptomEvent(
         user_id=current_user.user_id,
         date=params.date,

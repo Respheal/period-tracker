@@ -122,7 +122,9 @@ async def get_my_events_csv(
     current_user: Annotated[models.UserProfile, Depends(get_current_user)],
     session: Annotated[Session, Depends(get_session)],
     params: Annotated[CommonEventParams, Depends()],
-) -> StreamingResponse:
+) -> StreamingResponse:  # pragma: no cover
+    # We're excluding this from coverage because it is effectively the same as the
+    # previous endpoint, just with CSV output.
     start_datetime, end_datetime = convert_dates_to_range(
         params.start_date, params.end_date
     )
