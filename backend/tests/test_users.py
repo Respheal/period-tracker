@@ -45,11 +45,12 @@ class TestUserRetrieval:
         data = response.json()
         assert "count" in data
         assert data["count"] >= 1
-        assert isinstance(data["users"], list)
+        assert "events" in data
+        assert "users" in data["events"]
 
         # Verify user structure (UserSafe)
-        if data["users"]:
-            user = data["users"][0]
+        if data["events"]["users"]:
+            user = data["events"]["users"][0]
             assert "user_id" in user
             assert "username" in user
             assert "display_name" in user
