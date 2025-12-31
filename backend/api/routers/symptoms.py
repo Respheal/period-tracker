@@ -123,7 +123,7 @@ async def update_symptom_event(
     return updated_symptom
 
 
-@router.delete("/me/{symptom_id}", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete("/me/{symptom_id}")
 async def delete_symptom_event(
     symptom_id: int,
     current_user: Annotated[models.UserProfile, Depends(get_current_user)],
