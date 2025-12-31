@@ -51,7 +51,7 @@ async def create_period_event(
 async def get_all_periods(
     session: Annotated[Session, Depends(get_session)],
     params: Annotated[CommonEventParams, Depends()],
-) -> models.EventResponse:
+) -> models.Response:
     start_datetime, end_datetime = convert_dates_to_range(
         params.start_date, params.end_date
     )
@@ -62,7 +62,7 @@ async def get_all_periods(
         offset=params.offset,
         limit=params.limit,
     )
-    return models.EventResponse(events=periods, count=periods.__len__())
+    return models.Response(events={"periods": periods}, count=len(periods))
 
 
 @router.get("/me/", dependencies=[Depends(get_current_user)])
@@ -70,7 +70,7 @@ async def get_my_periods(
     current_user: Annotated[models.UserProfile, Depends(get_current_user)],
     session: Annotated[Session, Depends(get_session)],
     params: Annotated[CommonEventParams, Depends()],
-) -> models.EventResponse:
+) -> models.Response:
     start_datetime, end_datetime = convert_dates_to_range(
         params.start_date, params.end_date
     )
@@ -82,7 +82,7 @@ async def get_my_periods(
         offset=params.offset,
         limit=params.limit,
     )
-    return models.EventResponse(events=periods, count=periods.__len__())
+    return models.Response(events={"periods": periods}, count=len(periods))
 
 
 @router.get("/me/{period_id}")

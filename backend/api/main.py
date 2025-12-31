@@ -5,7 +5,7 @@ from fastapi import Depends, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from api.db.models import ApplicationInfo, HealthCheck
-from api.routers import auth, period, temperature, users
+from api.routers import auth, period, symptoms, temperature, users
 from api.utils.config import Settings
 from api.utils.dependencies import get_settings
 
@@ -29,6 +29,7 @@ app.include_router(auth.router)
 app.include_router(users.router)
 app.include_router(period.router)
 app.include_router(temperature.router)
+app.include_router(symptoms.router)
 
 
 @app.get("/")

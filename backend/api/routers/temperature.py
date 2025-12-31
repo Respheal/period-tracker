@@ -46,7 +46,7 @@ async def create_temp_reading(
 async def get_temp_readings(
     session: Annotated[Session, Depends(get_session)],
     params: Annotated[CommonEventParams, Depends()],
-) -> models.EventResponse:
+) -> models.Response:
     start_datetime, end_datetime = convert_dates_to_range(
         params.start_date, params.end_date
     )
@@ -57,7 +57,7 @@ async def get_temp_readings(
         offset=params.offset,
         limit=params.limit,
     )
-    return models.EventResponse(events=readings, count=readings.__len__())
+    return models.Response(events={"temperatures": readings}, count=len(readings))
 
 
 @router.get("/me/", dependencies=[Depends(get_current_user)])
@@ -65,7 +65,7 @@ async def get_my_readings(
     current_user: Annotated[models.UserProfile, Depends(get_current_user)],
     session: Annotated[Session, Depends(get_session)],
     params: Annotated[CommonEventParams, Depends()],
-) -> models.EventResponse:
+) -> models.Response:
     start_datetime, end_datetime = convert_dates_to_range(
         params.start_date, params.end_date
     )
@@ -77,7 +77,7 @@ async def get_my_readings(
         offset=params.offset,
         limit=params.limit,
     )
-    return models.EventResponse(events=readings, count=readings.__len__())
+    return models.Response(events={"temperatures": readings}, count=len(readings))
 
 
 @router.get("/me/{temperature_id}")

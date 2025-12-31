@@ -31,6 +31,7 @@ class Response(SQLModel):
     """Base response model with count field used for list endpoints."""
 
     count: int
+    events: dict[str, list[Temperature | Period | SymptomEvent | UserSafe]]
 
 
 ###
@@ -61,11 +62,6 @@ class TokenPayload(SQLModel):
 ###
 # User
 ###
-class UserResponse(Response):
-    # count
-    users: list[UserSafe]
-
-
 class UserBase(SQLModel):
     username: str = Field(unique=True, index=True)
     display_name: str | None = None
@@ -344,11 +340,28 @@ class Cycle(SQLModel, table=True):
 
 
 class FlowIntensity(str, enum.Enum):
-    NONE = "none"
-    SPOTTING = "spotting"
-    LIGHT = "light"
-    MEDIUM = "medium"
-    HEAVY = "heavy"
+    NONE = 0
+    SPOTTING = 1
+    LIGHT = 2
+    MEDIUM = 3
+    HEAVY = 4
+
+
+class CreateSymptomParams(SQLModel):
+    date: Annotated[
+        str | None,
+        Body(
+            default=str((datetime.now(UTC) - timedelta(days=1)).date().isoformat()),
+            description="Date of the symptom event",
+            pattern=r"^\d{4}-\d{2}-\d{2}$",
+        ),
+    ] = None
+    flow_intensity: FlowIntensity | None = None
+    symptoms: list[str] | None = None
+    mood: list[str] | None = None
+    ovulation_test: bool | None = None
+    discharge: list[str] | None = None
+    sex: list[str] | None = None
 
 
 class CreateSymptomEvent(EventBase):
@@ -362,6 +375,23 @@ class CreateSymptomEvent(EventBase):
     ovulation_test: bool | None = None
     discharge: list[str] | None = Field(sa_column=Column(JSON), unique_items=True)
     sex: list[str] | None = Field(sa_column=Column(JSON), unique_items=True)
+
+
+class UpdateSymptomEvent(EventBase):
+    timestamp: Annotated[
+        str | None,
+        Body(
+            default=None,
+            description="YYYY-MM-DD format",
+            pattern=r"^\d{4}-\d{2}-\d{2}$",
+        ),
+    ] = None
+    flow_intensity: FlowIntensity | None = None
+    symptoms: list[str] | None = None
+    mood: list[str] | None = None
+    ovulation_test: bool | None = None
+    discharge: list[str] | None = None
+    sex: list[str] | None = None
 
 
 class SymptomEvent(CreateSymptomEvent, table=True):
@@ -391,9 +421,13 @@ class SymptomEvent(CreateSymptomEvent, table=True):
     pid: int = Field(default=None, primary_key=True, index=True)
 
 
-class EventResponse(Response):
-    # count
-    events: list[Temperature | Period | SymptomEvent]
+class SymptomSummary(SQLModel):
+    flow_intensity: FlowIntensity = FlowIntensity.NONE
+    symptoms: set[str] = set()
+    mood: set[str] = set()
+    ovulation_test: bool = False
+    discharge: set[str] = set()
+    sex: set[str] = set()
 
 
 ###
