@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import UTC, datetime
 from typing import Sequence
 
 from sqlmodel import Session, desc, select
@@ -17,6 +17,45 @@ def create_temp_reading(
     session.commit()
     session.refresh(db_reading)
     return db_reading
+
+
+def get_single_reading(
+    session: Session,
+    temperature_id: int,
+    user_id: str | None = None,
+) -> models.Temperature | None:
+    if user_id is None:  # pragma: no cover
+        return session.get(models.Temperature, temperature_id)
+    return session.exec(
+        select(models.Temperature).where(
+            models.Temperature.pid == temperature_id,
+            models.Temperature.user_id == user_id,
+        )
+    ).first()
+
+
+def update_temp(
+    session: Session, temp: models.Temperature, data: models.TempUpdate
+) -> models.Temperature:
+    temp_data = data.model_dump(exclude_unset=True)
+    if (
+        "timestamp" in temp_data
+        and temp_data["timestamp"] is not None
+        and isinstance(temp_data["timestamp"], str)
+    ):
+        temp_data["timestamp"] = datetime.strptime(
+            temp_data["timestamp"], "%Y-%m-%d"
+        ).replace(tzinfo=UTC)
+    temp.sqlmodel_update(temp_data)
+    session.add(temp)
+    session.commit()
+    session.refresh(temp)
+    return temp
+
+
+def delete_temp(session: Session, temperature: models.Temperature) -> None:
+    session.delete(temperature)
+    session.commit()
 
 
 def get_temp_readings(

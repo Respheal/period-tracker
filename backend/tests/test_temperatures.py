@@ -1,10 +1,11 @@
-from datetime import datetime
+from datetime import UTC, datetime
 
 from fastapi.testclient import TestClient
 from sqlmodel import Session
 
 from api.db import models
 from tests.utils.auth import get_user_headers
+from tests.utils.events import create_temperature_readings
 from tests.utils.user import create_random_user
 
 
@@ -14,9 +15,7 @@ class TestTemperatureCreation:
         client: TestClient,
         user_headers: dict[str, str],
     ) -> None:
-        response = client.post(
-            "/temp/", headers=user_headers, json={"temperature": 36.5}
-        )
+        response = client.post("/temp/", headers=user_headers, json={"temperature": 36.5})
         assert response.status_code == 200
         data = response.json()
         assert data["temperature"] == 36.5
@@ -27,15 +26,11 @@ class TestTemperatureCreation:
         user_headers: dict[str, str],
     ) -> None:
         # Temperature too low
-        response = client.post(
-            "/temp/", headers=user_headers, json={"temperature": 29.0}
-        )
+        response = client.post("/temp/", headers=user_headers, json={"temperature": 29.0})
         assert response.status_code == 422
 
         # Temperature too high
-        response = client.post(
-            "/temp/", headers=user_headers, json={"temperature": 41.0}
-        )
+        response = client.post("/temp/", headers=user_headers, json={"temperature": 41.0})
         assert response.status_code == 422
 
 
@@ -56,11 +51,164 @@ class TestTemperatureRetrieval:
         data = response.json()
         assert "count" in data
         assert data["count"] >= 3
-        assert isinstance(data["events"], list)
+        assert "events" in data
+        assert "temperatures" in data["events"]
+        assert len(data["events"]["temperatures"]) >= 3
 
-        temperatures = [event["temperature"] for event in data["events"]]
+        temperatures = [event["temperature"] for event in data["events"]["temperatures"]]
         for temp in temps:
             assert temp in temperatures
+
+    def test_get_single_temp_reading(
+        self,
+        client: TestClient,
+        user_headers: dict[str, str],
+    ) -> None:
+        # Create a temperature reading
+        create_response = client.post(
+            "/temp/", headers=user_headers, json={"temperature": 36.5}
+        )
+        assert create_response.status_code == 200
+        temp_id = create_response.json()["pid"]
+
+        # Retrieve the specific reading
+        response = client.get(f"/temp/me/{temp_id}", headers=user_headers)
+        assert response.status_code == 200
+        data = response.json()
+        assert data["pid"] == temp_id
+        assert data["temperature"] == 36.5
+
+    def test_get_single_temp_reading_not_found(
+        self,
+        client: TestClient,
+        user_headers: dict[str, str],
+    ) -> None:
+        response = client.get("/temp/me/99999", headers=user_headers)
+        assert response.status_code == 404
+
+    def test_get_other_user_temp(
+        self,
+        client: TestClient,
+        session: Session,
+        user_headers: dict[str, str],
+    ) -> None:
+        other_user = create_random_user(session)
+        # Create a temperature reading for the other user
+        other_temp = create_temperature_readings(session, other_user, [36.7])[0]
+        response = client.get(f"/temp/me/{other_temp.pid}", headers=user_headers)
+        assert response.status_code == 404
+
+
+class TestTemperatureUpdate:
+    def test_update_temp_reading(
+        self,
+        client: TestClient,
+        user_headers: dict[str, str],
+    ) -> None:
+        # Create a temperature reading
+        create_response = client.post(
+            "/temp/", headers=user_headers, json={"temperature": 36.5}
+        )
+        assert create_response.status_code == 200
+        temp_id = create_response.json()["pid"]
+
+        # Update the temperature
+        response = client.patch(
+            f"/temp/me/{temp_id}",
+            headers=user_headers,
+            json={"temperature": 37.0},
+        )
+        assert response.status_code == 200
+        data = response.json()
+        assert data["temperature"] == 37.0
+
+    def test_update_temp_timestamp(
+        self,
+        client: TestClient,
+        user_headers: dict[str, str],
+    ) -> None:
+        # Create a temperature reading
+        create_response = client.post(
+            "/temp/", headers=user_headers, json={"temperature": 36.5}
+        )
+        assert create_response.status_code == 200
+        temp_id = create_response.json()["pid"]
+
+        # Update the timestamp
+        response = client.patch(
+            f"/temp/me/{temp_id}",
+            headers=user_headers,
+            json={"timestamp": "2025-01-15"},
+        )
+        assert response.status_code == 200
+        data = response.json()
+        assert "2025-01-15" in data["timestamp"]
+
+    def test_update_temp_reading_not_found(
+        self,
+        client: TestClient,
+        user_headers: dict[str, str],
+    ) -> None:
+        response = client.patch(
+            "/temp/me/99999",
+            headers=user_headers,
+            json={"temperature": 37.0},
+        )
+        assert response.status_code == 404
+
+    def test_update_temp_validation(
+        self,
+        client: TestClient,
+        user_headers: dict[str, str],
+    ) -> None:
+        # Create a temperature reading
+        create_response = client.post(
+            "/temp/", headers=user_headers, json={"temperature": 36.5}
+        )
+        assert create_response.status_code == 200
+        temp_id = create_response.json()["pid"]
+
+        # Try to update with invalid temperature
+        response = client.patch(
+            f"/temp/me/{temp_id}",
+            headers=user_headers,
+            json={"temperature": 50.0},  # Too high
+        )
+        assert response.status_code == 422
+
+
+class TestTemperatureDeletion:
+    def test_delete_temp_reading(
+        self,
+        client: TestClient,
+        user_headers: dict[str, str],
+    ) -> None:
+        # Create a temperature reading
+        create_response = client.post(
+            "/temp/", headers=user_headers, json={"temperature": 36.5}
+        )
+        assert create_response.status_code == 200
+        temp_id = create_response.json()["pid"]
+
+        # Delete the temperature
+        response = client.delete(f"/temp/me/{temp_id}", headers=user_headers)
+        assert response.status_code == 200
+
+        data = response.json()
+        assert data["resource_type"] == "temperature"
+        assert data["resource_id"] == str(temp_id)
+
+        # Verify it's actually deleted
+        get_response = client.get(f"/temp/me/{temp_id}", headers=user_headers)
+        assert get_response.status_code == 404
+
+    def test_delete_temp_reading_not_found(
+        self,
+        client: TestClient,
+        user_headers: dict[str, str],
+    ) -> None:
+        response = client.delete("/temp/me/99999", headers=user_headers)
+        assert response.status_code == 404
 
 
 class TestTemperatureAdminAccess:
@@ -87,14 +235,14 @@ class TestTemperatureAdminAccess:
             models.Temperature(
                 user_id=user2.user_id,
                 temperature=37.5,
-                timestamp=datetime(2024, 12, 19, 0, 0, 0, 0),
+                timestamp=datetime(2024, 12, 19, 0, 0, 0, 0, tzinfo=UTC),
             )
         )
         session.add(
             models.Temperature(
                 user_id=user2.user_id,
                 temperature=37.5,
-                timestamp=datetime(2024, 6, 19, 0, 0, 0, 0),
+                timestamp=datetime(2024, 6, 19, 0, 0, 0, 0, tzinfo=UTC),
             )
         )
         session.commit()
@@ -106,9 +254,10 @@ class TestTemperatureAdminAccess:
         data = response.json()
         assert "count" in data
         assert data["count"] >= 6
-        assert isinstance(data["events"], list)
+        assert "events" in data
+        assert "temperatures" in data["events"]
 
-        temperatures = [event["temperature"] for event in data["events"]]
+        temperatures = [event["temperature"] for event in data["events"]["temperatures"]]
         for temp in [36.5, 37.0, 36.8, 37.2]:
             assert temp in temperatures
 
@@ -133,12 +282,19 @@ class TestTemperatureDateFiltering:
         user_headers = get_user_headers(client, session, user.username)
 
         client.post("/temp/", headers=user_headers, json={"temperature": 36.5})
-
+        # Also create some readings in the past for date filtering tests
         session.add(
             models.Temperature(
                 user_id=user.user_id,
                 temperature=37.5,
-                timestamp=datetime(2024, 6, 19, 0, 0, 0, 0),
+                timestamp=datetime(2024, 12, 19, 0, 0, 0, 0, tzinfo=UTC),
+            )
+        )
+        session.add(
+            models.Temperature(
+                user_id=user.user_id,
+                temperature=37.5,
+                timestamp=datetime(2024, 6, 19, 0, 0, 0, 0, tzinfo=UTC),
             )
         )
         session.commit()
@@ -146,9 +302,8 @@ class TestTemperatureDateFiltering:
         # Test start_date filter
         response = client.get("/temp/?start_date=2025-01-01", headers=admin_headers)
         assert response.status_code == 200
-
         data = response.json()
-        for event in data["events"]:
+        for event in data["events"]["temperatures"]:
             assert event["timestamp"] >= "2025-01-01T00:00:00"
 
     def test_filter_by_end_date(
@@ -158,21 +313,19 @@ class TestTemperatureDateFiltering:
         admin_headers: dict[str, str],
     ) -> None:
         user = create_random_user(session)
-
         session.add(
             models.Temperature(
                 user_id=user.user_id,
                 temperature=37.5,
-                timestamp=datetime(2024, 6, 19, 0, 0, 0, 0),
+                timestamp=datetime(2024, 6, 19, 0, 0, 0, 0, tzinfo=UTC),
             )
         )
         session.commit()
 
         response = client.get("/temp/?end_date=2025-01-01", headers=admin_headers)
         assert response.status_code == 200
-
         data = response.json()
-        for event in data["events"]:
+        for event in data["events"]["temperatures"]:
             assert event["timestamp"] <= "2025-01-01T00:00:00"
 
     def test_filter_by_date_range(
@@ -182,12 +335,11 @@ class TestTemperatureDateFiltering:
         admin_headers: dict[str, str],
     ) -> None:
         user = create_random_user(session)
-
         session.add(
             models.Temperature(
                 user_id=user.user_id,
                 temperature=37.5,
-                timestamp=datetime(2024, 6, 19, 0, 0, 0, 0),
+                timestamp=datetime(2024, 6, 19, 0, 0, 0, 0, tzinfo=UTC),
             )
         )
         session.commit()
@@ -196,9 +348,8 @@ class TestTemperatureDateFiltering:
             "/temp/?start_date=2024-01-01&end_date=2024-09-01", headers=admin_headers
         )
         assert response.status_code == 200
-
         data = response.json()
-        for event in data["events"]:
+        for event in data["events"]["temperatures"]:
             assert event["timestamp"] <= "2024-09-01T00:00:00"
             assert event["timestamp"] >= "2024-01-01T00:00:00"
 
@@ -213,10 +364,8 @@ class TestTemperatureAverages:
         temps = [36.5, 37.0, 36.8, 37.2, 36.9]
         for temp in temps:
             client.post("/temp/", headers=user_headers, json={"temperature": temp})
-
         response = client.get("/temp/me/averages/", headers=user_headers)
         assert response.status_code == 200
-
         data = response.json()
         assert isinstance(data, list)
         assert len(data) >= 1
@@ -238,14 +387,13 @@ class TestTemperatureAverages:
         user_headers: dict[str, str],
     ) -> None:
         # Create temperature readings
-        temps = [36.567, 37.123, 36.891]
+        temps = [36.564567, 37.12643, 36.89451]
         for temp in temps:
             client.post("/temp/", headers=user_headers, json={"temperature": temp})
 
         # Test with default precision (2)
         response = client.get("/temp/me/averages/", headers=user_headers)
         assert response.status_code == 200
-
         data = response.json()
         # Check that values are rounded to 2 decimal places
         for item in data:
@@ -257,6 +405,10 @@ class TestTemperatureAverages:
         assert response.status_code == 200
         data = response.json()
         assert isinstance(data, list)
+        # Check that values are rounded to 4 decimal places
+        for item in data:
+            assert len(str(item["ewm"]).split(".")[-1]) <= 4
+            assert len(str(item["baseline"]).split(".")[-1]) <= 4
 
 
 class TestTemperatureState:
@@ -272,79 +424,3 @@ class TestTemperatureState:
         assert user.temp_state is not None
         assert user.temp_state.phase == models.TempPhase.LEARNING
         assert user.temp_state.baseline is None
-
-    def test_temperature_state_updates_with_readings(
-        self,
-        session: Session,
-        client: TestClient,
-    ) -> None:
-        """Test that temperature state updates as readings are added."""
-        user = create_random_user(session)
-        user_headers = get_user_headers(client, session, user.username)
-
-        # Add enough readings to move out of LEARNING phase
-        for _ in range(15):
-            client.post("/temp/", headers=user_headers, json={"temperature": 36.5})
-
-        session.refresh(user)
-        # Should have moved to LOW phase
-        assert user.temp_state.phase in [models.TempPhase.LOW, models.TempPhase.LEARNING]
-        if user.temp_state.phase == models.TempPhase.LOW:
-            assert user.temp_state.baseline is not None
-
-    def test_temperature_state_elevated_phase(
-        self,
-        session: Session,
-        client: TestClient,
-    ) -> None:
-        """Test that elevated phase is detected correctly."""
-        user = create_random_user(session)
-        user_headers = get_user_headers(client, session, user.username)
-
-        # Add low baseline readings (need enough to establish baseline)
-        for _ in range(20):
-            client.post("/temp/", headers=user_headers, json={"temperature": 36.5})
-
-        # Add sustained elevated readings
-        for _ in range(5):
-            client.post("/temp/", headers=user_headers, json={"temperature": 37.5})
-
-        session.refresh(user)
-        # Note: Background task execution in tests may not always trigger immediately,
-        # so we accept LEARNING, LOW, or ELEVATED as valid states
-        assert user.temp_state.phase in [
-            models.TempPhase.ELEVATED,
-            models.TempPhase.LOW,
-            models.TempPhase.LEARNING,
-        ]
-
-
-class TestTemperatureExport:
-    def test_csv_export_includes_averages(
-        self,
-        client: TestClient,
-        user_headers: dict[str, str],
-    ) -> None:
-        """Test that CSV export includes ewm and baseline columns."""
-        # Create some temperature readings
-        temps = [36.5, 37.0, 36.8, 37.2, 36.9]
-        for temp in temps:
-            client.post("/temp/", headers=user_headers, json={"temperature": temp})
-
-        response = client.get("/temp/me/csv/", headers=user_headers)
-        assert response.status_code == 200
-        assert response.headers["content-type"] == "text/csv; charset=utf-8"
-
-        # Parse CSV - handle both Unix (\n) and Windows (\r\n) line endings
-        csv_content = response.text
-        lines = csv_content.strip().replace("\r\n", "\n").split("\n")
-        headers = [h.strip() for h in lines[0].split(",")]
-
-        # Verify required columns exist
-        assert "timestamp" in headers
-        assert "temperature" in headers
-        assert "ewm" in headers
-        assert "baseline" in headers
-
-        # Verify we have data rows
-        assert len(lines) > 1

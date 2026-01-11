@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 from typing import Annotated, Literal
 from uuid import uuid4
 
@@ -60,7 +60,7 @@ def create_token(
     Returns:
         str: The encoded JWT token.
     """
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
     if token_type == "access":  # nosec B105
         exp = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
     elif token_type == "refresh":  # nosec B105

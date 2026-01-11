@@ -1,4 +1,4 @@
-from datetime import UTC, datetime, timedelta
+from datetime import UTC, date, datetime, timedelta
 from typing import Sequence
 
 import pandas as pd
@@ -18,20 +18,15 @@ def temperatures_to_frame(
     """Convert Temperatures to a time-indexed DataFrame."""
     df = pd.DataFrame(
         [
-            {
-                "timestamp": pd.to_datetime(t.timestamp, utc=True),
-                "temperature": t.temperature,
-            }
+            {"timestamp": pd.to_datetime(t.timestamp), "temperature": t.temperature}
             for t in temps
         ]
     )
     if df.empty:
         return df
-    df = df.sort_values("timestamp")
-    if index:
-        df = df.set_index("timestamp").resample("D").mean()
-    else:
-        df = df.resample("D", on="timestamp").mean()
+    df = df.sort_values("timestamp").set_index("timestamp").resample("D").mean()
+    if not index:
+        df = df.reset_index()
     return df
 
 
@@ -199,7 +194,7 @@ def evaluate_cycle_state(
     cycle_data = previous_state or models.Cycle(state=models.CycleState.LEARNING)
     cycle_data.last_evaluated = datetime.now(UTC)
 
-    if df.empty or len(df) < 2:
+    if df.empty or len(df) <= settings.MIN_CYCLES_FOR_STABLE:
         cycle_data.state = models.CycleState.LEARNING
         return cycle_data
 
@@ -210,10 +205,11 @@ def evaluate_cycle_state(
     period_lengths = compute_period_lengths(df)
     avg_period = compute_period_average(period_lengths)
 
-    cycle_data.avg_cycle_length = avg_cycle
-    cycle_data.avg_period_length = avg_period
+    cycle_data.avg_cycle_length = int(avg_cycle) if avg_cycle is not None else None
+    cycle_data.avg_period_length = int(avg_period) if avg_period is not None else None
 
-    if avg_cycle is None:
+    if avg_cycle is None:  # pragma: no cover
+        # We likely already hit this case above, but just in case
         cycle_data.state = models.CycleState.LEARNING
     elif (
         valid_mask.tail(settings.MIN_CYCLES_FOR_STABLE).sum()
@@ -229,18 +225,20 @@ def evaluate_cycle_state(
 def detect_elevated_phase_start(
     temperatures: Sequence[models.Temperature],
     period: models.Period,
-) -> datetime | None:
+) -> date | None:
     """
     Returns the first day of an elevated phase preceding the given period,
     or None if not found.
     """
     df = temperatures_to_frame(temperatures, index=False)
+    if df.empty:
+        return None
     # Get the subset of data before the period, within the lookback window
     window_start = period.start_date - timedelta(days=settings.MAX_LOOKBACK_DAYS)
     subset = df[
         (df["timestamp"] < period.start_date) & (df["timestamp"] >= window_start)
     ].copy()
-    if subset.empty:
+    if subset.empty:  # pragma: no cover
         return None
 
     # With the computed temperature baseline, find the first day of a sustained
@@ -258,7 +256,7 @@ def detect_elevated_phase_start(
             consecutive += 1
             if consecutive == settings.ELEVATION_DAYS_REQUIRED:
                 # First day of the elevated run
-                first_day: datetime = (
+                first_day: date = (
                     row["timestamp"]
                     - timedelta(days=settings.ELEVATION_DAYS_REQUIRED - 1)
                 ).date()
@@ -268,13 +266,13 @@ def detect_elevated_phase_start(
     return None
 
 
-def compute_luteal_length(elevated_phase_start: datetime, period_start: datetime) -> int:
+def compute_luteal_length(elevated_phase_start: date, period_start: datetime) -> int:
     luteal_start = elevated_phase_start - timedelta(days=1)
-    return (period_start - luteal_start).days
+    return (period_start.date() - luteal_start).days
 
 
 def is_valid_luteal_length(length: int) -> bool:
-    return settings.MIN_LUTEAL <= length <= settings.MAX_LUTEAL
+    return settings.MIN_LUTEAL_DAYS <= length <= settings.MAX_LUTEAL_DAYS
 
 
 def compute_average_luteal_length(df: pd.DataFrame) -> int | None:
@@ -292,29 +290,87 @@ def compute_average_luteal_length(df: pd.DataFrame) -> int | None:
 
 def predict_next_period(
     cycle_state: models.Cycle, periods: Sequence[models.Period]
-) -> models.Period | None:
+) -> models.PredictedPeriod | None:
     # If we have the temperature data, use that and the historical luteal length to
     # predict the next period start date. If not, fall back to cycle averages.
     df = periods_to_frame(periods)
     last_period: datetime | None = df["start"].iloc[-1].date() if not df.empty else None
-    if (
-        cycle_state.state != models.CycleState.STABLE
-        or not cycle_state.avg_cycle_length
-        or not last_period
-    ):
+    if not last_period:
         return None
-
+    if cycle_state.state == models.CycleState.UNSTABLE:
+        # Don't make an attempt if the state is unstable
+        return None
     # Check if we can get an average luteal length from provided data
     avg_luteal = compute_average_luteal_length(df)
-    if avg_luteal:
+    if avg_luteal and cycle_state.avg_cycle_length:
         expected_start = last_period + timedelta(
             days=cycle_state.avg_cycle_length - avg_luteal
         )
-    else:
+        confidence = 0.8  # High confidence with luteal-based prediction
+    elif cycle_state.avg_cycle_length:
         # Fallback to cycle-based prediction
         expected_start = last_period + timedelta(days=round(cycle_state.avg_cycle_length))
+        confidence = 0.5  # Lower confidence without luteal data
+    else:
+        # Fallback to a statistically average cycle length
+        expected_start = last_period + timedelta(days=28)
+        confidence = 0.2  # Low confidence with generic average
     expected_end = expected_start + timedelta(days=cycle_state.avg_period_length or 0)
 
-    return models.Period(
-        user_id=cycle_state.user_id, start_date=expected_start, end_date=expected_end
+    return models.PredictedPeriod(
+        start_date=expected_start, end_date=expected_end, confidence=confidence
     )
+
+
+def combine_events(
+    periods: Sequence[models.Period],
+    temperatures: Sequence[models.Temperature],
+    symptoms: Sequence[models.SymptomEvent],
+) -> pd.DataFrame:  # pragma: no cover
+    """Combine period, temperature, and symptom events into a single DataFrame."""
+    # Get periods and reformat to fit logically with the rest of the data
+    period_df = periods_to_frame(periods)
+    period_df["period_start"] = period_df["start"]
+    period_df = period_df.rename(columns={"start": "date", "end": "period_end"})
+    period_df["period_end"] = period_df["period_end"].dt.date
+    period_df = period_df[["date", "period_start", "period_end", "luteal_length"]]
+    # Get temperatures
+    temp_df = temperatures_to_frame(temperatures, index=False)
+    temp_df = temp_df.rename(columns={"timestamp": "date"})
+    # For symptoms, we'll need to group the fields by date.
+    # For each date, we'll aggregate the symptoms, mood, sex, and discharge lists.
+    # For ovulation_test, any True on that date overrides any Falses on that date
+    # For flow_intensity, we'll take the max intensity on that date.
+    symptom_records: dict[str, models.SymptomSummary] = {}
+    for symptom in symptoms:
+        date_str = symptom.date.date().isoformat()
+        if date_str not in symptom_records:
+            symptom_records[date_str] = models.SymptomSummary()
+        symptom_records[date_str].symptoms.update(symptom.symptoms or [])
+        symptom_records[date_str].mood.update(symptom.mood or [])
+        symptom_records[date_str].sex.update(symptom.sex or [])
+        symptom_records[date_str].discharge.update(symptom.discharge or [])
+        if symptom.ovulation_test:
+            symptom_records[date_str].ovulation_test = True
+        if symptom.flow_intensity is not None:
+            symptom_records[date_str].flow_intensity = max(
+                symptom_records[date_str].flow_intensity, symptom.flow_intensity
+            )
+    symptom_df = pd.DataFrame(
+        [
+            {"date": datetime.fromisoformat(date_str), **data.model_dump()}
+            for date_str, data in symptom_records.items()
+        ]
+    )
+    # Join all the lists into comma-separated strings for CSV output
+    symptom_df["symptoms"] = [", ".join(map(str, sym)) for sym in symptom_df["symptoms"]]
+    symptom_df["mood"] = [", ".join(map(str, mood)) for mood in symptom_df["mood"]]
+    symptom_df["sex"] = [", ".join(map(str, sex)) for sex in symptom_df["sex"]]
+    symptom_df["discharge"] = [
+        ", ".join(map(str, discharge)) for discharge in symptom_df["discharge"]
+    ]
+    # Now merge all three DataFrames on date
+    combined_df = pd.merge(period_df, temp_df, how="outer", on="date")
+    combined_df = pd.merge(combined_df, symptom_df, how="outer", on="date")
+    combined_df = combined_df.sort_values("date").reset_index(drop=True)
+    return combined_df

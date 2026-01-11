@@ -60,14 +60,14 @@
 - [x] Username
 - [x] Display Name
 - [x] Password (hashed)
-- [ ] Average menses length (average period length in days)
-- [ ] Average cycle length (average time between period start dates)
+- [x] Average menses length (average period length in days) (separate model)
+- [x] Average cycle length (average time between period start dates) (separate model)
 - [ ] Partners (List of users with access to this User's calendar, many-many)
   - Period Only option (only displays the user's period dates and stats for the partner)
 
 #### User Stats
 
-- [ ] Endpoint to retrieve user stats
+- [x] Endpoint to retrieve user stats
   - Median and Mean period length (exponential moving average)
   - Median and mean cycle length (exponential moving average)
   - Median and mean temperature (exponential moving average)
@@ -88,13 +88,13 @@
 
 ### Events
 
-- [ ] Endpoint to retrieve all events
+- [x] Endpoint to retrieve all events
   - User.id
   - Date Range
   - Event Type
   - Skip/Limit (default: 0/100)
   - Also display count (refer to Netbox's API response)
-- [ ] Endpoint to retrieve all events as csv
+- [x] Endpoint to retrieve all events as csv
   - Same filters as above
 
 #### Period Events
@@ -104,20 +104,20 @@
   - End Date (Optional)
   - Length (Optional, updated when both start/end known)
   - User.id
-- [ ] Endpoint to create an menstrual event (period start date)
+- [x] Endpoint to create an menstrual event (period start date)
   - Start Date updates the User median and mean period length (exponential moving average)
   - State+End updates the User median and mean cycle length (exponential moving average)
-- [ ] Endpoint to retrieve all mentrual events
+- [x] Endpoint to retrieve all mentrual events
   - Filter by:
     - Date Range
     - Length
     - Skip/Limit (default: 0/100)
     - Also display count (refer to Netbox's API response)
-- [ ] Endpoint to retrieve mentrual events as CSV (ref: https://medium.com/@liamwr17/supercharge-your-apis-with-csv-and-excel-exports-fastapi-pandas-a371b2c8f030)
+- [x] Endpoint to retrieve mentrual events as CSV (ref: https://medium.com/@liamwr17/supercharge-your-apis-with-csv-and-excel-exports-fastapi-pandas-a371b2c8f030)
   - Same filters as above
-- [ ] Endpoint to retrieve a specific mentrual event
-- [ ] Endpoint to update a menstrual event (e.g. update the end date)
-- [ ] Endpoint to delete a menstrual event
+- [x] Endpoint to retrieve a specific mentrual event
+- [x] Endpoint to update a menstrual event (e.g. update the end date)
+- [x] Endpoint to delete a menstrual event
 
 #### Symptom Events
 
@@ -130,18 +130,18 @@
   - Ovulation test (none, positive, negative)
   - Discharge (none, creamy, sticky, unusual)
   - Sex (protected, unprotected, morning-after pill)
-- [ ] Endpoint to retrieve all symptom events
+- [x] Endpoint to retrieve all symptom events
   - Filter by:
     - Date Range
     - Symptom (list[str], and\_)
     - Skip/Limit (default: 0/100)
     - Also display count (refer to Netbox's API response)
-- [ ] Endpoint to retrieve symptom events as CSV
+- [x] Endpoint to retrieve symptom events as CSV
   - Same filters as above
-- [ ] Endpoint to retrieve a specific symptom event
-- [ ] Endpoint to create a symptom event
-- [ ] Endpoint to update a symptom event
-- [ ] Endpoint to delete a symptom event
+- [x] Endpoint to retrieve a specific symptom event
+- [x] Endpoint to create a symptom event
+- [x] Endpoint to update a symptom event
+- [x] Endpoint to delete a symptom event
 
 #### Temperature Events
 
@@ -154,13 +154,12 @@
     - Date Range
     - Skip/Limit (default: 0/100)
     - Also display count (refer to Netbox's API response)
-- [ ] Endpoint to retrieve temperature events as CSV
+- [x] Endpoint to retrieve temperature events as CSV
   - Same filters as above
-  - I have a rough draft of this but I could probably do better
-- [ ] Endpoint to retrieve a specific temperature event
+- [x] Endpoint to retrieve a specific temperature event
 - [x] Endpoint to create a temperature event
-- [ ] Endpoint to update a temperature event
-- [ ] Endpoint to delete a temperature event
+- [x] Endpoint to update a temperature event
+- [x] Endpoint to delete a temperature event
 
 ## Frontend
 
