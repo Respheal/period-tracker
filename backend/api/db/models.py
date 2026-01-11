@@ -152,6 +152,9 @@ class User(UserSafe, table=True):
         cascade_delete=True,
         sa_relationship_kwargs={"uselist": False},
     )
+    # partners: list[User] = Relationship(
+    #     back_populates="partners", link_model="Partners", cascade_delete=True
+    # )
     hashed_password: str
 
 
@@ -163,6 +166,15 @@ class UserUpdate(SQLModel):
 class UserAdminUpdate(UserUpdate):
     is_disabled: bool | None = None
     is_admin: bool | None = None
+
+
+class Partners(SQLModel, table=True):
+    user_id: str = Field(
+        foreign_key="user.user_id", primary_key=True, index=True, ondelete="CASCADE"
+    )
+    partner_user_id: str = Field(
+        foreign_key="user.user_id", primary_key=True, index=True, ondelete="CASCADE"
+    )
 
 
 ###
