@@ -12,8 +12,10 @@ if os.environ.get("ENVIRONMENT") == "test":  # pragma: no branch
     env_path = rf"{Path(__file__).absolute().parent.parent.parent.parent}/.env.test"
     load_dotenv(env_path, override=True)
 
-DATABASE_HOST = os.environ.get("DATABASE", settings.DATABASE)
-DATABASE_URL = f"sqlite:///./{DATABASE_HOST}"
+DATABASE_DIR = os.environ.get("DATA_DIR", "./data/")
+os.makedirs(DATABASE_DIR, exist_ok=True)
+DATABASE_FILE = os.environ.get("DATABASE", settings.DATABASE)
+DATABASE_URL = f"sqlite:///{DATABASE_DIR}{DATABASE_FILE}"
 
 engine = create_engine(
     DATABASE_URL,
