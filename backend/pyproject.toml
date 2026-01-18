@@ -40,19 +40,10 @@ pytest-dotenv = "^0.5.2"
 httpx = "^0.28.1"
 fakeredis = "^2.32.1"
 pytest-env = "^1.2.0"
-coverage = "^7.13.0"
 pytest-cov = "^7.0.0"
 
 [tool.poetry.group.tox.dependencies]
 tox = "^4.32.0"
-
-[tool.poetry.group.dev]
-include-groups = [
-    "tox",
-    "lint",
-    "security",
-    "test",
-]
 
 [build-system]
 requires = ["poetry-core>=2.0.0,<3.0.0"]
