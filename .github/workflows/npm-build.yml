@@ -9,8 +9,14 @@ on:
   pull_request:
     branches: ["main"]
     types: [opened, synchronize, reopened, ready_for_review]
+    paths:
+      - "frontend/**"
+      - ".github/workflows/npm-build.yml"
   push:
     branches: ["main"]
+    paths:
+      - "frontend/**"
+      - ".github/workflows/npm-build.yml"
 
 permissions:
   contents: read
