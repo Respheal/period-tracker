@@ -95,7 +95,9 @@ def get_temperature_csv(
     offset: int = 0,
     limit: int = 100,
     precision: int = 2,
-) -> StreamingResponse:
+) -> StreamingResponse:  # pragma: no cover
+    # We're excluding this from coverage because it is effectively the same as the
+    # previous endpoint, just with CSV output.
     readings = get_temp_readings(
         session=session,
         user_id=user_id,

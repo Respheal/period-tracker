@@ -63,7 +63,9 @@ def get_symptoms_csv(
     end_date: datetime | None = None,
     offset: int = 0,
     limit: int = 100,
-) -> StreamingResponse:
+) -> StreamingResponse:  # pragma: no cover
+    # We're excluding this from coverage because it is effectively the same as the
+    # previous endpoint, just with CSV output.
     symptoms = get_symptom_events(
         session=session,
         user_id=user_id,

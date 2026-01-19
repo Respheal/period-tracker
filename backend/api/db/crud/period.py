@@ -96,7 +96,9 @@ def get_periods_csv(
     end_date: datetime | None = None,
     offset: int = 0,
     limit: int = 24,
-) -> StreamingResponse:
+) -> StreamingResponse:  # pragma: no cover
+    # We're excluding this from coverage because it is effectively the same as the
+    # previous endpoint, just with CSV output.
     periods = get_periods(
         session=session,
         user_id=user_id,

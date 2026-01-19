@@ -4,6 +4,7 @@ from fastapi.testclient import TestClient
 from sqlmodel import Session
 
 from api.db import models
+from api.db.crud.user import add_partner
 from tests.utils.auth import get_user_headers
 from tests.utils.events import create_symptom_events
 from tests.utils.user import create_random_user
@@ -322,3 +323,52 @@ class TestSymptomEventDateFiltering:
             event_date = datetime.fromisoformat(event["date"]).date()
             assert datetime.fromisoformat(start_date).date() <= event_date
             assert event_date <= datetime.fromisoformat(end_date).date()
+
+
+class TestPartnerSymptomEventAccess:
+    def test_get_partner_symptoms_authorized(
+        self, client: TestClient, session: Session
+    ) -> None:
+        user = create_random_user(session)
+        partner = create_random_user(session)
+        add_partner(session, user, partner)
+        user_headers = get_user_headers(client, session, user.username)
+
+        # Create symptom events for partner
+        create_symptom_events(
+            session,
+            partner,
+            [{"date": datetime.now(UTC).date().isoformat(), "mood": ["happy"]}],
+        )
+
+        response = client.get(
+            f"/symptoms/partner/{partner.user_id}/",
+            headers=user_headers,
+        )
+        assert response.status_code == 200
+        data = response.json()
+        assert "symptoms" in data["data"]
+        assert data["count"] == 1
+        for event in data["data"]["symptoms"]:
+            assert event["user_id"] == partner.user_id
+
+    def test_get_partner_symptoms_unauthorized(
+        self, client: TestClient, session: Session
+    ) -> None:
+        user = create_random_user(session)
+        partner = create_random_user(session)
+        user_headers = get_user_headers(client, session, user.username)
+
+        response = client.get(
+            f"/symptoms/partner/{partner.user_id}/",
+            headers=user_headers,
+        )
+        assert response.status_code == 403
+        assert response.json()["detail"] == "You do not have access to this user's data."
+
+    def test_get_partner_symptoms_requires_authentication(
+        self, client: TestClient, session: Session
+    ) -> None:
+        partner = create_random_user(session)
+        response = client.get(f"/symptoms/partner/{partner.user_id}/")
+        assert response.status_code == 401

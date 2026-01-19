@@ -2,14 +2,7 @@ from typing import Sequence
 
 from sqlmodel import Session, select
 
-from api.db.models import (
-    TemperatureState,
-    User,
-    UserCreate,
-    UserProfile,
-    UserSafe,
-    UserUpdate,
-)
+from api.db.models import TemperatureState, User, UserCreate, UserProfile, UserUpdate
 from api.utils import auth
 from api.utils.stats import evaluate_cycle_state, evaluate_temperature_state
 
@@ -73,13 +66,6 @@ def update_temp_state(
     return user
 
 
-def get_user_partners(session: Session, user_id: str) -> Sequence[User]:
-    user = get_user(session, user_id)
-    if not user:
-        return []
-    return user.partners
-
-
 def add_partner(session: Session, user: User, partner: User) -> User:
     if partner not in user.partners:
         user.partners.append(partner)
@@ -102,4 +88,4 @@ def is_partner(session: Session, user: UserProfile, partner_id: str) -> bool:
     partner = get_user(session, partner_id)
     if not partner:
         return False
-    return UserSafe.model_validate(partner) in (user.partners or [])
+    return partner in (user.partners or [])

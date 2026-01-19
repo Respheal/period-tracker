@@ -4,6 +4,7 @@ from fastapi.testclient import TestClient
 from sqlmodel import Session
 
 from api.db import models
+from api.db.crud.user import add_partner
 from tests.utils.auth import get_user_headers
 from tests.utils.user import create_random_user
 
@@ -320,3 +321,49 @@ class TestPeriodPrediction:
         assert data is not None
         assert data["start_date"] == today.date().isoformat()
         assert data["end_date"] == (today + timedelta(days=3)).date().isoformat()
+
+
+class TestPartnerPeriodAccess:
+    def test_get_partner_periods(self, client: TestClient, session: Session) -> None:
+        user = create_random_user(session)
+        partner = create_random_user(session)
+        add_partner(session, user, partner)
+        user_headers = get_user_headers(client, session, user.username)
+        partner_headers = get_user_headers(client, session, partner.username)
+
+        # Create a period for partner
+        client.post(
+            "/period/",
+            headers=partner_headers,
+            json={"start_date": "2025-04-01", "end_date": "2025-04-05"},
+        )
+
+        response = client.get(f"/period/partner/{partner.user_id}/", headers=user_headers)
+        assert response.status_code == 200
+        response_json = response.json()
+        assert "count" in response_json
+        assert "periods" in response_json["data"]
+        assert response_json["count"] >= 1
+
+    def test_get_partner_periods_unauthorized(
+        self, client: TestClient, session: Session
+    ) -> None:
+        user1 = create_random_user(session)
+        user2 = create_random_user(session)
+        user1_headers = get_user_headers(client, session, user1.username)
+        user2_headers = get_user_headers(client, session, user2.username)
+
+        # Create a period for user2
+        client.post(
+            "/period/",
+            headers=user2_headers,
+            json={"start_date": "2025-04-01", "end_date": "2025-04-05"},
+        )
+
+        # Try to get periods from the second user without a partnership
+        response = client.get(
+            f"/period/partner/{user2.user_id}/",
+            headers=user1_headers,
+        )
+        assert response.status_code == 403
+        assert response.json()["detail"] == "You do not have access to this user's data."

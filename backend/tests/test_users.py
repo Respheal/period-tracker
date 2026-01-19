@@ -4,6 +4,7 @@ from fastapi.testclient import TestClient
 from sqlmodel import Session
 
 from api.db import models
+from api.db.crud.user import add_partner, is_partner
 from tests.utils import is_valid_uuid
 from tests.utils.auth import get_user_headers
 from tests.utils.events import (
@@ -178,4 +179,129 @@ class TestGetMyEvents:
 
     def test_get_my_events_unauthenticated(self, client: TestClient) -> None:
         response = client.get("/users/me/events/")
+        assert response.status_code == 401
+
+
+class TestIsPartner:
+    def test_is_partner(self, client: TestClient, session: Session) -> None:
+        # Create two users and add one as partner to the other
+        user1 = create_random_user(session)
+        user2 = create_random_user(session)
+        add_partner(session=session, user=user1, partner=user2)
+        session.refresh(user1)
+        assert is_partner(session, user1, user2.user_id) is True
+
+    def test_is_not_partner(self, client: TestClient, session: Session) -> None:
+        # Create two users without partnership
+        user1 = create_random_user(session)
+        user2 = create_random_user(session)
+        assert is_partner(session, user1, user2.user_id) is False
+
+    def test_partner_not_found(self, client: TestClient, session: Session) -> None:
+        # Create a user
+        user1 = create_random_user(session)
+        # Check partnership with non-existent user
+        assert is_partner(session, user1, "non-existent-id") is False
+
+
+class TestGetMyPartners:
+    def test_get_my_partners(self, client: TestClient, session: Session) -> None:
+        # Create two users and add one as partner to the other
+        user1 = create_random_user(session)
+        user2 = create_random_user(session)
+        user1_headers = get_user_headers(client, session, user1.username)
+        # Add partner
+        client.post(f"/users/me/partners/{user2.user_id}/", headers=user1_headers)
+        # Get partners
+        response = client.get("/users/me/partners/", headers=user1_headers)
+        assert response.status_code == 200
+        data = response.json()
+        assert "count" in data
+        assert data["count"] == 1
+        assert "data" in data
+        assert "partners" in data["data"]
+        assert isinstance(data["data"]["partners"], list)
+        assert any(p["user_id"] == user2.user_id for p in data["data"]["partners"])
+
+    def test_no_partners(self, client: TestClient, session: Session) -> None:
+        user = create_random_user(session)
+        user_headers = get_user_headers(client, session, user.username)
+        response = client.get("/users/me/partners/", headers=user_headers)
+        assert response.status_code == 200
+        data = response.json()
+        assert data["count"] == 0
+        assert "partners" in data["data"]
+        assert data["data"]["partners"] == []
+
+    def test_get_my_partners_unauthenticated(self, client: TestClient) -> None:
+        response = client.get("/users/me/partners/")
+        assert response.status_code == 401
+
+
+class TestAddPartner:
+    def test_add_partner_success(self, client: TestClient, session: Session) -> None:
+        # Create two users
+        user1 = create_random_user(session)
+        user2 = create_random_user(session)
+        user1_headers = get_user_headers(client, session, user1.username)
+
+        response = client.post(
+            f"/users/me/partners/{user2.user_id}/",
+            headers=user1_headers,
+        )
+        assert response.status_code == 200
+        data = response.json()
+        assert "user_id" in data
+        assert data["user_id"] == user1.user_id
+        assert any(p["user_id"] == user2.user_id for p in data.get("partners", []))
+
+    def test_add_partner_not_found(self, client: TestClient, session: Session) -> None:
+        user = create_random_user(session)
+        user_headers = get_user_headers(client, session, user.username)
+
+        response = client.post(
+            "/users/me/partners/fake-partner-id/",
+            headers=user_headers,
+        )
+        assert response.status_code == 404
+        assert response.json()["detail"] == "Partner not found."
+
+    def test_add_partner_unauthenticated(self, client: TestClient) -> None:
+        response = client.post("/users/me/partners/fake-partner-id/")
+        assert response.status_code == 401
+
+
+class TestRemovePartner:
+    def test_remove_partner(self, client: TestClient, session: Session) -> None:
+        # Create two users and add one as partner to the other
+        user1 = create_random_user(session)
+        user2 = create_random_user(session)
+        user1_headers = get_user_headers(client, session, user1.username)
+        # Add partner
+        client.post(f"/users/me/partners/{user2.user_id}/", headers=user1_headers)
+        # Remove partner
+        response = client.delete(
+            f"/users/me/partners/{user2.user_id}/", headers=user1_headers
+        )
+        assert response.status_code == 200
+        data = response.json()
+        assert data["resource_type"] == "partner"
+        assert data["resource_id"] == user2.user_id
+        # Verify partner is removed
+        response = client.get("/users/me/partners/", headers=user1_headers)
+        assert response.status_code == 200
+        partners = response.json()["data"]["partners"]
+        assert all(p["user_id"] != user2.user_id for p in partners)
+
+    def test_remove_partner_not_found(self, client: TestClient, session: Session) -> None:
+        user = create_random_user(session)
+        user_headers = get_user_headers(client, session, user.username)
+        response = client.delete(
+            "/users/me/partners/fake-partner-id/", headers=user_headers
+        )
+        assert response.status_code == 404
+        assert response.json()["detail"] == "Partner not found."
+
+    def test_remove_partner_unauthenticated(self, client: TestClient) -> None:
+        response = client.delete("/users/me/partners/fake-partner-id/")
         assert response.status_code == 401
