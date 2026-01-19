@@ -159,3 +159,12 @@ async def get_my_events_csv(
         headers={"Content-Disposition": "attachment; filename=events.csv"},
     )
     return stream
+
+
+@router.get("/me/partners/")
+async def get_my_partners(
+    current_user: Annotated[models.UserProfile, Depends(get_current_user)],
+    session: Annotated[Session, Depends(get_session)],
+) -> models.Response:
+    partners = user_crud.get_user_partners(session=session, user_id=current_user.user_id)
+    return models.Response(events={"partners": partners}, count=len(partners))

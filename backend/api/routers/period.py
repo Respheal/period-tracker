@@ -203,3 +203,34 @@ async def get_next_period(
     if periods is None:  # pragma: no cover
         return None
     return predict_next_period(cycle_state=current_user.cycle_state, periods=periods)
+
+
+@router.get("/partner/{user_id}/")
+async def get_partner_periods(
+    user_id: str,
+    current_user: Annotated[models.UserProfile, Depends(get_current_user)],
+    session: Annotated[Session, Depends(get_session)],
+    params: Annotated[CommonEventParams, Depends()],
+) -> models.Response:
+    # Verify that the requested user is a partner of the current user
+    partnership = session.get(
+        models.UserPartner,
+        {"user_id": current_user.user_id, "partner_id": user_id},
+    )
+    if partnership is None:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="You do not have access to this user's data.",
+        )
+    start_datetime, end_datetime = convert_dates_to_range(
+        params.start_date, params.end_date
+    )
+    periods = period_crud.get_periods(
+        session=session,
+        user_id=user_id,
+        start_date=start_datetime,
+        end_date=end_datetime,
+        offset=params.offset,
+        limit=params.limit,
+    )
+    return models.Response(events={"periods": periods}, count=len(periods))

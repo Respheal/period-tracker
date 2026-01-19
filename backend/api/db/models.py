@@ -62,6 +62,15 @@ class TokenPayload(SQLModel):
 ###
 # User
 ###
+
+
+class UserPartner(SQLModel, table=True):
+    user_id: str = Field(foreign_key="user.user_id", primary_key=True, ondelete="CASCADE")
+    partner_id: str = Field(
+        foreign_key="user.user_id", primary_key=True, ondelete="CASCADE"
+    )
+
+
 class UserBase(SQLModel):
     username: str = Field(unique=True, index=True)
     display_name: str | None = None
@@ -108,6 +117,7 @@ class UserProfile(UserSafe):
     - display_name
     - is_disabled
     - is_admin
+    - partners
 
     """
 
@@ -118,6 +128,7 @@ class UserProfile(UserSafe):
     # user_id
     temp_state: TemperatureState | None = None
     cycle_state: Cycle | None = None
+    partners: list[UserSafe] | None = None
 
 
 class User(UserSafe, table=True):
@@ -134,6 +145,7 @@ class User(UserSafe, table=True):
     - is_disabled
     - is_admin
     - hashed_password
+    - partners (users whose data the current user can view)
 
     """
 
@@ -152,9 +164,14 @@ class User(UserSafe, table=True):
         cascade_delete=True,
         sa_relationship_kwargs={"uselist": False},
     )
-    # partners: list[User] = Relationship(
-    #     back_populates="partners", link_model="Partners", cascade_delete=True
-    # )
+    partners: list["User"] = Relationship(
+        link_model=UserPartner,
+        sa_relationship_kwargs={
+            "primaryjoin": "User.user_id==UserPartner.user_id",
+            "secondaryjoin": "User.user_id==UserPartner.partner_id",
+            "lazy": "selectin",
+        },
+    )
     hashed_password: str
 
 
