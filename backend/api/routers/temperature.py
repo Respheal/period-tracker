@@ -7,6 +7,7 @@ from sqlmodel import Session
 
 from api.db import models
 from api.db.crud import temperature as temp_crud
+from api.db.crud.user import is_partner
 from api.utils import convert_dates_to_range
 from api.utils.auth import get_admin_user, get_current_user
 from api.utils.dependencies import CommonEventParams, get_session
@@ -57,7 +58,7 @@ async def get_temp_readings(
         offset=params.offset,
         limit=params.limit,
     )
-    return models.Response(events={"temperatures": readings}, count=len(readings))
+    return models.Response(data={"temperatures": readings}, count=len(readings))
 
 
 @router.get("/me/", dependencies=[Depends(get_current_user)])
@@ -77,7 +78,7 @@ async def get_my_readings(
         offset=params.offset,
         limit=params.limit,
     )
-    return models.Response(events={"temperatures": readings}, count=len(readings))
+    return models.Response(data={"temperatures": readings}, count=len(readings))
 
 
 @router.get("/me/{temperature_id}")
@@ -198,25 +199,67 @@ async def get_my_temp_readings_csv(
     start_datetime, end_datetime = convert_dates_to_range(
         params.start_date, params.end_date
     )
-    readings = temp_crud.get_temp_readings(
+    return temp_crud.get_temperature_csv(
         session=session,
         user_id=current_user.user_id,
         start_date=start_datetime,
         end_date=end_datetime,
-        order="asc",
+        offset=params.offset,
+        limit=params.limit,
+        precision=precision,
+    )
+
+
+@router.get("/partner/{partner_id}/")
+async def get_partner_temperatures(
+    partner_id: str,
+    current_user: Annotated[models.UserProfile, Depends(get_current_user)],
+    session: Annotated[Session, Depends(get_session)],
+    params: Annotated[CommonEventParams, Depends()],
+) -> models.Response:
+    if not is_partner(session, current_user, partner_id):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="You do not have access to this user's data.",
+        )
+    start_datetime, end_datetime = convert_dates_to_range(
+        params.start_date, params.end_date
+    )
+    temperatures = temp_crud.get_temp_readings(
+        session=session,
+        user_id=partner_id,
+        start_date=start_datetime,
+        end_date=end_datetime,
         offset=params.offset,
         limit=params.limit,
     )
-    df = temperatures_to_frame(readings)
-    df.insert(1, "ewm", compute_smoothed_temperature(df))
-    df.insert(2, "baseline", compute_baseline(df))
-    df.reset_index(inplace=True)
-    df["timestamp"] = df["timestamp"].dt.strftime("%Y-%m-%d")
-    df["ewm"] = df["ewm"].round(precision)
-    df["baseline"] = df["baseline"].round(precision)
-    stream = StreamingResponse(
-        iter([df.to_csv(index=False)]),
-        media_type="text/csv",
-        headers={"Content-Disposition": "attachment; filename=temperature_readings.csv"},
+    return models.Response(data={"temperatures": temperatures}, count=len(temperatures))
+
+
+@router.get("/partner/{partner_id}/csv/", dependencies=[Depends(get_current_user)])
+async def get_partner_temp_readings_csv(
+    partner_id: str,
+    current_user: Annotated[models.UserProfile, Depends(get_current_user)],
+    session: Annotated[Session, Depends(get_session)],
+    params: Annotated[CommonEventParams, Depends()],
+    precision: Annotated[int, Query(embed=True, description="Decimal precision")] = 2,
+) -> StreamingResponse:  # pragma: no cover
+    # We're excluding this from coverage because it is effectively the same as the
+    # previous endpoint, just with CSV output.
+    if not is_partner(session, current_user, partner_id):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="You do not have access to this user's data.",
+        )
+    start_datetime, end_datetime = convert_dates_to_range(
+        params.start_date, params.end_date
     )
-    return stream
+    return temp_crud.get_temperature_csv(
+        session=session,
+        user_id=partner_id,
+        start_date=start_datetime,
+        end_date=end_datetime,
+        offset=params.offset,
+        limit=params.limit,
+        precision=precision,
+    )

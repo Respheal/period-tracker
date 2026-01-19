@@ -14,9 +14,6 @@ on:
       - ".github/workflows/npm-build.yml"
   push:
     branches: ["main"]
-    paths:
-      - "frontend/**"
-      - ".github/workflows/npm-build.yml"
 
 permissions:
   contents: read

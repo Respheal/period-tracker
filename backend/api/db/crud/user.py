@@ -2,7 +2,7 @@ from typing import Sequence
 
 from sqlmodel import Session, select
 
-from api.db.models import TemperatureState, User, UserCreate, UserUpdate
+from api.db.models import TemperatureState, User, UserCreate, UserProfile, UserUpdate
 from api.utils import auth
 from api.utils.stats import evaluate_cycle_state, evaluate_temperature_state
 
@@ -12,6 +12,10 @@ def get_users(session: Session, offset: int = 0, limit: int = 100) -> Sequence[U
     Retrieve a list of users for the purposes of user moderation by an admin.
     """
     return session.exec(select(User).offset(offset).limit(limit)).all()
+
+
+def get_user(session: Session, user_id: str) -> User | None:
+    return session.get(User, user_id)
 
 
 def create_user(session: Session, user: UserCreate) -> User:
@@ -45,15 +49,14 @@ def update_user(session: Session, user: User, data: UserUpdate) -> User:
 
 
 def delete_user(session: Session, user_id: str) -> None:
-    user = session.get(User, user_id)
-    session.delete(user)
+    session.delete(get_user(session, user_id))
     session.commit()
 
 
 def update_temp_state(
     session: Session, user_id: str, new_state: TemperatureState
 ) -> User | None:
-    user = session.get(User, user_id)
+    user = get_user(session, user_id)
     if not user:  # pragma: no cover
         return None
     user.temp_state = new_state
@@ -61,3 +64,28 @@ def update_temp_state(
     session.commit()
     session.refresh(user)
     return user
+
+
+def add_partner(session: Session, user: User, partner: User) -> User:
+    if partner not in user.partners:
+        user.partners.append(partner)
+        session.add(user)
+        session.commit()
+        session.refresh(user)
+    return user
+
+
+def remove_partner(session: Session, user: User, partner: User) -> User:
+    if partner in user.partners:
+        user.partners.remove(partner)
+        session.add(user)
+        session.commit()
+        session.refresh(user)
+    return user
+
+
+def is_partner(session: Session, user: UserProfile, partner_id: str) -> bool:
+    partner = get_user(session, partner_id)
+    if not partner:
+        return False
+    return partner in (user.partners or [])

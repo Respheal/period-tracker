@@ -45,7 +45,7 @@ async def get_users(
     :rtype: Sequence[UserSafe]
     """
     users = user_crud.get_users(session=session, offset=params.offset, limit=params.limit)
-    return models.Response(events={"users": users}, count=len(users))
+    return models.Response(data={"users": users}, count=len(users))
 
 
 @router.get("/me/")
@@ -61,7 +61,7 @@ async def update_me(
     session: Annotated[Session, Depends(get_session)],
     user_update: models.UserUpdate,
 ) -> models.UserProfile:
-    user = session.get(models.User, current_user.user_id)
+    user = user_crud.get_user(session, current_user.user_id)
     # If the user doesn't exist, we'll hit an auth error before we get here,
     # so type ignore
     return user_crud.update_user(session, user, user_update)  # type: ignore
@@ -113,7 +113,7 @@ async def get_my_events(
     )
     return models.Response(
         count=len(symptoms) + len(temperatures) + len(periods),
-        events={"periods": periods, "symptoms": symptoms, "temperatures": temperatures},
+        data={"periods": periods, "symptoms": symptoms, "temperatures": temperatures},
     )
 
 
@@ -159,3 +159,51 @@ async def get_my_events_csv(
         headers={"Content-Disposition": "attachment; filename=events.csv"},
     )
     return stream
+
+
+@router.get("/me/partners/")
+async def get_my_partners(
+    current_user: Annotated[models.UserProfile, Depends(get_current_user)],
+) -> models.Response:
+    return models.Response(
+        data={"partners": current_user.partners}, count=len(current_user.partners or [])
+    )
+
+
+@router.post("/me/partners/{partner_id}/", response_model=models.UserProfile)
+async def add_partner(
+    partner_id: str,
+    current_user: Annotated[models.UserProfile, Depends(get_current_user)],
+    session: Annotated[Session, Depends(get_session)],
+) -> models.User:
+    user = user_crud.get_user(session, current_user.user_id)
+    partner = user_crud.get_user(session, partner_id)
+    if not partner or not user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Partner not found."
+        )
+    return user_crud.add_partner(
+        session=session,
+        user=user,
+        partner=partner,
+    )
+
+
+@router.delete("/me/partners/{partner_id}/")
+async def remove_partner(
+    partner_id: str,
+    current_user: Annotated[models.UserProfile, Depends(get_current_user)],
+    session: Annotated[Session, Depends(get_session)],
+) -> models.ResourceDeleteResponse:
+    user = user_crud.get_user(session, current_user.user_id)
+    partner = user_crud.get_user(session, partner_id)
+    if not partner or not user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Partner not found."
+        )
+    user_crud.remove_partner(
+        session=session,
+        user=user,
+        partner=partner,
+    )
+    return models.ResourceDeleteResponse(resource_type="partner", resource_id=partner_id)

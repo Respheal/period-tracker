@@ -4,6 +4,7 @@ from fastapi.testclient import TestClient
 from sqlmodel import Session
 
 from api.db import models
+from api.db.crud.user import add_partner
 from tests.utils.auth import get_user_headers
 from tests.utils.user import create_random_user
 
@@ -49,12 +50,12 @@ class TestPeriodRetrieval:
 
         response = client.get("/period/me/", headers=user_headers)
         assert response.status_code == 200
-        data = response.json()
-        assert "count" in data
-        assert data["count"] >= 3
-        assert "events" in data
-        assert "periods" in data["events"]
-        assert len(data["events"]["periods"]) >= 3
+        response_json = response.json()
+        assert "count" in response_json
+        assert response_json["count"] >= 3
+        assert "data" in response_json
+        assert "periods" in response_json["data"]
+        assert len(response_json["data"]["periods"]) >= 3
 
     def test_get_single_period(
         self,
@@ -73,8 +74,8 @@ class TestPeriodRetrieval:
         # Retrieve the specific period
         response = client.get(f"/period/me/{period_id}", headers=user_headers)
         assert response.status_code == 200
-        data = response.json()
-        assert data["pid"] == period_id
+        response_json = response.json()
+        assert response_json["pid"] == period_id
 
     def test_get_single_period_not_found(
         self,
@@ -196,11 +197,11 @@ class TestPeriodAdminAccess:
         # Get all periods as admin
         response = client.get("/period/", headers=admin_headers)
         assert response.status_code == 200
-        data = response.json()
-        assert "count" in data
-        assert data["count"] >= 2
-        assert "periods" in data["events"]
-        assert len(data["events"]["periods"]) >= 2
+        response_json = response.json()
+        assert "count" in response_json
+        assert response_json["count"] >= 2
+        assert "periods" in response_json["data"]
+        assert len(response_json["data"]["periods"]) >= 2
 
     def test_get_all_periods_as_non_admin(
         self,
@@ -233,8 +234,8 @@ class TestPeriodDateFiltering:
         # Filter by start_date
         response = client.get("/period/?start_date=2025-01-01", headers=admin_headers)
         assert response.status_code == 200
-        data = response.json()
-        for event in data["events"]["periods"]:
+        response_json = response.json()
+        for event in response_json["data"]["periods"]:
             assert event["start_date"] >= "2025-01-01"
 
     def test_filter_by_end_date(
@@ -253,8 +254,8 @@ class TestPeriodDateFiltering:
         # Filter by end_date
         response = client.get("/period/?end_date=2025-01-01", headers=admin_headers)
         assert response.status_code == 200
-        data = response.json()
-        for event in data["events"]["periods"]:
+        response_json = response.json()
+        for event in response_json["data"]["periods"]:
             assert event["start_date"] <= "2025-01-01T00:00:00"
 
 
@@ -320,3 +321,49 @@ class TestPeriodPrediction:
         assert data is not None
         assert data["start_date"] == today.date().isoformat()
         assert data["end_date"] == (today + timedelta(days=3)).date().isoformat()
+
+
+class TestPartnerPeriodAccess:
+    def test_get_partner_periods(self, client: TestClient, session: Session) -> None:
+        user = create_random_user(session)
+        partner = create_random_user(session)
+        add_partner(session, user, partner)
+        user_headers = get_user_headers(client, session, user.username)
+        partner_headers = get_user_headers(client, session, partner.username)
+
+        # Create a period for partner
+        client.post(
+            "/period/",
+            headers=partner_headers,
+            json={"start_date": "2025-04-01", "end_date": "2025-04-05"},
+        )
+
+        response = client.get(f"/period/partner/{partner.user_id}/", headers=user_headers)
+        assert response.status_code == 200
+        response_json = response.json()
+        assert "count" in response_json
+        assert "periods" in response_json["data"]
+        assert response_json["count"] >= 1
+
+    def test_get_partner_periods_unauthorized(
+        self, client: TestClient, session: Session
+    ) -> None:
+        user1 = create_random_user(session)
+        user2 = create_random_user(session)
+        user1_headers = get_user_headers(client, session, user1.username)
+        user2_headers = get_user_headers(client, session, user2.username)
+
+        # Create a period for user2
+        client.post(
+            "/period/",
+            headers=user2_headers,
+            json={"start_date": "2025-04-01", "end_date": "2025-04-05"},
+        )
+
+        # Try to get periods from the second user without a partnership
+        response = client.get(
+            f"/period/partner/{user2.user_id}/",
+            headers=user1_headers,
+        )
+        assert response.status_code == 403
+        assert response.json()["detail"] == "You do not have access to this user's data."
