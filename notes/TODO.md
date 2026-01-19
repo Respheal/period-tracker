@@ -62,7 +62,7 @@
 - [x] Password (hashed)
 - [x] Average menses length (average period length in days) (separate model)
 - [x] Average cycle length (average time between period start dates) (separate model)
-- [ ] Partners (List of users with access to this User's calendar, many-many)
+- [x] Partners (List of users with access to this User's calendar, many-many)
   - Period Only option (only displays the user's period dates and stats for the partner)
 
 #### User Stats
@@ -165,7 +165,7 @@
 
 ### Framework
 
-- [ ] [Vite + React](https://react.dev/learn/build-a-react-app-from-scratch)
+- [x] [Vite + React](https://react.dev/learn/build-a-react-app-from-scratch)
 - [ ] [TanStack Query](https://tanstack.com/query/latest) - API client, state handling
 - [ ] [TanStack Router](https://tanstack.com/router/latest) - routing? (consider form instead of hooks too)
 - [ ] [Ladle](https://ladle.dev/)

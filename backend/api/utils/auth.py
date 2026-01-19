@@ -127,7 +127,7 @@ async def get_current_user(
     payload: models.TokenPayload = validate_token(
         token=token, token_type="access", settings=settings  # nosec B106
     )
-    user = session.get(models.User, payload.sub)
+    user = user_crud.get_user(session, payload.sub)
     if user is None or user.is_disabled:
         raise credentials_exception
     return user
@@ -157,7 +157,7 @@ async def refresh_tokens(
     payload: models.TokenPayload = validate_token(
         token=refresh_token, token_type="refresh", settings=settings  # nosec B106
     )
-    user = session.get(models.User, payload.sub)
+    user = user_crud.get_user(session, payload.sub)
     # Check if user is disabled or token is revoked
     redis_client = get_redis_client()
     if user is None or user.is_disabled or redis_client.get(f"{payload.jti}"):

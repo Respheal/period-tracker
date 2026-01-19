@@ -4,6 +4,7 @@ from fastapi.testclient import TestClient
 from sqlmodel import Session
 
 from api.db import models
+from api.db.crud.user import add_partner
 from tests.utils.auth import get_user_headers
 from tests.utils.events import create_temperature_readings
 from tests.utils.user import create_random_user
@@ -48,14 +49,16 @@ class TestTemperatureRetrieval:
         response = client.get("/temp/me/", headers=user_headers)
         assert response.status_code == 200
 
-        data = response.json()
-        assert "count" in data
-        assert data["count"] >= 3
-        assert "events" in data
-        assert "temperatures" in data["events"]
-        assert len(data["events"]["temperatures"]) >= 3
+        response_json = response.json()
+        assert "count" in response_json
+        assert response_json["count"] >= 3
+        assert "data" in response_json
+        assert "temperatures" in response_json["data"]
+        assert len(response_json["data"]["temperatures"]) >= 3
 
-        temperatures = [event["temperature"] for event in data["events"]["temperatures"]]
+        temperatures = [
+            event["temperature"] for event in response_json["data"]["temperatures"]
+        ]
         for temp in temps:
             assert temp in temperatures
 
@@ -251,13 +254,15 @@ class TestTemperatureAdminAccess:
         response = client.get("/temp/", headers=admin_headers)
         assert response.status_code == 200
 
-        data = response.json()
-        assert "count" in data
-        assert data["count"] >= 6
-        assert "events" in data
-        assert "temperatures" in data["events"]
+        response_json = response.json()
+        assert "count" in response_json
+        assert response_json["count"] >= 6
+        assert "data" in response_json
+        assert "temperatures" in response_json["data"]
 
-        temperatures = [event["temperature"] for event in data["events"]["temperatures"]]
+        temperatures = [
+            event["temperature"] for event in response_json["data"]["temperatures"]
+        ]
         for temp in [36.5, 37.0, 36.8, 37.2]:
             assert temp in temperatures
 
@@ -302,8 +307,8 @@ class TestTemperatureDateFiltering:
         # Test start_date filter
         response = client.get("/temp/?start_date=2025-01-01", headers=admin_headers)
         assert response.status_code == 200
-        data = response.json()
-        for event in data["events"]["temperatures"]:
+        response_json = response.json()
+        for event in response_json["data"]["temperatures"]:
             assert event["timestamp"] >= "2025-01-01T00:00:00"
 
     def test_filter_by_end_date(
@@ -324,8 +329,8 @@ class TestTemperatureDateFiltering:
 
         response = client.get("/temp/?end_date=2025-01-01", headers=admin_headers)
         assert response.status_code == 200
-        data = response.json()
-        for event in data["events"]["temperatures"]:
+        response_json = response.json()
+        for event in response_json["data"]["temperatures"]:
             assert event["timestamp"] <= "2025-01-01T00:00:00"
 
     def test_filter_by_date_range(
@@ -348,8 +353,8 @@ class TestTemperatureDateFiltering:
             "/temp/?start_date=2024-01-01&end_date=2024-09-01", headers=admin_headers
         )
         assert response.status_code == 200
-        data = response.json()
-        for event in data["events"]["temperatures"]:
+        response_json = response.json()
+        for event in response_json["data"]["temperatures"]:
             assert event["timestamp"] <= "2024-09-01T00:00:00"
             assert event["timestamp"] >= "2024-01-01T00:00:00"
 
@@ -424,3 +429,37 @@ class TestTemperatureState:
         assert user.temp_state is not None
         assert user.temp_state.phase == models.TempPhase.LEARNING
         assert user.temp_state.baseline is None
+
+
+class TestPartnerTemperatureAccess:
+    def test_get_partner_temperatures(self, client: TestClient, session: Session) -> None:
+        user = create_random_user(session)
+        partner = create_random_user(session)
+        add_partner(session, user, partner)
+        user_headers = get_user_headers(client, session, user.username)
+
+        # Create temperature readings for partner
+        temps = [36.6, 37.1]
+        create_temperature_readings(session, partner, temps)
+
+        # Get partner's temperatures
+        response = client.get(f"/temp/partner/{partner.user_id}/", headers=user_headers)
+        assert response.status_code == 200
+        response_json = response.json()
+        assert "count" in response_json
+        assert "data" in response_json
+        assert "temperatures" in response_json["data"]
+        returned_temps = [t["temperature"] for t in response_json["data"]["temperatures"]]
+        for temp in temps:
+            assert temp in returned_temps
+
+    def test_get_partner_temperatures_unauthorized(
+        self, client: TestClient, session: Session
+    ) -> None:
+        user = create_random_user(session)
+        user2 = create_random_user(session)
+        user_headers = get_user_headers(client, session, user.username)
+        # Try to get temperatures from the second user without a partnership
+        response = client.get(f"/temp/partner/{user2.user_id}/", headers=user_headers)
+        assert response.status_code == 403
+        assert response.json()["detail"] == "You do not have access to this user's data."

@@ -1,6 +1,8 @@
 from datetime import UTC, datetime
 from typing import Sequence
 
+import pandas as pd
+from fastapi.responses import StreamingResponse
 from sqlmodel import Session, desc, select
 
 from api.db import models
@@ -52,6 +54,37 @@ def get_symptom_events(
         statement = statement.order_by(desc(models.SymptomEvent.date))
     statement = statement.offset(offset).limit(limit)
     return session.exec(statement).all()
+
+
+def get_symptoms_csv(
+    session: Session,
+    user_id: str | None = None,
+    start_date: datetime | None = None,
+    end_date: datetime | None = None,
+    offset: int = 0,
+    limit: int = 100,
+) -> StreamingResponse:  # pragma: no cover
+    # We're excluding this from coverage because it is effectively the same as the
+    # previous endpoint, just with CSV output.
+    symptoms = get_symptom_events(
+        session=session,
+        user_id=user_id,
+        start_date=start_date,
+        end_date=end_date,
+        offset=offset,
+        limit=limit,
+    )
+    df = pd.DataFrame([symptom.model_dump() for symptom in symptoms])
+    df["symptoms"] = [",".join(map(str, sym)) for sym in df["symptoms"]]
+    df["sex"] = [",".join(map(str, sex)) for sex in df["sex"]]
+    df["mood"] = [",".join(map(str, mood)) for mood in df["mood"]]
+    df["discharge"] = [",".join(map(str, dis)) for dis in df["discharge"]]
+    df.drop("user_id", axis=1, inplace=True)
+    return StreamingResponse(
+        iter([df.to_csv(index=False)]),
+        media_type="text/csv",
+        headers={"Content-Disposition": "attachment; filename=symptoms.csv"},
+    )
 
 
 def update_symptom_event(

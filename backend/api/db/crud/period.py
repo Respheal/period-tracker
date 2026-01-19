@@ -1,6 +1,7 @@
 from datetime import UTC, datetime, time, timedelta
 from typing import Sequence
 
+from fastapi.responses import StreamingResponse
 from sqlmodel import Session, desc, select
 
 from api.db import models
@@ -11,6 +12,7 @@ from api.utils.stats import (
     detect_elevated_phase_start,
     evaluate_cycle_state,
     is_valid_luteal_length,
+    periods_to_frame,
 )
 
 
@@ -85,6 +87,36 @@ def get_periods(
         statement = statement.order_by(desc(models.Period.start_date))
     statement = statement.offset(offset).limit(limit)
     return session.exec(statement).all()
+
+
+def get_periods_csv(
+    session: Session,
+    user_id: str | None = None,
+    start_date: datetime | None = None,
+    end_date: datetime | None = None,
+    offset: int = 0,
+    limit: int = 24,
+) -> StreamingResponse:  # pragma: no cover
+    # We're excluding this from coverage because it is effectively the same as the
+    # previous endpoint, just with CSV output.
+    periods = get_periods(
+        session=session,
+        user_id=user_id,
+        start_date=start_date,
+        end_date=end_date,
+        offset=offset,
+        limit=limit,
+    )
+    df = periods_to_frame(periods)
+    if not df.empty:
+        df["start"] = df["start"].dt.strftime("%Y-%m-%d")
+        df["end"] = df["end"].dt.strftime("%Y-%m-%d")
+        df["luteal_length"] = df["luteal_length"].round(0)
+    return StreamingResponse(
+        iter([df.to_csv(index=False)]),
+        media_type="text/csv",
+        headers={"Content-Disposition": "attachment; filename=periods.csv"},
+    )
 
 
 def eval_cycle_metrics(session: Session, user_id: str) -> None:

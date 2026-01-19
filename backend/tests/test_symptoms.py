@@ -4,6 +4,7 @@ from fastapi.testclient import TestClient
 from sqlmodel import Session
 
 from api.db import models
+from api.db.crud.user import add_partner
 from tests.utils.auth import get_user_headers
 from tests.utils.events import create_symptom_events
 from tests.utils.user import create_random_user
@@ -99,9 +100,9 @@ class TestSymptomEventRetrieval:
             )
         response = client.get("/symptoms/me/", headers=user_headers)
         assert response.status_code == 200
-        data = response.json()
-        assert data["count"] == 3
-        assert len(data["events"]["symptoms"]) == 3
+        response_json = response.json()
+        assert response_json["count"] == 3
+        assert len(response_json["data"]["symptoms"]) == 3
 
     def test_get_single_symptom_event(
         self, client: TestClient, user_headers: dict[str, str]
@@ -114,11 +115,11 @@ class TestSymptomEventRetrieval:
         s_id = create_response.json()["pid"]
         response = client.get(f"/symptoms/me/{s_id}", headers=user_headers)
         assert response.status_code == 200
-        data = response.json()
-        assert data["pid"] == s_id
-        assert data["flow_intensity"] == "4"
-        assert data["symptoms"] == ["cramps"]
-        assert "cramps" in data["symptoms"]
+        response_json = response.json()
+        assert response_json["pid"] == s_id
+        assert response_json["flow_intensity"] == "4"
+        assert response_json["symptoms"] == ["cramps"]
+        assert "cramps" in response_json["symptoms"]
 
     def test_get_single_symptom_event_not_found(
         self, client: TestClient, user_headers: dict[str, str]
@@ -156,11 +157,11 @@ class TestSymptomEventUpdate:
             },
         )
         assert response.status_code == 200, response.text
-        data = response.json()
-        assert "2025-01-15" in data["date"]
-        assert data["flow_intensity"] == "0"
-        assert data["symptoms"] == ["cramps", "headache"]
-        assert "tired" in data["mood"]
+        response_json = response.json()
+        assert "2025-01-15" in response_json["date"]
+        assert response_json["flow_intensity"] == "0"
+        assert response_json["symptoms"] == ["cramps", "headache"]
+        assert "tired" in response_json["mood"]
 
     def test_update_symptom_event_not_found(
         self, client: TestClient, user_headers: dict[str, str]
@@ -218,10 +219,10 @@ class TestSymptomEventAdminAccess:
         # Check for the readings as admin
         response = client.get("/symptoms/", headers=admin_headers)
         assert response.status_code == 200
-        data = response.json()
-        assert data["count"] >= 2
+        response_json = response.json()
+        assert response_json["count"] >= 2
         # Should include events from both users
-        user_ids = {event["user_id"] for event in data["events"]["symptoms"]}
+        user_ids = {event["user_id"] for event in response_json["data"]["symptoms"]}
         assert user1.user_id in user_ids
         assert user2.user_id in user_ids
 
@@ -256,10 +257,10 @@ class TestSymptomEventDateFiltering:
             headers=user_headers,
         )
         assert response.status_code == 200
-        data = response.json()
-        assert data["count"] == 2
+        response_json = response.json()
+        assert response_json["count"] == 2
         # Only events from days 5 and 2 should be included
-        for event in data["events"]["symptoms"]:
+        for event in response_json["data"]["symptoms"]:
             event_date = datetime.fromisoformat(event["date"]).date()
             assert event_date >= datetime.fromisoformat(start_date).date()
 
@@ -285,10 +286,10 @@ class TestSymptomEventDateFiltering:
             headers=user_headers,
         )
         assert response.status_code == 200
-        data = response.json()
-        assert data["count"] == 1
+        response_json = response.json()
+        assert response_json["count"] == 1
         # Only event from day 10 should be included
-        for event in data["events"]["symptoms"]:
+        for event in response_json["data"]["symptoms"]:
             event_date = datetime.fromisoformat(event["date"]).date()
             assert event_date <= datetime.fromisoformat(end_date).date()
 
@@ -315,10 +316,59 @@ class TestSymptomEventDateFiltering:
             headers=user_headers,
         )
         assert response.status_code == 200
-        data = response.json()
-        assert data["count"] == 2
+        response_json = response.json()
+        assert response_json["count"] == 2
         # Only events from days 10 and 5 should be included
-        for event in data["events"]["symptoms"]:
+        for event in response_json["data"]["symptoms"]:
             event_date = datetime.fromisoformat(event["date"]).date()
             assert datetime.fromisoformat(start_date).date() <= event_date
             assert event_date <= datetime.fromisoformat(end_date).date()
+
+
+class TestPartnerSymptomEventAccess:
+    def test_get_partner_symptoms_authorized(
+        self, client: TestClient, session: Session
+    ) -> None:
+        user = create_random_user(session)
+        partner = create_random_user(session)
+        add_partner(session, user, partner)
+        user_headers = get_user_headers(client, session, user.username)
+
+        # Create symptom events for partner
+        create_symptom_events(
+            session,
+            partner,
+            [{"date": datetime.now(UTC).date().isoformat(), "mood": ["happy"]}],
+        )
+
+        response = client.get(
+            f"/symptoms/partner/{partner.user_id}/",
+            headers=user_headers,
+        )
+        assert response.status_code == 200
+        data = response.json()
+        assert "symptoms" in data["data"]
+        assert data["count"] == 1
+        for event in data["data"]["symptoms"]:
+            assert event["user_id"] == partner.user_id
+
+    def test_get_partner_symptoms_unauthorized(
+        self, client: TestClient, session: Session
+    ) -> None:
+        user = create_random_user(session)
+        partner = create_random_user(session)
+        user_headers = get_user_headers(client, session, user.username)
+
+        response = client.get(
+            f"/symptoms/partner/{partner.user_id}/",
+            headers=user_headers,
+        )
+        assert response.status_code == 403
+        assert response.json()["detail"] == "You do not have access to this user's data."
+
+    def test_get_partner_symptoms_requires_authentication(
+        self, client: TestClient, session: Session
+    ) -> None:
+        partner = create_random_user(session)
+        response = client.get(f"/symptoms/partner/{partner.user_id}/")
+        assert response.status_code == 401
