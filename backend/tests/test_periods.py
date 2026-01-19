@@ -49,12 +49,12 @@ class TestPeriodRetrieval:
 
         response = client.get("/period/me/", headers=user_headers)
         assert response.status_code == 200
-        data = response.json()
-        assert "count" in data
-        assert data["count"] >= 3
-        assert "events" in data
-        assert "periods" in data["events"]
-        assert len(data["events"]["periods"]) >= 3
+        response_json = response.json()
+        assert "count" in response_json
+        assert response_json["count"] >= 3
+        assert "data" in response_json
+        assert "periods" in response_json["data"]
+        assert len(response_json["data"]["periods"]) >= 3
 
     def test_get_single_period(
         self,
@@ -73,8 +73,8 @@ class TestPeriodRetrieval:
         # Retrieve the specific period
         response = client.get(f"/period/me/{period_id}", headers=user_headers)
         assert response.status_code == 200
-        data = response.json()
-        assert data["pid"] == period_id
+        response_json = response.json()
+        assert response_json["pid"] == period_id
 
     def test_get_single_period_not_found(
         self,
@@ -196,11 +196,11 @@ class TestPeriodAdminAccess:
         # Get all periods as admin
         response = client.get("/period/", headers=admin_headers)
         assert response.status_code == 200
-        data = response.json()
-        assert "count" in data
-        assert data["count"] >= 2
-        assert "periods" in data["events"]
-        assert len(data["events"]["periods"]) >= 2
+        response_json = response.json()
+        assert "count" in response_json
+        assert response_json["count"] >= 2
+        assert "periods" in response_json["data"]
+        assert len(response_json["data"]["periods"]) >= 2
 
     def test_get_all_periods_as_non_admin(
         self,
@@ -233,8 +233,8 @@ class TestPeriodDateFiltering:
         # Filter by start_date
         response = client.get("/period/?start_date=2025-01-01", headers=admin_headers)
         assert response.status_code == 200
-        data = response.json()
-        for event in data["events"]["periods"]:
+        response_json = response.json()
+        for event in response_json["data"]["periods"]:
             assert event["start_date"] >= "2025-01-01"
 
     def test_filter_by_end_date(
@@ -253,8 +253,8 @@ class TestPeriodDateFiltering:
         # Filter by end_date
         response = client.get("/period/?end_date=2025-01-01", headers=admin_headers)
         assert response.status_code == 200
-        data = response.json()
-        for event in data["events"]["periods"]:
+        response_json = response.json()
+        for event in response_json["data"]["periods"]:
             assert event["start_date"] <= "2025-01-01T00:00:00"
 
 

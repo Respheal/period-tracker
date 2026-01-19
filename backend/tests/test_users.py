@@ -50,15 +50,15 @@ class TestUserRetrieval:
 
         response = client.get("/users/", headers=admin_headers)
         assert response.status_code == 200
-        data = response.json()
-        assert "count" in data
-        assert data["count"] >= 1
-        assert "events" in data
-        assert "users" in data["events"]
+        response_json = response.json()
+        assert "count" in response_json
+        assert response_json["count"] >= 1
+        assert "data" in response_json
+        assert "users" in response_json["data"]
 
         # Verify user structure (UserSafe)
-        if data["events"]["users"]:
-            user = data["events"]["users"][0]
+        if response_json["data"]["users"]:
+            user = response_json["data"]["users"][0]
             assert "user_id" in user
             assert "username" in user
             assert "display_name" in user
@@ -145,17 +145,20 @@ class TestGetMyEvents:
 
         response = client.get("/users/me/events/", headers=user_headers)
         assert response.status_code == 200
-        data = response.json()
-        assert "count" in data
-        assert data["count"] == 3
-        assert "events" in data
-        assert "periods" in data["events"]
-        assert "symptoms" in data["events"]
-        assert "temperatures" in data["events"]
-        assert yesterday.date().isoformat() in data["events"]["periods"][0]["start_date"]
-        assert today.date().isoformat() in data["events"]["periods"][0]["end_date"]
-        assert data["events"]["symptoms"][0]["symptoms"] == ["cramps"]
-        assert data["events"]["temperatures"][0]["temperature"] == 36.5
+        response_json = response.json()
+        assert "count" in response_json
+        assert response_json["count"] == 3
+        assert "data" in response_json
+        assert "periods" in response_json["data"]
+        assert "symptoms" in response_json["data"]
+        assert "temperatures" in response_json["data"]
+        assert (
+            yesterday.date().isoformat()
+            in response_json["data"]["periods"][0]["start_date"]
+        )
+        assert today.date().isoformat() in response_json["data"]["periods"][0]["end_date"]
+        assert response_json["data"]["symptoms"][0]["symptoms"] == ["cramps"]
+        assert response_json["data"]["temperatures"][0]["temperature"] == 36.5
 
     def test_get_my_events_no_events(
         self,
@@ -164,14 +167,14 @@ class TestGetMyEvents:
     ) -> None:
         response = client.get("/users/me/events/", headers=user_headers)
         assert response.status_code == 200
-        data = response.json()
-        assert data["count"] == 0
-        assert "periods" in data["events"]
-        assert "symptoms" in data["events"]
-        assert "temperatures" in data["events"]
-        assert data["events"]["periods"] == []
-        assert data["events"]["symptoms"] == []
-        assert data["events"]["temperatures"] == []
+        response_json = response.json()
+        assert response_json["count"] == 0
+        assert "periods" in response_json["data"]
+        assert "symptoms" in response_json["data"]
+        assert "temperatures" in response_json["data"]
+        assert response_json["data"]["periods"] == []
+        assert response_json["data"]["symptoms"] == []
+        assert response_json["data"]["temperatures"] == []
 
     def test_get_my_events_unauthenticated(self, client: TestClient) -> None:
         response = client.get("/users/me/events/")

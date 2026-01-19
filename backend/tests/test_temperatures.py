@@ -48,14 +48,16 @@ class TestTemperatureRetrieval:
         response = client.get("/temp/me/", headers=user_headers)
         assert response.status_code == 200
 
-        data = response.json()
-        assert "count" in data
-        assert data["count"] >= 3
-        assert "events" in data
-        assert "temperatures" in data["events"]
-        assert len(data["events"]["temperatures"]) >= 3
+        response_json = response.json()
+        assert "count" in response_json
+        assert response_json["count"] >= 3
+        assert "data" in response_json
+        assert "temperatures" in response_json["data"]
+        assert len(response_json["data"]["temperatures"]) >= 3
 
-        temperatures = [event["temperature"] for event in data["events"]["temperatures"]]
+        temperatures = [
+            event["temperature"] for event in response_json["data"]["temperatures"]
+        ]
         for temp in temps:
             assert temp in temperatures
 
@@ -251,13 +253,15 @@ class TestTemperatureAdminAccess:
         response = client.get("/temp/", headers=admin_headers)
         assert response.status_code == 200
 
-        data = response.json()
-        assert "count" in data
-        assert data["count"] >= 6
-        assert "events" in data
-        assert "temperatures" in data["events"]
+        response_json = response.json()
+        assert "count" in response_json
+        assert response_json["count"] >= 6
+        assert "data" in response_json
+        assert "temperatures" in response_json["data"]
 
-        temperatures = [event["temperature"] for event in data["events"]["temperatures"]]
+        temperatures = [
+            event["temperature"] for event in response_json["data"]["temperatures"]
+        ]
         for temp in [36.5, 37.0, 36.8, 37.2]:
             assert temp in temperatures
 
@@ -302,8 +306,8 @@ class TestTemperatureDateFiltering:
         # Test start_date filter
         response = client.get("/temp/?start_date=2025-01-01", headers=admin_headers)
         assert response.status_code == 200
-        data = response.json()
-        for event in data["events"]["temperatures"]:
+        response_json = response.json()
+        for event in response_json["data"]["temperatures"]:
             assert event["timestamp"] >= "2025-01-01T00:00:00"
 
     def test_filter_by_end_date(
@@ -324,8 +328,8 @@ class TestTemperatureDateFiltering:
 
         response = client.get("/temp/?end_date=2025-01-01", headers=admin_headers)
         assert response.status_code == 200
-        data = response.json()
-        for event in data["events"]["temperatures"]:
+        response_json = response.json()
+        for event in response_json["data"]["temperatures"]:
             assert event["timestamp"] <= "2025-01-01T00:00:00"
 
     def test_filter_by_date_range(
@@ -348,8 +352,8 @@ class TestTemperatureDateFiltering:
             "/temp/?start_date=2024-01-01&end_date=2024-09-01", headers=admin_headers
         )
         assert response.status_code == 200
-        data = response.json()
-        for event in data["events"]["temperatures"]:
+        response_json = response.json()
+        for event in response_json["data"]["temperatures"]:
             assert event["timestamp"] <= "2024-09-01T00:00:00"
             assert event["timestamp"] >= "2024-01-01T00:00:00"
 

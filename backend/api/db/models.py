@@ -31,7 +31,7 @@ class Response(SQLModel):
     """Base response model with count field used for list endpoints."""
 
     count: int
-    events: dict[str, list[Temperature | Period | SymptomEvent | UserSafe]]
+    data: dict[str, list[Temperature | Period | SymptomEvent | UserSafe]]
 
 
 ###

@@ -8,6 +8,7 @@ from sqlmodel import Session
 
 from api.db import models
 from api.db.crud import symptoms as symptom_crud
+from api.db.crud.user import is_partner
 from api.utils import convert_dates_to_range
 from api.utils.auth import get_admin_user, get_current_user
 from api.utils.dependencies import CommonEventParams, get_session
@@ -58,7 +59,7 @@ async def get_symptom_events(
         offset=params.offset,
         limit=params.limit,
     )
-    return models.Response(events={"symptoms": symptoms}, count=len(symptoms))
+    return models.Response(data={"symptoms": symptoms}, count=len(symptoms))
 
 
 @router.get("/me/", dependencies=[Depends(get_current_user)])
@@ -79,7 +80,7 @@ async def get_my_symptom_events(
         offset=params.offset,
         limit=params.limit,
     )
-    return models.Response(events={"symptoms": symptoms}, count=len(symptoms))
+    return models.Response(data={"symptoms": symptoms}, count=len(symptoms))
 
 
 @router.get("/me/{symptom_id}")
@@ -171,15 +172,29 @@ async def export_symptoms_csv(
         offset=params.offset,
         limit=params.limit,
     )
-    df = pd.DataFrame([symptom.model_dump() for symptom in symptoms])
-    df["symptoms"] = [",".join(map(str, sym)) for sym in df["symptoms"]]
-    df["sex"] = [",".join(map(str, sex)) for sex in df["sex"]]
-    df["mood"] = [",".join(map(str, mood)) for mood in df["mood"]]
-    df["discharge"] = [",".join(map(str, dis)) for dis in df["discharge"]]
-    df.drop("user_id", axis=1, inplace=True)
-    stream = StreamingResponse(
-        iter([df.to_csv(index=False)]),
-        media_type="text/csv",
-        headers={"Content-Disposition": "attachment; filename=symptoms.csv"},
+
+
+@router.get("/partner/{partner_id}/")
+async def get_partner_symptoms(
+    partner_id: str,
+    current_user: Annotated[models.UserProfile, Depends(get_current_user)],
+    session: Annotated[Session, Depends(get_session)],
+    params: Annotated[CommonEventParams, Depends()],
+) -> models.Response:
+    if not is_partner(session, current_user, partner_id):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="You do not have access to this user's data.",
+        )
+    start_datetime, end_datetime = convert_dates_to_range(
+        params.start_date, params.end_date
     )
-    return stream
+    symptoms = symptom_crud.get_symptom_events(
+        session=session,
+        user_id=partner_id,
+        start_date=start_datetime,
+        end_date=end_datetime,
+        offset=params.offset,
+        limit=params.limit,
+    )
+    return models.Response(data={"symptoms": symptoms}, count=len(symptoms))

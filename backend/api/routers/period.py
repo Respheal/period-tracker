@@ -6,6 +6,7 @@ from sqlmodel import Session
 
 from api.db import models
 from api.db.crud import period as period_crud
+from api.db.crud.user import is_partner
 from api.utils import convert_dates_to_range
 from api.utils.auth import get_admin_user, get_current_user
 from api.utils.dependencies import CommonEventParams, get_session
@@ -62,7 +63,7 @@ async def get_all_periods(
         offset=params.offset,
         limit=params.limit,
     )
-    return models.Response(events={"periods": periods}, count=len(periods))
+    return models.Response(data={"periods": periods}, count=len(periods))
 
 
 @router.get("/me/", dependencies=[Depends(get_current_user)])
@@ -82,7 +83,7 @@ async def get_my_periods(
         offset=params.offset,
         limit=params.limit,
     )
-    return models.Response(events={"periods": periods}, count=len(periods))
+    return models.Response(data={"periods": periods}, count=len(periods))
 
 
 @router.get("/me/{period_id}")
@@ -205,19 +206,14 @@ async def get_next_period(
     return predict_next_period(cycle_state=current_user.cycle_state, periods=periods)
 
 
-@router.get("/partner/{user_id}/")
+@router.get("/partner/{partner_id}/")
 async def get_partner_periods(
-    user_id: str,
+    partner_id: str,
     current_user: Annotated[models.UserProfile, Depends(get_current_user)],
     session: Annotated[Session, Depends(get_session)],
     params: Annotated[CommonEventParams, Depends()],
 ) -> models.Response:
-    # Verify that the requested user is a partner of the current user
-    partnership = session.get(
-        models.UserPartner,
-        {"user_id": current_user.user_id, "partner_id": user_id},
-    )
-    if partnership is None:
+    if not is_partner(session, current_user, partner_id):
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="You do not have access to this user's data.",
@@ -227,10 +223,10 @@ async def get_partner_periods(
     )
     periods = period_crud.get_periods(
         session=session,
-        user_id=user_id,
+        user_id=partner_id,
         start_date=start_datetime,
         end_date=end_datetime,
         offset=params.offset,
         limit=params.limit,
     )
-    return models.Response(events={"periods": periods}, count=len(periods))
+    return models.Response(data={"periods": periods}, count=len(periods))
