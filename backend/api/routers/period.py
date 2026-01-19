@@ -10,7 +10,7 @@ from api.db.crud.user import is_partner
 from api.utils import convert_dates_to_range
 from api.utils.auth import get_admin_user, get_current_user
 from api.utils.dependencies import CommonEventParams, get_session
-from api.utils.stats import periods_to_frame, predict_next_period
+from api.utils.stats import predict_next_period
 
 router = APIRouter(
     prefix="/period",
@@ -170,7 +170,7 @@ async def get_my_periods_csv(
     start_datetime, end_datetime = convert_dates_to_range(
         params.start_date, params.end_date
     )
-    periods = period_crud.get_periods(
+    return period_crud.get_periods_csv(
         session=session,
         user_id=current_user.user_id,
         start_date=start_datetime,
@@ -178,17 +178,6 @@ async def get_my_periods_csv(
         offset=params.offset,
         limit=params.limit,
     )
-    df = periods_to_frame(periods)
-    if not df.empty:
-        df["start"] = df["start"].dt.strftime("%Y-%m-%d")
-        df["end"] = df["end"].dt.strftime("%Y-%m-%d")
-        df["luteal_length"] = df["luteal_length"].round(0)
-    stream = StreamingResponse(
-        iter([df.to_csv(index=False)]),
-        media_type="text/csv",
-        headers={"Content-Disposition": "attachment; filename=periods.csv"},
-    )
-    return stream
 
 
 @router.get("/me/next/")
@@ -230,3 +219,30 @@ async def get_partner_periods(
         limit=params.limit,
     )
     return models.Response(data={"periods": periods}, count=len(periods))
+
+
+@router.get("/partner/{partner_id}/csv/", dependencies=[Depends(get_current_user)])
+async def get_partner_periods_csv(
+    partner_id: str,
+    current_user: Annotated[models.UserProfile, Depends(get_current_user)],
+    session: Annotated[Session, Depends(get_session)],
+    params: Annotated[CommonEventParams, Depends()],
+) -> StreamingResponse:  # pragma: no cover
+    # We're excluding this from coverage because it is effectively the same as the
+    # previous endpoint, just with CSV output.
+    if not is_partner(session, current_user, partner_id):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="You do not have access to this user's data.",
+        )
+    start_datetime, end_datetime = convert_dates_to_range(
+        params.start_date, params.end_date
+    )
+    return period_crud.get_periods_csv(
+        session=session,
+        user_id=partner_id,
+        start_date=start_datetime,
+        end_date=end_datetime,
+        offset=params.offset,
+        limit=params.limit,
+    )

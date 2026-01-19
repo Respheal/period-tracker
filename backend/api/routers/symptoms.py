@@ -1,7 +1,6 @@
 from datetime import UTC, datetime
 from typing import Annotated
 
-import pandas as pd
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.responses import StreamingResponse
 from sqlmodel import Session
@@ -163,12 +162,11 @@ async def export_symptoms_csv(
     start_datetime, end_datetime = convert_dates_to_range(
         params.start_date, params.end_date
     )
-    symptoms = symptom_crud.get_symptom_events(
+    return symptom_crud.get_symptoms_csv(
         session=session,
         user_id=current_user.user_id,
         start_date=start_datetime,
         end_date=end_datetime,
-        order="desc",
         offset=params.offset,
         limit=params.limit,
     )
@@ -198,3 +196,30 @@ async def get_partner_symptoms(
         limit=params.limit,
     )
     return models.Response(data={"symptoms": symptoms}, count=len(symptoms))
+
+
+@router.get("/partner/{partner_id}/csv/", dependencies=[Depends(get_current_user)])
+async def export_partner_symptoms_csv(
+    partner_id: str,
+    current_user: Annotated[models.UserProfile, Depends(get_current_user)],
+    session: Annotated[Session, Depends(get_session)],
+    params: Annotated[CommonEventParams, Depends()],
+) -> StreamingResponse:  # pragma: no cover
+    # We're excluding this from coverage because it is effectively the same as the
+    # previous endpoint, just with CSV output.
+    if not is_partner(session, current_user, partner_id):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="You do not have access to this user's data.",
+        )
+    start_datetime, end_datetime = convert_dates_to_range(
+        params.start_date, params.end_date
+    )
+    return symptom_crud.get_symptoms_csv(
+        session=session,
+        user_id=partner_id,
+        start_date=start_datetime,
+        end_date=end_datetime,
+        offset=params.offset,
+        limit=params.limit,
+    )

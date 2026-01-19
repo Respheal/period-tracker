@@ -199,14 +199,15 @@ async def get_my_temp_readings_csv(
     start_datetime, end_datetime = convert_dates_to_range(
         params.start_date, params.end_date
     )
-    readings = temp_crud.get_temp_readings(
+    return temp_crud.get_temperature_csv(
         session=session,
         user_id=current_user.user_id,
         start_date=start_datetime,
         end_date=end_datetime,
-        order="asc",
         offset=params.offset,
         limit=params.limit,
+        precision=precision,
+    )
 
 
 @router.get("/partner/{partner_id}/")
@@ -233,3 +234,32 @@ async def get_partner_temperatures(
         limit=params.limit,
     )
     return models.Response(data={"temperatures": temperatures}, count=len(temperatures))
+
+
+@router.get("/partner/{partner_id}/csv/", dependencies=[Depends(get_current_user)])
+async def get_partner_temp_readings_csv(
+    partner_id: str,
+    current_user: Annotated[models.UserProfile, Depends(get_current_user)],
+    session: Annotated[Session, Depends(get_session)],
+    params: Annotated[CommonEventParams, Depends()],
+    precision: Annotated[int, Query(embed=True, description="Decimal precision")] = 2,
+) -> StreamingResponse:  # pragma: no cover
+    # We're excluding this from coverage because it is effectively the same as the
+    # previous endpoint, just with CSV output.
+    if not is_partner(session, current_user, partner_id):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="You do not have access to this user's data.",
+        )
+    start_datetime, end_datetime = convert_dates_to_range(
+        params.start_date, params.end_date
+    )
+    return temp_crud.get_temperature_csv(
+        session=session,
+        user_id=partner_id,
+        start_date=start_datetime,
+        end_date=end_datetime,
+        offset=params.offset,
+        limit=params.limit,
+        precision=precision,
+    )

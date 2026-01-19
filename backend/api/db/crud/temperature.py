@@ -1,12 +1,18 @@
 from datetime import UTC, datetime
 from typing import Sequence
 
+from fastapi.responses import StreamingResponse
 from sqlmodel import Session, desc, select
 
 from api.db import models
 from api.db.crud import user as user_crud
 from api.utils.config import settings
-from api.utils.stats import evaluate_temperature_state
+from api.utils.stats import (
+    compute_baseline,
+    compute_smoothed_temperature,
+    evaluate_temperature_state,
+    temperatures_to_frame,
+)
 
 
 def create_temp_reading(
@@ -79,6 +85,38 @@ def get_temp_readings(
         statement = statement.order_by(desc(models.Temperature.timestamp))
     statement = statement.offset(offset).limit(limit)
     return session.exec(statement).all()
+
+
+def get_temperature_csv(
+    session: Session,
+    user_id: str | None = None,
+    start_date: datetime | None = None,
+    end_date: datetime | None = None,
+    offset: int = 0,
+    limit: int = 100,
+    precision: int = 2,
+) -> StreamingResponse:
+    readings = get_temp_readings(
+        session=session,
+        user_id=user_id,
+        start_date=start_date,
+        end_date=end_date,
+        order="asc",
+        offset=offset,
+        limit=limit,
+    )
+    df = temperatures_to_frame(readings)
+    df.insert(1, "ewm", compute_smoothed_temperature(df))
+    df.insert(2, "baseline", compute_baseline(df))
+    df.reset_index(inplace=True)
+    df["timestamp"] = df["timestamp"].dt.strftime("%Y-%m-%d")
+    df["ewm"] = df["ewm"].round(precision)
+    df["baseline"] = df["baseline"].round(precision)
+    return StreamingResponse(
+        iter([df.to_csv(index=False)]),
+        media_type="text/csv",
+        headers={"Content-Disposition": "attachment; filename=temperature_readings.csv"},
+    )
 
 
 def get_temp_state(
