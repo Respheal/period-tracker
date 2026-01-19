@@ -61,7 +61,7 @@ async def update_me(
     session: Annotated[Session, Depends(get_session)],
     user_update: models.UserUpdate,
 ) -> models.UserProfile:
-    user = session.get(models.User, current_user.user_id)
+    user = user_crud.get_user(session, current_user.user_id)
     # If the user doesn't exist, we'll hit an auth error before we get here,
     # so type ignore
     return user_crud.update_user(session, user, user_update)  # type: ignore
@@ -176,8 +176,8 @@ async def add_partner(
     current_user: Annotated[models.UserProfile, Depends(get_current_user)],
     session: Annotated[Session, Depends(get_session)],
 ) -> models.User:
-    user = session.get(models.User, current_user.user_id)
-    partner = session.get(models.User, partner_id)
+    user = user_crud.get_user(session, current_user.user_id)
+    partner = user_crud.get_user(session, partner_id)
     if not partner or not user:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Partner not found."
@@ -195,8 +195,8 @@ async def remove_partner(
     current_user: Annotated[models.UserProfile, Depends(get_current_user)],
     session: Annotated[Session, Depends(get_session)],
 ) -> models.ResourceDeleteResponse:
-    user = session.get(models.User, current_user.user_id)
-    partner = session.get(models.User, partner_id)
+    user = user_crud.get_user(session, current_user.user_id)
+    partner = user_crud.get_user(session, partner_id)
     if not partner or not user:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Partner not found."

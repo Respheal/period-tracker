@@ -56,15 +56,14 @@ def update_user(session: Session, user: User, data: UserUpdate) -> User:
 
 
 def delete_user(session: Session, user_id: str) -> None:
-    user = session.get(User, user_id)
-    session.delete(user)
+    session.delete(get_user(session, user_id))
     session.commit()
 
 
 def update_temp_state(
     session: Session, user_id: str, new_state: TemperatureState
 ) -> User | None:
-    user = session.get(User, user_id)
+    user = get_user(session, user_id)
     if not user:  # pragma: no cover
         return None
     user.temp_state = new_state
@@ -75,7 +74,7 @@ def update_temp_state(
 
 
 def get_user_partners(session: Session, user_id: str) -> Sequence[User]:
-    user = session.get(User, user_id)
+    user = get_user(session, user_id)
     if not user:
         return []
     return user.partners
@@ -100,7 +99,7 @@ def remove_partner(session: Session, user: User, partner: User) -> User:
 
 
 def is_partner(session: Session, user: UserProfile, partner_id: str) -> bool:
-    partner = session.get(User, partner_id)
+    partner = get_user(session, partner_id)
     if not partner:
         return False
     return UserSafe.model_validate(partner) in (user.partners or [])
