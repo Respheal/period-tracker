@@ -255,6 +255,25 @@ class TestAddPartner:
         assert data["user_id"] == user1.user_id
         assert any(p["user_id"] == user2.user_id for p in data.get("partners", []))
 
+    def test_repeat_add_partner(self, client: TestClient, session: Session) -> None:
+        # Create two users
+        user1 = create_random_user(session)
+        user2 = create_random_user(session)
+        user1_headers = get_user_headers(client, session, user1.username)
+
+        # Run the addition twice
+        client.post(f"/users/me/partners/{user2.user_id}/", headers=user1_headers)
+        response2 = client.post(
+            f"/users/me/partners/{user2.user_id}/", headers=user1_headers
+        )
+        assert response2.status_code == 200
+        data = response2.json()
+        assert "user_id" in data
+        assert data["user_id"] == user1.user_id
+        # Ensure partner is not duplicated
+        partners = [p["user_id"] for p in data.get("partners", [])]
+        assert partners.count(user2.user_id) == 1
+
     def test_add_partner_not_found(self, client: TestClient, session: Session) -> None:
         user = create_random_user(session)
         user_headers = get_user_headers(client, session, user.username)
@@ -292,6 +311,18 @@ class TestRemovePartner:
         assert response.status_code == 200
         partners = response.json()["data"]["partners"]
         assert all(p["user_id"] != user2.user_id for p in partners)
+
+    def test_remove_non_partner(self, client: TestClient, session: Session) -> None:
+        # Create two users without partnership
+        user1 = create_random_user(session)
+        user2 = create_random_user(session)
+        user1_headers = get_user_headers(client, session, user1.username)
+
+        response = client.delete(
+            f"/users/me/partners/{user2.user_id}/", headers=user1_headers
+        )
+        # This will return 200 because the operation is idempotent
+        assert response.status_code == 200
 
     def test_remove_partner_not_found(self, client: TestClient, session: Session) -> None:
         user = create_random_user(session)
