@@ -10,7 +10,7 @@ from typing_extensions import Self
 
 def parse_cors(v: Any) -> list[str] | str:
     if isinstance(v, str) and not v.startswith("["):
-        return [i.strip() for i in v.split(",") if i.strip()]
+        return [i.strip().rstrip("/") for i in v.split(",") if i.strip()]
     elif isinstance(v, list | str):
         return v
     raise ValueError(v)
@@ -56,7 +56,7 @@ class Settings(BaseSettings):
     REDIS_HOST: str
     REDIS_PORT: int = 6379
     REDIS_DB: int = 0
-    BACKEND_CORS_ORIGINS: Annotated[list[AnyUrl] | str, BeforeValidator(parse_cors)] = []
+    BACKEND_CORS_ORIGINS: Annotated[list[str] | str, BeforeValidator(parse_cors)] = []
 
     # Cached keys to avoid reading from disk on every request
     _private_key_bytes: bytes | None = None

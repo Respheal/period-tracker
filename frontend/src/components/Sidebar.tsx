@@ -58,6 +58,8 @@ export function Sidebar({
     }
   };
 
+  // TODO: Figure out how to highlight the current route
+  // TODO: Clean up the aria stuff
   const drawer = (
     <div>
       <Toolbar />

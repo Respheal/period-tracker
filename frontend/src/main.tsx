@@ -8,7 +8,13 @@ import {
 import { routeTree } from "./routeTree.gen";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Spinner } from "./components/Spinner";
+import { client } from "./client/client.gen";
 import "./index.css";
+
+// Configure the API client
+client.setConfig({
+  baseUrl: "http://localhost:5000",
+});
 
 const queryClient = new QueryClient();
 

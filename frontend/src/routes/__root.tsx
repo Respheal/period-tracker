@@ -11,6 +11,7 @@ function RootComponent() {
   const nav_items = [
     ["/", "Home", <DashboardIcon />, true],
     ["/login", "Login", <DashboardIcon />],
+    ["/api", "API Test", <DashboardIcon />],
   ] as const;
 
   return (
