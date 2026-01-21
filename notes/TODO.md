@@ -166,19 +166,15 @@
 ### Framework
 
 - [x] [Vite + React](https://react.dev/learn/build-a-react-app-from-scratch)
-- [ ] [TanStack Query](https://tanstack.com/query/latest) - API client, state handling
-- [ ] [TanStack Router](https://tanstack.com/router/latest) - routing? (consider form instead of hooks too)
-- [ ] [Ladle](https://ladle.dev/)
-- [ ] [Ladle Accessibility](https://ladle.dev/docs/a11y)
-- [ ] [Ladle Actions](https://ladle.dev/docs/actions)
-- [ ] [Ladle Controls](https://ladle.dev/docs/controls)
-- [ ] [Ladlbe Story Source](https://ladle.dev/docs/source)
-- [ ] [Ladle Width](https://ladle.dev/docs/width)
-- [ ] [Material UI](https://mui.com/material-ui/)
-- [ ] [Form Management](https://react-hook-form.com/)
-- [ ] [Unit/Integration: Vitest + React Testing Library](https://vitest.dev/guide/browser/component-testing.html#testing-library-integration)
-- [ ] [E2E Tests: Playwright](https://playwright.dev/)
-- [ ] [Day.js](https://github.com/iamkun/dayjs) - If we need better date parsing on the frontend
+- [x] [TanStack Query](https://tanstack.com/query/latest) - API client, state handling
+- [x] [TanStack Router](https://tanstack.com/router/latest) - routing? (consider form instead of hooks too)
+- [x] [Storybook](https://storybook.js.org/)
+- [x] [Storybook Accessibility](https://storybook.js.org/addons/@storybook/addon-a11y)
+- [x] [Material UI](https://mui.com/material-ui/)
+- [x] [Form Management](https://tanstack.com/form/latest)
+- [x] [Unit/Integration: Vitest + React Testing Library](https://vitest.dev/guide/browser/component-testing.html#testing-library-integration)
+- [x] [E2E Tests: Playwright](https://playwright.dev/)
+- [x] [Day.js](https://github.com/iamkun/dayjs) - If we need better date parsing on the frontend
 
 ### User UI functionality
 

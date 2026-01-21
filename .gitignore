@@ -22,6 +22,9 @@ vite.config.ts.timestamp-*
 *storybook.log
 storybook-static
 
+# Tanstack cache
+.tanstack
+
 #
 # Python.gitignore
 #
@@ -87,7 +90,7 @@ report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
 *.db-journal
 results.sqlite
 
-# Coverage reports
+# Test and Coverage reports
 htmlcov/
 .tox/
 .nox/
@@ -104,6 +107,8 @@ coverage.xml
 cover/
 coverage
 *.lcov
+playwright-report/
+test-results/
 
 # Distribution / packaging
 .Python

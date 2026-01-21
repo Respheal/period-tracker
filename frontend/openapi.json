@@ -1,0 +1,2810 @@
+{
+  "openapi": "3.1.0",
+  "info": { "title": "Period Tracker API (test)", "version": "0.1.0" },
+  "paths": {
+    "/auth/": {
+      "post": {
+        "tags": ["auth"],
+        "summary": "Login",
+        "operationId": "login_auth__post",
+        "requestBody": {
+          "content": {
+            "application/x-www-form-urlencoded": {
+              "schema": { "$ref": "#/components/schemas/Body_login_auth__post" }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/AccessToken" }
+              }
+            }
+          },
+          "404": { "description": "Not found" },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/refresh": {
+      "post": {
+        "tags": ["auth"],
+        "summary": "Refresh Tokens",
+        "operationId": "refresh_tokens_auth_refresh_post",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/AccessToken" }
+              }
+            }
+          },
+          "404": { "description": "Not found" }
+        }
+      }
+    },
+    "/users/": {
+      "post": {
+        "tags": ["users"],
+        "summary": "Create User",
+        "operationId": "create_user_users__post",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/UserCreate" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/UserSafe" }
+              }
+            }
+          },
+          "404": { "description": "Not found" },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": ["users"],
+        "summary": "Get Users",
+        "description": "Endpoint to retrieve users for admin moderation. Admin-only.\n\n:return: A list of safe user representations (sans sensitive info)\n:rtype: Sequence[UserSafe]",
+        "operationId": "get_users_users__get",
+        "security": [{ "OAuth2PasswordBearer": [] }],
+        "parameters": [
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": { "type": "integer", "default": 0, "title": "Offset" }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 100,
+              "default": 100,
+              "title": "Limit"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Response" }
+              }
+            }
+          },
+          "404": { "description": "Not found" },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/users/me/": {
+      "get": {
+        "tags": ["users"],
+        "summary": "Read Me",
+        "operationId": "read_me_users_me__get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/UserProfile" }
+              }
+            }
+          },
+          "404": { "description": "Not found" }
+        },
+        "security": [{ "OAuth2PasswordBearer": [] }]
+      },
+      "delete": {
+        "tags": ["users"],
+        "summary": "Delete Me",
+        "operationId": "delete_me_users_me__delete",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResourceDeleteResponse"
+                }
+              }
+            }
+          },
+          "404": { "description": "Not found" }
+        },
+        "security": [{ "OAuth2PasswordBearer": [] }]
+      },
+      "patch": {
+        "tags": ["users"],
+        "summary": "Update Me",
+        "operationId": "update_me_users_me__patch",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/UserUpdate" }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/UserProfile" }
+              }
+            }
+          },
+          "404": { "description": "Not found" },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
+              }
+            }
+          }
+        },
+        "security": [{ "OAuth2PasswordBearer": [] }]
+      }
+    },
+    "/users/me/events/": {
+      "get": {
+        "tags": ["users"],
+        "summary": "Get My Events",
+        "operationId": "get_my_events_users_me_events__get",
+        "security": [{ "OAuth2PasswordBearer": [] }],
+        "parameters": [
+          {
+            "name": "start_date",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$" },
+                { "type": "null" }
+              ],
+              "description": "Start date filter",
+              "title": "Start Date"
+            },
+            "description": "Start date filter"
+          },
+          {
+            "name": "end_date",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$" },
+                { "type": "null" }
+              ],
+              "description": "End date filter",
+              "title": "End Date"
+            },
+            "description": "End date filter"
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": { "type": "integer", "default": 0, "title": "Offset" }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 365,
+              "default": 100,
+              "title": "Limit"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Response" }
+              }
+            }
+          },
+          "404": { "description": "Not found" },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/users/me/events/csv/": {
+      "get": {
+        "tags": ["users"],
+        "summary": "Get My Events Csv",
+        "operationId": "get_my_events_csv_users_me_events_csv__get",
+        "security": [{ "OAuth2PasswordBearer": [] }],
+        "parameters": [
+          {
+            "name": "start_date",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$" },
+                { "type": "null" }
+              ],
+              "description": "Start date filter",
+              "title": "Start Date"
+            },
+            "description": "Start date filter"
+          },
+          {
+            "name": "end_date",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$" },
+                { "type": "null" }
+              ],
+              "description": "End date filter",
+              "title": "End Date"
+            },
+            "description": "End date filter"
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": { "type": "integer", "default": 0, "title": "Offset" }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 365,
+              "default": 100,
+              "title": "Limit"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": { "application/json": { "schema": {} } }
+          },
+          "404": { "description": "Not found" },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/users/me/partners/": {
+      "get": {
+        "tags": ["users"],
+        "summary": "Get My Partners",
+        "operationId": "get_my_partners_users_me_partners__get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Response" }
+              }
+            }
+          },
+          "404": { "description": "Not found" }
+        },
+        "security": [{ "OAuth2PasswordBearer": [] }]
+      }
+    },
+    "/users/me/partners/{partner_id}/": {
+      "post": {
+        "tags": ["users"],
+        "summary": "Add Partner",
+        "operationId": "add_partner_users_me_partners__partner_id___post",
+        "security": [{ "OAuth2PasswordBearer": [] }],
+        "parameters": [
+          {
+            "name": "partner_id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string", "title": "Partner Id" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/UserProfile" }
+              }
+            }
+          },
+          "404": { "description": "Not found" },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": ["users"],
+        "summary": "Remove Partner",
+        "operationId": "remove_partner_users_me_partners__partner_id___delete",
+        "security": [{ "OAuth2PasswordBearer": [] }],
+        "parameters": [
+          {
+            "name": "partner_id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string", "title": "Partner Id" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResourceDeleteResponse"
+                }
+              }
+            }
+          },
+          "404": { "description": "Not found" },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/period/": {
+      "post": {
+        "tags": ["period"],
+        "summary": "Create Period Event",
+        "operationId": "create_period_event_period__post",
+        "security": [{ "OAuth2PasswordBearer": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/CreatePeriodParams" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Period" }
+              }
+            }
+          },
+          "404": { "description": "Not found" },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": ["period"],
+        "summary": "Get All Periods",
+        "operationId": "get_all_periods_period__get",
+        "security": [{ "OAuth2PasswordBearer": [] }],
+        "parameters": [
+          {
+            "name": "start_date",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$" },
+                { "type": "null" }
+              ],
+              "description": "Start date filter",
+              "title": "Start Date"
+            },
+            "description": "Start date filter"
+          },
+          {
+            "name": "end_date",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$" },
+                { "type": "null" }
+              ],
+              "description": "End date filter",
+              "title": "End Date"
+            },
+            "description": "End date filter"
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": { "type": "integer", "default": 0, "title": "Offset" }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 365,
+              "default": 100,
+              "title": "Limit"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Response" }
+              }
+            }
+          },
+          "404": { "description": "Not found" },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/period/me/": {
+      "get": {
+        "tags": ["period"],
+        "summary": "Get My Periods",
+        "operationId": "get_my_periods_period_me__get",
+        "security": [{ "OAuth2PasswordBearer": [] }],
+        "parameters": [
+          {
+            "name": "start_date",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$" },
+                { "type": "null" }
+              ],
+              "description": "Start date filter",
+              "title": "Start Date"
+            },
+            "description": "Start date filter"
+          },
+          {
+            "name": "end_date",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$" },
+                { "type": "null" }
+              ],
+              "description": "End date filter",
+              "title": "End Date"
+            },
+            "description": "End date filter"
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": { "type": "integer", "default": 0, "title": "Offset" }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 365,
+              "default": 100,
+              "title": "Limit"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Response" }
+              }
+            }
+          },
+          "404": { "description": "Not found" },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/period/me/{period_id}": {
+      "get": {
+        "tags": ["period"],
+        "summary": "Get Single Period",
+        "operationId": "get_single_period_period_me__period_id__get",
+        "security": [{ "OAuth2PasswordBearer": [] }],
+        "parameters": [
+          {
+            "name": "period_id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer", "title": "Period Id" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Period" }
+              }
+            }
+          },
+          "404": { "description": "Not found" },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": ["period"],
+        "summary": "Update Period",
+        "operationId": "update_period_period_me__period_id__patch",
+        "security": [{ "OAuth2PasswordBearer": [] }],
+        "parameters": [
+          {
+            "name": "period_id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer", "title": "Period Id" }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/PeriodUpdate" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Period" }
+              }
+            }
+          },
+          "404": { "description": "Not found" },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": ["period"],
+        "summary": "Delete Period",
+        "operationId": "delete_period_period_me__period_id__delete",
+        "security": [{ "OAuth2PasswordBearer": [] }],
+        "parameters": [
+          {
+            "name": "period_id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer", "title": "Period Id" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResourceDeleteResponse"
+                }
+              }
+            }
+          },
+          "404": { "description": "Not found" },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/period/me/csv/": {
+      "get": {
+        "tags": ["period"],
+        "summary": "Get My Periods Csv",
+        "operationId": "get_my_periods_csv_period_me_csv__get",
+        "security": [{ "OAuth2PasswordBearer": [] }],
+        "parameters": [
+          {
+            "name": "start_date",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$" },
+                { "type": "null" }
+              ],
+              "description": "Start date filter",
+              "title": "Start Date"
+            },
+            "description": "Start date filter"
+          },
+          {
+            "name": "end_date",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$" },
+                { "type": "null" }
+              ],
+              "description": "End date filter",
+              "title": "End Date"
+            },
+            "description": "End date filter"
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": { "type": "integer", "default": 0, "title": "Offset" }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 365,
+              "default": 100,
+              "title": "Limit"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": { "application/json": { "schema": {} } }
+          },
+          "404": { "description": "Not found" },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/period/me/next/": {
+      "get": {
+        "tags": ["period"],
+        "summary": "Get Next Period",
+        "operationId": "get_next_period_period_me_next__get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    { "$ref": "#/components/schemas/PredictedPeriod" },
+                    { "type": "null" }
+                  ],
+                  "title": "Response Get Next Period Period Me Next  Get"
+                }
+              }
+            }
+          },
+          "404": { "description": "Not found" }
+        },
+        "security": [{ "OAuth2PasswordBearer": [] }]
+      }
+    },
+    "/period/partner/{partner_id}/": {
+      "get": {
+        "tags": ["period"],
+        "summary": "Get Partner Periods",
+        "operationId": "get_partner_periods_period_partner__partner_id___get",
+        "security": [{ "OAuth2PasswordBearer": [] }],
+        "parameters": [
+          {
+            "name": "partner_id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string", "title": "Partner Id" }
+          },
+          {
+            "name": "start_date",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$" },
+                { "type": "null" }
+              ],
+              "description": "Start date filter",
+              "title": "Start Date"
+            },
+            "description": "Start date filter"
+          },
+          {
+            "name": "end_date",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$" },
+                { "type": "null" }
+              ],
+              "description": "End date filter",
+              "title": "End Date"
+            },
+            "description": "End date filter"
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": { "type": "integer", "default": 0, "title": "Offset" }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 365,
+              "default": 100,
+              "title": "Limit"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Response" }
+              }
+            }
+          },
+          "404": { "description": "Not found" },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/period/partner/{partner_id}/csv/": {
+      "get": {
+        "tags": ["period"],
+        "summary": "Get Partner Periods Csv",
+        "operationId": "get_partner_periods_csv_period_partner__partner_id__csv__get",
+        "security": [{ "OAuth2PasswordBearer": [] }],
+        "parameters": [
+          {
+            "name": "partner_id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string", "title": "Partner Id" }
+          },
+          {
+            "name": "start_date",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$" },
+                { "type": "null" }
+              ],
+              "description": "Start date filter",
+              "title": "Start Date"
+            },
+            "description": "Start date filter"
+          },
+          {
+            "name": "end_date",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$" },
+                { "type": "null" }
+              ],
+              "description": "End date filter",
+              "title": "End Date"
+            },
+            "description": "End date filter"
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": { "type": "integer", "default": 0, "title": "Offset" }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 365,
+              "default": 100,
+              "title": "Limit"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": { "application/json": { "schema": {} } }
+          },
+          "404": { "description": "Not found" },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/temp/": {
+      "post": {
+        "tags": ["temperature"],
+        "summary": "Create Temp Reading",
+        "operationId": "create_temp_reading_temp__post",
+        "security": [{ "OAuth2PasswordBearer": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/CreateTempParams" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Temperature" }
+              }
+            }
+          },
+          "404": { "description": "Not found" },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": ["temperature"],
+        "summary": "Get Temp Readings",
+        "operationId": "get_temp_readings_temp__get",
+        "security": [{ "OAuth2PasswordBearer": [] }],
+        "parameters": [
+          {
+            "name": "start_date",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$" },
+                { "type": "null" }
+              ],
+              "description": "Start date filter",
+              "title": "Start Date"
+            },
+            "description": "Start date filter"
+          },
+          {
+            "name": "end_date",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$" },
+                { "type": "null" }
+              ],
+              "description": "End date filter",
+              "title": "End Date"
+            },
+            "description": "End date filter"
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": { "type": "integer", "default": 0, "title": "Offset" }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 365,
+              "default": 100,
+              "title": "Limit"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Response" }
+              }
+            }
+          },
+          "404": { "description": "Not found" },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/temp/me/": {
+      "get": {
+        "tags": ["temperature"],
+        "summary": "Get My Readings",
+        "operationId": "get_my_readings_temp_me__get",
+        "security": [{ "OAuth2PasswordBearer": [] }],
+        "parameters": [
+          {
+            "name": "start_date",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$" },
+                { "type": "null" }
+              ],
+              "description": "Start date filter",
+              "title": "Start Date"
+            },
+            "description": "Start date filter"
+          },
+          {
+            "name": "end_date",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$" },
+                { "type": "null" }
+              ],
+              "description": "End date filter",
+              "title": "End Date"
+            },
+            "description": "End date filter"
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": { "type": "integer", "default": 0, "title": "Offset" }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 365,
+              "default": 100,
+              "title": "Limit"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Response" }
+              }
+            }
+          },
+          "404": { "description": "Not found" },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/temp/me/{temperature_id}": {
+      "get": {
+        "tags": ["temperature"],
+        "summary": "Get Single Reading",
+        "operationId": "get_single_reading_temp_me__temperature_id__get",
+        "security": [{ "OAuth2PasswordBearer": [] }],
+        "parameters": [
+          {
+            "name": "temperature_id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer", "title": "Temperature Id" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Temperature" }
+              }
+            }
+          },
+          "404": { "description": "Not found" },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": ["temperature"],
+        "summary": "Update Reading",
+        "operationId": "update_reading_temp_me__temperature_id__patch",
+        "security": [{ "OAuth2PasswordBearer": [] }],
+        "parameters": [
+          {
+            "name": "temperature_id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer", "title": "Temperature Id" }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/TempUpdate" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Temperature" }
+              }
+            }
+          },
+          "404": { "description": "Not found" },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": ["temperature"],
+        "summary": "Delete Temp",
+        "operationId": "delete_temp_temp_me__temperature_id__delete",
+        "security": [{ "OAuth2PasswordBearer": [] }],
+        "parameters": [
+          {
+            "name": "temperature_id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer", "title": "Temperature Id" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResourceDeleteResponse"
+                }
+              }
+            }
+          },
+          "404": { "description": "Not found" },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/temp/me/averages/": {
+      "get": {
+        "tags": ["temperature"],
+        "summary": "Get My Temp Averages",
+        "operationId": "get_my_temp_averages_temp_me_averages__get",
+        "security": [{ "OAuth2PasswordBearer": [] }],
+        "parameters": [
+          {
+            "name": "precision",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "description": "Decimal precision",
+              "embed": true,
+              "default": 2,
+              "title": "Precision"
+            },
+            "description": "Decimal precision"
+          },
+          {
+            "name": "start_date",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$" },
+                { "type": "null" }
+              ],
+              "description": "Start date filter",
+              "title": "Start Date"
+            },
+            "description": "Start date filter"
+          },
+          {
+            "name": "end_date",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$" },
+                { "type": "null" }
+              ],
+              "description": "End date filter",
+              "title": "End Date"
+            },
+            "description": "End date filter"
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": { "type": "integer", "default": 0, "title": "Offset" }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 365,
+              "default": 100,
+              "title": "Limit"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/TemperatureEMA" },
+                  "title": "Response Get My Temp Averages Temp Me Averages  Get"
+                }
+              }
+            }
+          },
+          "404": { "description": "Not found" },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/temp/me/csv/": {
+      "get": {
+        "tags": ["temperature"],
+        "summary": "Get My Temp Readings Csv",
+        "operationId": "get_my_temp_readings_csv_temp_me_csv__get",
+        "security": [{ "OAuth2PasswordBearer": [] }],
+        "parameters": [
+          {
+            "name": "precision",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "description": "Decimal precision",
+              "embed": true,
+              "default": 2,
+              "title": "Precision"
+            },
+            "description": "Decimal precision"
+          },
+          {
+            "name": "start_date",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$" },
+                { "type": "null" }
+              ],
+              "description": "Start date filter",
+              "title": "Start Date"
+            },
+            "description": "Start date filter"
+          },
+          {
+            "name": "end_date",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$" },
+                { "type": "null" }
+              ],
+              "description": "End date filter",
+              "title": "End Date"
+            },
+            "description": "End date filter"
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": { "type": "integer", "default": 0, "title": "Offset" }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 365,
+              "default": 100,
+              "title": "Limit"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": { "application/json": { "schema": {} } }
+          },
+          "404": { "description": "Not found" },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/temp/partner/{partner_id}/": {
+      "get": {
+        "tags": ["temperature"],
+        "summary": "Get Partner Temperatures",
+        "operationId": "get_partner_temperatures_temp_partner__partner_id___get",
+        "security": [{ "OAuth2PasswordBearer": [] }],
+        "parameters": [
+          {
+            "name": "partner_id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string", "title": "Partner Id" }
+          },
+          {
+            "name": "start_date",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$" },
+                { "type": "null" }
+              ],
+              "description": "Start date filter",
+              "title": "Start Date"
+            },
+            "description": "Start date filter"
+          },
+          {
+            "name": "end_date",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$" },
+                { "type": "null" }
+              ],
+              "description": "End date filter",
+              "title": "End Date"
+            },
+            "description": "End date filter"
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": { "type": "integer", "default": 0, "title": "Offset" }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 365,
+              "default": 100,
+              "title": "Limit"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Response" }
+              }
+            }
+          },
+          "404": { "description": "Not found" },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/temp/partner/{partner_id}/csv/": {
+      "get": {
+        "tags": ["temperature"],
+        "summary": "Get Partner Temp Readings Csv",
+        "operationId": "get_partner_temp_readings_csv_temp_partner__partner_id__csv__get",
+        "security": [{ "OAuth2PasswordBearer": [] }],
+        "parameters": [
+          {
+            "name": "partner_id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string", "title": "Partner Id" }
+          },
+          {
+            "name": "precision",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "description": "Decimal precision",
+              "embed": true,
+              "default": 2,
+              "title": "Precision"
+            },
+            "description": "Decimal precision"
+          },
+          {
+            "name": "start_date",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$" },
+                { "type": "null" }
+              ],
+              "description": "Start date filter",
+              "title": "Start Date"
+            },
+            "description": "Start date filter"
+          },
+          {
+            "name": "end_date",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$" },
+                { "type": "null" }
+              ],
+              "description": "End date filter",
+              "title": "End Date"
+            },
+            "description": "End date filter"
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": { "type": "integer", "default": 0, "title": "Offset" }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 365,
+              "default": 100,
+              "title": "Limit"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": { "application/json": { "schema": {} } }
+          },
+          "404": { "description": "Not found" },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/symptoms/": {
+      "post": {
+        "tags": ["symptoms"],
+        "summary": "Create Symptom Event",
+        "operationId": "create_symptom_event_symptoms__post",
+        "security": [{ "OAuth2PasswordBearer": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/CreateSymptomParams" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/SymptomEvent" }
+              }
+            }
+          },
+          "404": { "description": "Not found" },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": ["symptoms"],
+        "summary": "Get Symptom Events",
+        "operationId": "get_symptom_events_symptoms__get",
+        "security": [{ "OAuth2PasswordBearer": [] }],
+        "parameters": [
+          {
+            "name": "start_date",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$" },
+                { "type": "null" }
+              ],
+              "description": "Start date filter",
+              "title": "Start Date"
+            },
+            "description": "Start date filter"
+          },
+          {
+            "name": "end_date",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$" },
+                { "type": "null" }
+              ],
+              "description": "End date filter",
+              "title": "End Date"
+            },
+            "description": "End date filter"
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": { "type": "integer", "default": 0, "title": "Offset" }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 365,
+              "default": 100,
+              "title": "Limit"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Response" }
+              }
+            }
+          },
+          "404": { "description": "Not found" },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/symptoms/me/": {
+      "get": {
+        "tags": ["symptoms"],
+        "summary": "Get My Symptom Events",
+        "operationId": "get_my_symptom_events_symptoms_me__get",
+        "security": [{ "OAuth2PasswordBearer": [] }],
+        "parameters": [
+          {
+            "name": "start_date",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$" },
+                { "type": "null" }
+              ],
+              "description": "Start date filter",
+              "title": "Start Date"
+            },
+            "description": "Start date filter"
+          },
+          {
+            "name": "end_date",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$" },
+                { "type": "null" }
+              ],
+              "description": "End date filter",
+              "title": "End Date"
+            },
+            "description": "End date filter"
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": { "type": "integer", "default": 0, "title": "Offset" }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 365,
+              "default": 100,
+              "title": "Limit"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Response" }
+              }
+            }
+          },
+          "404": { "description": "Not found" },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/symptoms/me/{symptom_id}": {
+      "get": {
+        "tags": ["symptoms"],
+        "summary": "Get Single Symptom Event",
+        "operationId": "get_single_symptom_event_symptoms_me__symptom_id__get",
+        "security": [{ "OAuth2PasswordBearer": [] }],
+        "parameters": [
+          {
+            "name": "symptom_id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer", "title": "Symptom Id" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/SymptomEvent" }
+              }
+            }
+          },
+          "404": { "description": "Not found" },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": ["symptoms"],
+        "summary": "Update Symptom Event",
+        "operationId": "update_symptom_event_symptoms_me__symptom_id__patch",
+        "security": [{ "OAuth2PasswordBearer": [] }],
+        "parameters": [
+          {
+            "name": "symptom_id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer", "title": "Symptom Id" }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/UpdateSymptomEvent" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/SymptomEvent" }
+              }
+            }
+          },
+          "404": { "description": "Not found" },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": ["symptoms"],
+        "summary": "Delete Symptom Event",
+        "operationId": "delete_symptom_event_symptoms_me__symptom_id__delete",
+        "security": [{ "OAuth2PasswordBearer": [] }],
+        "parameters": [
+          {
+            "name": "symptom_id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer", "title": "Symptom Id" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResourceDeleteResponse"
+                }
+              }
+            }
+          },
+          "404": { "description": "Not found" },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/symptoms/me/csv/": {
+      "get": {
+        "tags": ["symptoms"],
+        "summary": "Export Symptoms Csv",
+        "operationId": "export_symptoms_csv_symptoms_me_csv__get",
+        "security": [{ "OAuth2PasswordBearer": [] }],
+        "parameters": [
+          {
+            "name": "start_date",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$" },
+                { "type": "null" }
+              ],
+              "description": "Start date filter",
+              "title": "Start Date"
+            },
+            "description": "Start date filter"
+          },
+          {
+            "name": "end_date",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$" },
+                { "type": "null" }
+              ],
+              "description": "End date filter",
+              "title": "End Date"
+            },
+            "description": "End date filter"
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": { "type": "integer", "default": 0, "title": "Offset" }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 365,
+              "default": 100,
+              "title": "Limit"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": { "application/json": { "schema": {} } }
+          },
+          "404": { "description": "Not found" },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/symptoms/partner/{partner_id}/": {
+      "get": {
+        "tags": ["symptoms"],
+        "summary": "Get Partner Symptoms",
+        "operationId": "get_partner_symptoms_symptoms_partner__partner_id___get",
+        "security": [{ "OAuth2PasswordBearer": [] }],
+        "parameters": [
+          {
+            "name": "partner_id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string", "title": "Partner Id" }
+          },
+          {
+            "name": "start_date",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$" },
+                { "type": "null" }
+              ],
+              "description": "Start date filter",
+              "title": "Start Date"
+            },
+            "description": "Start date filter"
+          },
+          {
+            "name": "end_date",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$" },
+                { "type": "null" }
+              ],
+              "description": "End date filter",
+              "title": "End Date"
+            },
+            "description": "End date filter"
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": { "type": "integer", "default": 0, "title": "Offset" }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 365,
+              "default": 100,
+              "title": "Limit"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Response" }
+              }
+            }
+          },
+          "404": { "description": "Not found" },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/symptoms/partner/{partner_id}/csv/": {
+      "get": {
+        "tags": ["symptoms"],
+        "summary": "Export Partner Symptoms Csv",
+        "operationId": "export_partner_symptoms_csv_symptoms_partner__partner_id__csv__get",
+        "security": [{ "OAuth2PasswordBearer": [] }],
+        "parameters": [
+          {
+            "name": "partner_id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string", "title": "Partner Id" }
+          },
+          {
+            "name": "start_date",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$" },
+                { "type": "null" }
+              ],
+              "description": "Start date filter",
+              "title": "Start Date"
+            },
+            "description": "Start date filter"
+          },
+          {
+            "name": "end_date",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$" },
+                { "type": "null" }
+              ],
+              "description": "End date filter",
+              "title": "End Date"
+            },
+            "description": "End date filter"
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": { "type": "integer", "default": 0, "title": "Offset" }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 365,
+              "default": 100,
+              "title": "Limit"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": { "application/json": { "schema": {} } }
+          },
+          "404": { "description": "Not found" },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/": {
+      "get": {
+        "summary": "Root",
+        "operationId": "root__get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ApplicationInfo" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/health": {
+      "get": {
+        "summary": "Health Check",
+        "operationId": "health_check_health_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/HealthCheck" }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "AccessToken": {
+        "properties": {
+          "token_type": { "type": "string", "title": "Token Type" },
+          "access_token": { "type": "string", "title": "Access Token" }
+        },
+        "type": "object",
+        "required": ["token_type", "access_token"],
+        "title": "AccessToken"
+      },
+      "ApplicationInfo": {
+        "properties": {
+          "app_name": { "type": "string", "title": "App Name" },
+          "version": { "type": "string", "title": "Version" }
+        },
+        "type": "object",
+        "required": ["app_name", "version"],
+        "title": "ApplicationInfo"
+      },
+      "Body_login_auth__post": {
+        "properties": {
+          "grant_type": {
+            "anyOf": [
+              { "type": "string", "pattern": "^password$" },
+              { "type": "null" }
+            ],
+            "title": "Grant Type"
+          },
+          "username": { "type": "string", "title": "Username" },
+          "password": {
+            "type": "string",
+            "format": "password",
+            "title": "Password"
+          },
+          "scope": { "type": "string", "title": "Scope", "default": "" },
+          "client_id": {
+            "anyOf": [{ "type": "string" }, { "type": "null" }],
+            "title": "Client Id"
+          },
+          "client_secret": {
+            "anyOf": [{ "type": "string" }, { "type": "null" }],
+            "format": "password",
+            "title": "Client Secret"
+          }
+        },
+        "type": "object",
+        "required": ["username", "password"],
+        "title": "Body_login_auth__post"
+      },
+      "CreatePeriodParams": {
+        "properties": {
+          "start_date": {
+            "type": "string",
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+            "title": "Start Date",
+            "description": "Start date",
+            "default": "2026-01-17"
+          },
+          "end_date": {
+            "anyOf": [
+              { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$" },
+              { "type": "null" }
+            ],
+            "title": "End Date",
+            "description": "End date (Optional)",
+            "default": "2026-01-20"
+          }
+        },
+        "type": "object",
+        "title": "CreatePeriodParams"
+      },
+      "CreateSymptomParams": {
+        "properties": {
+          "date": {
+            "anyOf": [
+              { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$" },
+              { "type": "null" }
+            ],
+            "title": "Date",
+            "description": "Date of the symptom event"
+          },
+          "flow_intensity": {
+            "anyOf": [
+              { "$ref": "#/components/schemas/FlowIntensity" },
+              { "type": "null" }
+            ]
+          },
+          "symptoms": {
+            "anyOf": [
+              { "items": { "type": "string" }, "type": "array" },
+              { "type": "null" }
+            ],
+            "title": "Symptoms"
+          },
+          "mood": {
+            "anyOf": [
+              { "items": { "type": "string" }, "type": "array" },
+              { "type": "null" }
+            ],
+            "title": "Mood"
+          },
+          "ovulation_test": {
+            "anyOf": [{ "type": "boolean" }, { "type": "null" }],
+            "title": "Ovulation Test"
+          },
+          "discharge": {
+            "anyOf": [
+              { "items": { "type": "string" }, "type": "array" },
+              { "type": "null" }
+            ],
+            "title": "Discharge"
+          },
+          "sex": {
+            "anyOf": [
+              { "items": { "type": "string" }, "type": "array" },
+              { "type": "null" }
+            ],
+            "title": "Sex"
+          }
+        },
+        "type": "object",
+        "title": "CreateSymptomParams"
+      },
+      "CreateTempParams": {
+        "properties": {
+          "temperature": {
+            "type": "number",
+            "maximum": 40.0,
+            "minimum": 30.0,
+            "title": "Temperature"
+          }
+        },
+        "type": "object",
+        "required": ["temperature"],
+        "title": "CreateTempParams"
+      },
+      "Cycle": {
+        "properties": {
+          "pid": {
+            "anyOf": [{ "type": "integer" }, { "type": "null" }],
+            "title": "Pid"
+          },
+          "user_id": { "type": "string", "title": "User Id" },
+          "state": {
+            "$ref": "#/components/schemas/CycleState",
+            "default": "learning"
+          },
+          "avg_cycle_length": {
+            "anyOf": [{ "type": "integer" }, { "type": "null" }],
+            "title": "Avg Cycle Length"
+          },
+          "avg_period_length": {
+            "anyOf": [{ "type": "integer" }, { "type": "null" }],
+            "title": "Avg Period Length"
+          },
+          "last_period_start": {
+            "anyOf": [
+              { "type": "string", "format": "date-time" },
+              { "type": "null" }
+            ],
+            "title": "Last Period Start"
+          },
+          "last_evaluated": {
+            "anyOf": [
+              { "type": "string", "format": "date-time" },
+              { "type": "null" }
+            ],
+            "title": "Last Evaluated"
+          }
+        },
+        "type": "object",
+        "required": ["user_id"],
+        "title": "Cycle"
+      },
+      "CycleState": {
+        "type": "string",
+        "enum": ["learning", "stable", "unstable"],
+        "title": "CycleState"
+      },
+      "FlowIntensity": {
+        "type": "string",
+        "enum": ["0", "1", "2", "3", "4"],
+        "title": "FlowIntensity"
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": { "$ref": "#/components/schemas/ValidationError" },
+            "type": "array",
+            "title": "Detail"
+          }
+        },
+        "type": "object",
+        "title": "HTTPValidationError"
+      },
+      "HealthCheck": {
+        "properties": {
+          "status": { "type": "string", "title": "Status" },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Timestamp"
+          }
+        },
+        "type": "object",
+        "required": ["status", "timestamp"],
+        "title": "HealthCheck"
+      },
+      "Period": {
+        "properties": {
+          "user_id": { "type": "string", "title": "User Id" },
+          "start_date": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Start Date"
+          },
+          "end_date": {
+            "anyOf": [
+              { "type": "string", "format": "date-time" },
+              { "type": "null" }
+            ],
+            "title": "End Date"
+          },
+          "duration": {
+            "anyOf": [{ "type": "integer" }, { "type": "null" }],
+            "title": "Duration"
+          },
+          "pid": { "type": "integer", "title": "Pid" },
+          "luteal_length": {
+            "anyOf": [{ "type": "integer" }, { "type": "null" }],
+            "title": "Luteal Length"
+          }
+        },
+        "type": "object",
+        "required": ["user_id", "start_date"],
+        "title": "Period",
+        "description": "Period Event model.\n\nThis is the class representing the Period table in the database.\n\n- user_id\n- start_date, assume TZ-naive on read due to SQLite limitations\n- end_date, assume TZ-naive on read due to SQLite limitations\n- duration"
+      },
+      "PeriodUpdate": {
+        "properties": {
+          "start_date": {
+            "anyOf": [
+              { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$" },
+              { "type": "null" }
+            ],
+            "title": "Start Date",
+            "description": "YYYY-MM-DD format"
+          },
+          "end_date": {
+            "anyOf": [
+              { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$" },
+              { "type": "null" }
+            ],
+            "title": "End Date",
+            "description": "YYYY-MM-DD format"
+          }
+        },
+        "type": "object",
+        "title": "PeriodUpdate"
+      },
+      "PredictedPeriod": {
+        "properties": {
+          "start_date": {
+            "type": "string",
+            "format": "date",
+            "title": "Start Date"
+          },
+          "end_date": {
+            "type": "string",
+            "format": "date",
+            "title": "End Date"
+          },
+          "confidence": {
+            "anyOf": [{ "type": "number" }, { "type": "null" }],
+            "title": "Confidence"
+          }
+        },
+        "type": "object",
+        "required": ["start_date", "end_date"],
+        "title": "PredictedPeriod"
+      },
+      "ResourceDeleteResponse": {
+        "properties": {
+          "resource_type": { "type": "string", "title": "Resource Type" },
+          "resource_id": { "type": "string", "title": "Resource Id" }
+        },
+        "type": "object",
+        "required": ["resource_type", "resource_id"],
+        "title": "ResourceDeleteResponse"
+      },
+      "Response": {
+        "properties": {
+          "count": { "type": "integer", "title": "Count" },
+          "data": {
+            "additionalProperties": {
+              "items": {
+                "anyOf": [
+                  { "$ref": "#/components/schemas/Temperature" },
+                  { "$ref": "#/components/schemas/Period" },
+                  { "$ref": "#/components/schemas/SymptomEvent" },
+                  { "$ref": "#/components/schemas/UserSafe" }
+                ]
+              },
+              "type": "array"
+            },
+            "type": "object",
+            "title": "Data"
+          }
+        },
+        "type": "object",
+        "required": ["count", "data"],
+        "title": "Response",
+        "description": "Base response model with count field used for list endpoints."
+      },
+      "SymptomEvent": {
+        "properties": {
+          "user_id": { "type": "string", "title": "User Id" },
+          "date": { "type": "string", "format": "date-time", "title": "Date" },
+          "flow_intensity": {
+            "anyOf": [
+              { "$ref": "#/components/schemas/FlowIntensity" },
+              { "type": "null" }
+            ]
+          },
+          "symptoms": {
+            "anyOf": [
+              { "items": { "type": "string" }, "type": "array" },
+              { "type": "null" }
+            ],
+            "title": "Symptoms"
+          },
+          "mood": {
+            "anyOf": [
+              { "items": { "type": "string" }, "type": "array" },
+              { "type": "null" }
+            ],
+            "title": "Mood"
+          },
+          "ovulation_test": {
+            "anyOf": [{ "type": "boolean" }, { "type": "null" }],
+            "title": "Ovulation Test"
+          },
+          "discharge": {
+            "anyOf": [
+              { "items": { "type": "string" }, "type": "array" },
+              { "type": "null" }
+            ],
+            "title": "Discharge"
+          },
+          "sex": {
+            "anyOf": [
+              { "items": { "type": "string" }, "type": "array" },
+              { "type": "null" }
+            ],
+            "title": "Sex"
+          },
+          "pid": { "type": "integer", "title": "Pid" }
+        },
+        "type": "object",
+        "required": [
+          "user_id",
+          "date",
+          "flow_intensity",
+          "symptoms",
+          "mood",
+          "discharge",
+          "sex"
+        ],
+        "title": "SymptomEvent",
+        "description": "Symptom Event model.\n\nThis is the class representing the Symptom Event table in the database.\n- user_id\n- date\n- flow_intensity\n- symptoms\n- mood\n- ovulation_test\n- discharge\n- sex"
+      },
+      "TempPhase": {
+        "type": "string",
+        "enum": ["learning", "low_phase", "elevated_phase", "unknown"],
+        "title": "TempPhase"
+      },
+      "TempUpdate": {
+        "properties": {
+          "temperature": {
+            "anyOf": [
+              { "type": "number", "maximum": 40.0, "minimum": 30.0 },
+              { "type": "null" }
+            ],
+            "title": "Temperature"
+          },
+          "timestamp": {
+            "anyOf": [
+              { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$" },
+              { "type": "null" }
+            ],
+            "title": "Timestamp",
+            "description": "YYYY-MM-DD format"
+          }
+        },
+        "type": "object",
+        "title": "TempUpdate"
+      },
+      "Temperature": {
+        "properties": {
+          "temperature": {
+            "type": "number",
+            "maximum": 40.0,
+            "minimum": 30.0,
+            "title": "Temperature"
+          },
+          "user_id": { "type": "string", "title": "User Id" },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Timestamp"
+          },
+          "pid": {
+            "anyOf": [{ "type": "integer" }, { "type": "null" }],
+            "title": "Pid"
+          }
+        },
+        "type": "object",
+        "required": ["temperature", "user_id", "timestamp"],
+        "title": "Temperature",
+        "description": "Temperature Event model.\n\nThis is the class representing the Temperature table in the database.\n\n- user_id\n- temperature\n- pid\n- timestamp, assume TZ-naive on read due to SQLite limitations"
+      },
+      "TemperatureEMA": {
+        "properties": {
+          "timestamp": { "type": "string", "title": "Timestamp" },
+          "temperature": { "type": "number", "title": "Temperature" },
+          "ewm": { "type": "number", "title": "Ewm" },
+          "baseline": { "type": "number", "title": "Baseline" }
+        },
+        "type": "object",
+        "required": ["timestamp", "temperature", "ewm", "baseline"],
+        "title": "TemperatureEMA"
+      },
+      "TemperatureState": {
+        "properties": {
+          "pid": {
+            "anyOf": [{ "type": "integer" }, { "type": "null" }],
+            "title": "Pid"
+          },
+          "user_id": { "type": "string", "title": "User Id" },
+          "phase": {
+            "$ref": "#/components/schemas/TempPhase",
+            "default": "learning"
+          },
+          "baseline": {
+            "anyOf": [{ "type": "number" }, { "type": "null" }],
+            "title": "Baseline"
+          },
+          "last_evaluated": {
+            "anyOf": [
+              { "type": "string", "format": "date-time" },
+              { "type": "null" }
+            ],
+            "title": "Last Evaluated"
+          }
+        },
+        "type": "object",
+        "required": ["user_id"],
+        "title": "TemperatureState"
+      },
+      "UpdateSymptomEvent": {
+        "properties": {
+          "date": {
+            "anyOf": [
+              { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$" },
+              { "type": "null" }
+            ],
+            "title": "Date",
+            "description": "YYYY-MM-DD format"
+          },
+          "flow_intensity": {
+            "anyOf": [
+              { "$ref": "#/components/schemas/FlowIntensity" },
+              { "type": "null" }
+            ]
+          },
+          "symptoms": {
+            "anyOf": [
+              { "items": { "type": "string" }, "type": "array" },
+              { "type": "null" }
+            ],
+            "title": "Symptoms"
+          },
+          "mood": {
+            "anyOf": [
+              { "items": { "type": "string" }, "type": "array" },
+              { "type": "null" }
+            ],
+            "title": "Mood"
+          },
+          "ovulation_test": {
+            "anyOf": [{ "type": "boolean" }, { "type": "null" }],
+            "title": "Ovulation Test"
+          },
+          "discharge": {
+            "anyOf": [
+              { "items": { "type": "string" }, "type": "array" },
+              { "type": "null" }
+            ],
+            "title": "Discharge"
+          },
+          "sex": {
+            "anyOf": [
+              { "items": { "type": "string" }, "type": "array" },
+              { "type": "null" }
+            ],
+            "title": "Sex"
+          }
+        },
+        "type": "object",
+        "title": "UpdateSymptomEvent"
+      },
+      "UserCreate": {
+        "properties": {
+          "is_disabled": {
+            "type": "boolean",
+            "title": "Is Disabled",
+            "default": false
+          },
+          "is_admin": {
+            "type": "boolean",
+            "title": "Is Admin",
+            "default": false
+          },
+          "username": { "type": "string", "title": "Username" },
+          "display_name": {
+            "anyOf": [{ "type": "string" }, { "type": "null" }],
+            "title": "Display Name"
+          },
+          "password": { "type": "string", "title": "Password" }
+        },
+        "type": "object",
+        "required": ["username", "password"],
+        "title": "UserCreate"
+      },
+      "UserProfile": {
+        "properties": {
+          "is_disabled": {
+            "type": "boolean",
+            "title": "Is Disabled",
+            "default": false
+          },
+          "is_admin": {
+            "type": "boolean",
+            "title": "Is Admin",
+            "default": false
+          },
+          "username": { "type": "string", "title": "Username" },
+          "display_name": {
+            "anyOf": [{ "type": "string" }, { "type": "null" }],
+            "title": "Display Name"
+          },
+          "user_id": { "type": "string", "title": "User Id" },
+          "temp_state": {
+            "anyOf": [
+              { "$ref": "#/components/schemas/TemperatureState" },
+              { "type": "null" }
+            ]
+          },
+          "cycle_state": {
+            "anyOf": [
+              { "$ref": "#/components/schemas/Cycle" },
+              { "type": "null" }
+            ]
+          },
+          "partners": {
+            "anyOf": [
+              {
+                "items": { "$ref": "#/components/schemas/UserSafe" },
+                "type": "array"
+              },
+              { "type": "null" }
+            ],
+            "title": "Partners"
+          }
+        },
+        "type": "object",
+        "required": ["username"],
+        "title": "UserProfile",
+        "description": "Everything but the hashed password.\n- user_id\n- username\n- display_name\n- is_disabled\n- is_admin\n- partners"
+      },
+      "UserSafe": {
+        "properties": {
+          "is_disabled": {
+            "type": "boolean",
+            "title": "Is Disabled",
+            "default": false
+          },
+          "is_admin": {
+            "type": "boolean",
+            "title": "Is Admin",
+            "default": false
+          },
+          "username": { "type": "string", "title": "Username" },
+          "display_name": {
+            "anyOf": [{ "type": "string" }, { "type": "null" }],
+            "title": "Display Name"
+          },
+          "user_id": { "type": "string", "title": "User Id" }
+        },
+        "type": "object",
+        "required": ["username"],
+        "title": "UserSafe",
+        "description": "Everything but the hashed password and period stats.\n- user_id\n- username\n- display_name\n- is_disabled\n- is_admin"
+      },
+      "UserUpdate": {
+        "properties": {
+          "display_name": {
+            "anyOf": [{ "type": "string" }, { "type": "null" }],
+            "title": "Display Name"
+          },
+          "password": {
+            "anyOf": [{ "type": "string" }, { "type": "null" }],
+            "title": "Password"
+          }
+        },
+        "type": "object",
+        "title": "UserUpdate"
+      },
+      "ValidationError": {
+        "properties": {
+          "loc": {
+            "items": { "anyOf": [{ "type": "string" }, { "type": "integer" }] },
+            "type": "array",
+            "title": "Location"
+          },
+          "msg": { "type": "string", "title": "Message" },
+          "type": { "type": "string", "title": "Error Type" }
+        },
+        "type": "object",
+        "required": ["loc", "msg", "type"],
+        "title": "ValidationError"
+      }
+    },
+    "securitySchemes": {
+      "OAuth2PasswordBearer": {
+        "type": "oauth2",
+        "flows": { "password": { "scopes": {}, "tokenUrl": "auth/" } }
+      }
+    }
+  }
+}

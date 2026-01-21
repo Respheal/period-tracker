@@ -12,6 +12,15 @@
     "**/.tox/**": true,
     "**/.venv/**": true
   },
+  "files.readonlyInclude": {
+    "**/routeTree.gen.ts": true
+  },
+  "files.watcherExclude": {
+    "**/routeTree.gen.ts": true
+  },
+  "search.exclude": {
+    "**/routeTree.gen.ts": true
+  },
   "editor.wordWrapColumn": 90,
   "editor.minimap.maxColumn": 90,
   "editor.rulers": [90],
