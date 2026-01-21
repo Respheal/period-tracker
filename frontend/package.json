@@ -10,7 +10,9 @@
     "preview": "vite preview",
     "openapi-ts": "openapi-ts",
     "storybook": "storybook dev -p 6006",
-    "build-storybook": "storybook build"
+    "build-storybook": "storybook build",
+    "test": "vitest --coverage",
+    "test-storybook": "vitest --project=storybook --coverage"
   },
   "peerDependencies": {
     "react": "^17.0.0 || ^18.0.0 || ^19.0.0",
@@ -38,6 +40,7 @@
     "@storybook/addon-a11y": "^10.2.0",
     "@storybook/addon-docs": "^10.2.0",
     "@storybook/addon-onboarding": "^10.2.0",
+    "@storybook/addon-themes": "^10.2.0",
     "@storybook/addon-vitest": "^10.2.0",
     "@storybook/react-vite": "^10.2.0",
     "@tanstack/router-plugin": "^1.154.1",
