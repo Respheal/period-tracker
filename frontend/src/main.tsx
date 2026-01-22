@@ -7,7 +7,6 @@ import {
 } from "@tanstack/react-router";
 import { routeTree } from "./routeTree.gen";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { Spinner } from "./components/Spinner";
 import { client } from "./client/client.gen";
 import "./index.css";
 
@@ -21,9 +20,7 @@ const queryClient = new QueryClient();
 const router = createRouter({
   routeTree,
   defaultPendingComponent: () => (
-    <div className={`p-2 text-2xl`}>
-      <Spinner />
-    </div>
+    <div style={{ padding: "2rem", textAlign: "center" }}>Loading...</div>
   ),
   defaultErrorComponent: ({ error }) => <ErrorComponent error={error} />,
   context: {

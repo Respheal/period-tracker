@@ -83,7 +83,7 @@ export default function SidebarLayout({
         <Toolbar>
           <IconButton
             color="inherit"
-            aria-label="open drawer"
+            aria-label="open navigation menu"
             edge="start"
             onClick={handleDrawerToggle}
             sx={{ mr: 2, display: { sm: "none" } }}
@@ -98,7 +98,7 @@ export default function SidebarLayout({
       <Box
         component="nav"
         sx={{ width: { sm: drawerWidth }, flexShrink: { sm: 0 } }}
-        aria-label="mailbox folders"
+        aria-label="navigation menu"
       >
         <Drawer
           variant="temporary"
