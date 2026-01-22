@@ -3,7 +3,7 @@ import { Outlet, createLink } from "@tanstack/react-router";
 import type { LinkComponent } from "@tanstack/react-router";
 import ListItemButton from "@mui/material/ListItemButton";
 import type { ListItemProps } from "@mui/material";
-import SidebarLayout from "../stories/pages/Sidebar/SidebarLayout";
+import SidebarLayout from "../stories/organisms/Sidebar/SidebarLayout";
 import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
 
 interface MUIButtonLinkProps extends ListItemProps<"a"> {
