@@ -1,12 +1,12 @@
 import type { Preview } from "@storybook/react-vite";
-import { CssBaseline, ThemeProvider } from '@mui/material';
-import { withThemeFromJSXProvider } from '@storybook/addon-themes';
-import { lightTheme, darkTheme } from '../src/themes';
-import '@fontsource/roboto/300.css';
-import '@fontsource/roboto/400.css';
-import '@fontsource/roboto/500.css';
-import '@fontsource/roboto/700.css';
-import '@mui/icons-material';
+import { CssBaseline, ThemeProvider } from "@mui/material";
+import { withThemeFromJSXProvider } from "@storybook/addon-themes";
+import { lightTheme, darkTheme } from "../src/themes";
+import "@fontsource/roboto/300.css";
+import "@fontsource/roboto/400.css";
+import "@fontsource/roboto/500.css";
+import "@fontsource/roboto/700.css";
+import "@mui/icons-material";
 
 const preview: Preview = {
   parameters: {
@@ -34,7 +34,7 @@ export const decorators = [
       light: lightTheme,
       dark: darkTheme,
     },
-    defaultTheme: 'light',
+    defaultTheme: "light",
     Provider: ThemeProvider,
     GlobalStyles: CssBaseline,
   }),
