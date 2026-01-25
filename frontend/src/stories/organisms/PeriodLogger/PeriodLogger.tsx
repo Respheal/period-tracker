@@ -44,7 +44,13 @@ export default function PeriodLogger() {
   });
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>
-      <Box component="section">
+      <Box
+        component="section"
+        sx={{
+          flexGrow: 1,
+          p: { xs: 1, sm: 2, md: 3 },
+        }}
+      >
         <form
           onSubmit={(e) => {
             e.preventDefault();
