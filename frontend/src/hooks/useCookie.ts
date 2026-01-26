@@ -20,8 +20,8 @@ const useCookie = () => {
     document.cookie = cookie;
   };
 
-  const getCookie = (cname: string) => {
-    const name = cname + "=";
+  const getCookie = (name: string) => {
+    const cname = `${name}=`;
     const decodedCookie = decodeURIComponent(document.cookie);
     const ca = decodedCookie.split(";");
     for (let i = 0; i < ca.length; i++) {
@@ -29,8 +29,8 @@ const useCookie = () => {
       while (c.charAt(0) == " ") {
         c = c.substring(1);
       }
-      if (c.indexOf(name) == 0) {
-        return c.substring(name.length, c.length);
+      if (c.indexOf(cname) == 0) {
+        return c.substring(cname.length, c.length);
       }
     }
     return "";
