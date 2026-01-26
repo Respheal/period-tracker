@@ -5,15 +5,15 @@ import {
   refreshTokensAuthRefreshPostMutation,
 } from "../client/@tanstack/react-query.gen";
 import { useNavigate } from "@tanstack/react-router";
-import { useCookies } from "react-cookie";
 import type { BodyLoginAuthPost } from "@/client/types.gen";
+import useCookie from "@hooks/useCookie";
 
 const isLoggedIn = () => {
   return localStorage.getItem("access_token") !== null;
 };
 
 const useAuth = () => {
-  const [cookies, setCookie, removeCookie] = useCookies(["refresh_token"]);
+  const { setCookie, getCookie, expireCookie } = useCookie();
   const navigate = useNavigate();
 
   const CreateUserMutation = useMutation({
@@ -34,12 +34,7 @@ const useAuth = () => {
     },
     onSuccess: (data) => {
       localStorage.setItem("access_token", data.access_token);
-      setCookie("refresh_token", data.refresh_token, {
-        path: "/",
-        maxAge: 3600,
-        secure: true,
-        sameSite: "lax",
-      });
+      setCookie("refresh_token", data.refresh_token);
       navigate({ to: "/" });
     },
   });
@@ -51,13 +46,7 @@ const useAuth = () => {
     },
     onSuccess: (data) => {
       localStorage.setItem("access_token", data.access_token);
-      setCookie("refresh_token", data.refresh_token, {
-        path: "/",
-        maxAge: 3600,
-        secure: true,
-        httpOnly: true,
-        sameSite: "lax",
-      });
+      setCookie("refresh_token", data.refresh_token);
     },
   });
 
@@ -84,14 +73,14 @@ const useAuth = () => {
   const refresh = async () => {
     RefreshMutation.mutate({
       body: {
-        refresh_token: cookies["refresh_token"],
+        refresh_token: getCookie("refresh_token"),
       },
     });
   };
 
   const logout = () => {
     localStorage.removeItem("access_token");
-    removeCookie("refresh_token", { path: "/" });
+    expireCookie("refresh_token");
     navigate({ to: "/login" });
   };
 
