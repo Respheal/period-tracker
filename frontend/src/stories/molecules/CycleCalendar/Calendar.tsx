@@ -7,7 +7,7 @@ export default function Calendar() {
     <LocalizationProvider dateAdapter={AdapterDayjs}>
       <DateCalendar
         sx={{
-          maxWidth: { xs: "90vw", md: "100%" },
+          maxWidth: { xs: "85vw", md: "100%" },
         }}
       />
     </LocalizationProvider>

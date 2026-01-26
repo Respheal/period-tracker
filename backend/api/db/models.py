@@ -45,8 +45,14 @@ class AccessToken(Token):
     access_token: str
 
 
-class RefreshToken(Token):
+class RefreshToken(SQLModel):
     refresh_token: str
+
+
+class LoginResponse(SQLModel):
+    access_token: str
+    refresh_token: str
+    token_type: str
 
 
 class TokenPayload(SQLModel):

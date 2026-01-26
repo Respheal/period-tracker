@@ -153,6 +153,7 @@ import type {
   ReadMeUsersMeGetData,
   ReadMeUsersMeGetResponse,
   RefreshTokensAuthRefreshPostData,
+  RefreshTokensAuthRefreshPostError,
   RefreshTokensAuthRefreshPostResponse,
   RemovePartnerUsersMePartnersPartnerIdDeleteData,
   RemovePartnerUsersMePartnersPartnerIdDeleteError,
@@ -207,12 +208,12 @@ export const refreshTokensAuthRefreshPostMutation = (
   options?: Partial<Options<RefreshTokensAuthRefreshPostData>>,
 ): UseMutationOptions<
   RefreshTokensAuthRefreshPostResponse,
-  DefaultError,
+  RefreshTokensAuthRefreshPostError,
   Options<RefreshTokensAuthRefreshPostData>
 > => {
   const mutationOptions: UseMutationOptions<
     RefreshTokensAuthRefreshPostResponse,
-    DefaultError,
+    RefreshTokensAuthRefreshPostError,
     Options<RefreshTokensAuthRefreshPostData>
   > = {
     mutationFn: async (fnOptions) => {

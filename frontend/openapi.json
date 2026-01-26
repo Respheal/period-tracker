@@ -1,6 +1,6 @@
 {
   "openapi": "3.1.0",
-  "info": { "title": "Period Tracker API (test)", "version": "0.1.0" },
+  "info": { "title": "Period Tracker API", "version": "0.1.0" },
   "paths": {
     "/auth/": {
       "post": {
@@ -20,7 +20,7 @@
             "description": "Successful Response",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/AccessToken" }
+                "schema": { "$ref": "#/components/schemas/LoginResponse" }
               }
             }
           },
@@ -41,16 +41,32 @@
         "tags": ["auth"],
         "summary": "Refresh Tokens",
         "operationId": "refresh_tokens_auth_refresh_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/RefreshToken" }
+            }
+          },
+          "required": true
+        },
         "responses": {
           "200": {
             "description": "Successful Response",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/AccessToken" }
+                "schema": { "$ref": "#/components/schemas/LoginResponse" }
               }
             }
           },
-          "404": { "description": "Not found" }
+          "404": { "description": "Not found" },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
+              }
+            }
+          }
         }
       }
     },
@@ -2168,15 +2184,6 @@
   },
   "components": {
     "schemas": {
-      "AccessToken": {
-        "properties": {
-          "token_type": { "type": "string", "title": "Token Type" },
-          "access_token": { "type": "string", "title": "Access Token" }
-        },
-        "type": "object",
-        "required": ["token_type", "access_token"],
-        "title": "AccessToken"
-      },
       "ApplicationInfo": {
         "properties": {
           "app_name": { "type": "string", "title": "App Name" },
@@ -2223,7 +2230,7 @@
             "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
             "title": "Start Date",
             "description": "Start date",
-            "default": "2026-01-17"
+            "default": "2026-01-22"
           },
           "end_date": {
             "anyOf": [
@@ -2232,7 +2239,7 @@
             ],
             "title": "End Date",
             "description": "End date (Optional)",
-            "default": "2026-01-20"
+            "default": "2026-01-25"
           }
         },
         "type": "object",
@@ -2375,6 +2382,16 @@
         "required": ["status", "timestamp"],
         "title": "HealthCheck"
       },
+      "LoginResponse": {
+        "properties": {
+          "access_token": { "type": "string", "title": "Access Token" },
+          "refresh_token": { "type": "string", "title": "Refresh Token" },
+          "token_type": { "type": "string", "title": "Token Type" }
+        },
+        "type": "object",
+        "required": ["access_token", "refresh_token", "token_type"],
+        "title": "LoginResponse"
+      },
       "Period": {
         "properties": {
           "user_id": { "type": "string", "title": "User Id" },
@@ -2447,6 +2464,14 @@
         "type": "object",
         "required": ["start_date", "end_date"],
         "title": "PredictedPeriod"
+      },
+      "RefreshToken": {
+        "properties": {
+          "refresh_token": { "type": "string", "title": "Refresh Token" }
+        },
+        "type": "object",
+        "required": ["refresh_token"],
+        "title": "RefreshToken"
       },
       "ResourceDeleteResponse": {
         "properties": {

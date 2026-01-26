@@ -1,5 +1,12 @@
 {
   "compilerOptions": {
+    "baseUrl": "./src", // This sets the base directory for your imports
+    "paths": {
+      "@/*": ["*"], // This maps "@" to the "src" folder
+      "@components/*": ["components/*"], // Example alias for components folder
+      "@hooks/*": ["hooks/*"] // Example alias for utils folder
+    },
+
     "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.node.tsbuildinfo",
     "target": "ES2023",
     "lib": ["ES2023"],

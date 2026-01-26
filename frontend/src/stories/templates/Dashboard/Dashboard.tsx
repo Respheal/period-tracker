@@ -1,13 +1,16 @@
-import { Container, Grid, Paper, Stack } from "@mui/material";
 import PeriodLogger from "../../organisms/PeriodLogger/PeriodLogger";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import Calendar from "../../molecules/CycleCalendar/Calendar";
+import Box from "@mui/material/Box";
+import Grid from "@mui/material/Grid";
+import Paper from "@mui/material/Paper";
+import Stack from "@mui/material/Stack";
 
 export default function Dashboard() {
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>
-      <Container fixed maxWidth="sm" disableGutters>
+      <Box maxWidth="sm">
         <Grid container spacing={2}>
           {/* Calendar Row */}
           <Grid size={{ xs: 12, md: 7 }}>
@@ -29,7 +32,7 @@ export default function Dashboard() {
             </Stack>
           </Grid>
         </Grid>
-      </Container>
+      </Box>
     </LocalizationProvider>
   );
 }
