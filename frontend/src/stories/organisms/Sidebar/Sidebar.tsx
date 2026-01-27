@@ -21,7 +21,7 @@ interface NavItemProps {
   children: React.ReactNode;
 }
 
-export default function SidebarLayout({
+export default function Sidebar({
   title,
   nav_items,
   active,

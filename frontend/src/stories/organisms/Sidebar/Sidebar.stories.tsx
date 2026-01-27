@@ -1,15 +1,15 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import DashboardIcon from "@mui/icons-material/Dashboard";
-import SidebarLayout from "./SidebarLayout";
+import Sidebar from "./Sidebar";
 
 const meta = {
-  title: "Organisms/SidebarLayout",
-  component: SidebarLayout,
+  title: "Organisms/Sidebar",
+  component: Sidebar,
   tags: ["autodocs"],
   parameters: {
     layout: "fullscreen",
   },
-} satisfies Meta<typeof SidebarLayout>;
+} satisfies Meta<typeof Sidebar>;
 
 export default meta;
 
