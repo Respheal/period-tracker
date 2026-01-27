@@ -14,7 +14,7 @@ import ListItemButton from "@mui/material/ListItemButton";
 import type { ListItemProps } from "@mui/material";
 
 import Sidebar from "../stories/organisms/Sidebar/Sidebar";
-import { isLoggedIn } from "@/hooks/useAuth";
+import useAuth, { isLoggedIn } from "@/hooks/useAuth";
 
 interface MUIButtonLinkProps extends ListItemProps<"a"> {
   onClick?: React.MouseEventHandler<HTMLAnchorElement>;
@@ -42,6 +42,7 @@ function RootComponent() {
   ] as const;
   const navigate = useNavigate();
   const router = useRouterState();
+  const { logout } = useAuth();
 
   if (!isLoggedIn()) {
     if (
@@ -58,7 +59,11 @@ function RootComponent() {
       </>
     );
   } else {
-    if (router.location.pathname === "/") {
+    if (
+      router.location.pathname === "/" ||
+      router.location.pathname === "/register" ||
+      router.location.pathname === "/login"
+    ) {
       navigate({ to: "/dashboard" });
     }
     // Display the main dashboard with sidebar
@@ -68,6 +73,7 @@ function RootComponent() {
         nav_items={nav_items}
         active={router.location.pathname}
         NavItemComponent={ListItemLink}
+        logoutFn={logout}
       >
         <Outlet />
         <TanStackRouterDevtools />

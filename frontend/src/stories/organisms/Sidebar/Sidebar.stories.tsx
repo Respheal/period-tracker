@@ -1,6 +1,12 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
+import { fn } from "storybook/test";
 import DashboardIcon from "@mui/icons-material/Dashboard";
+
 import Sidebar from "./Sidebar";
+
+const MockLogoutFn = fn(async () => {
+  return new Promise((resolve) => setTimeout(resolve, 1000));
+}).mockName("logoutFn");
 
 const meta = {
   title: "Organisms/Sidebar",
@@ -27,6 +33,7 @@ export const Dashboard: Story = {
     nav_items: nav_items,
     active: "#",
     children: <div style={{ height: "20vh" }}>Dashboard content here</div>,
+    logoutFn: MockLogoutFn,
   },
 };
 
@@ -36,6 +43,7 @@ export const LongDashboard: Story = {
     nav_items: nav_items,
     active: "#",
     children: <div style={{ height: "50vh" }}>Long scrollable content</div>,
+    logoutFn: MockLogoutFn,
   },
 };
 
@@ -45,5 +53,6 @@ export const APIDashboard: Story = {
     nav_items: nav_items,
     active: "#api",
     children: <div style={{ height: "20vh" }}>API Dashboard content here</div>,
+    logoutFn: MockLogoutFn,
   },
 };

@@ -11,6 +11,7 @@ import Stack from "@mui/material/Stack";
 import TextField from "@mui/material/TextField";
 
 import type { UserCreate } from "@/client/types.gen";
+import Typography from "@mui/material/Typography";
 
 export default function Register({
   registerFn,
@@ -57,11 +58,10 @@ export default function Register({
             }}
           >
             <CardContent sx={{ paddingBottom: 0 }}>
-              <Stack
-                direction="column"
-                spacing={1}
-                sx={{ alignItems: "center" }}
-              >
+              <Typography variant="h5" component="div" gutterBottom>
+                Register
+              </Typography>
+              <Stack direction="column" spacing={1}>
                 <form.Field
                   name="username"
                   children={(field) => {
@@ -150,16 +150,14 @@ export default function Register({
                   const disabled =
                     !state.canSubmit || state.isSubmitting || !allFieldsFilled;
                   return (
-                    <>
-                      <Button
-                        variant="contained"
-                        type="submit"
-                        loading={loading}
-                        disabled={disabled}
-                      >
-                        Register
-                      </Button>
-                    </>
+                    <Button
+                      variant="contained"
+                      type="submit"
+                      loading={loading}
+                      disabled={disabled}
+                    >
+                      Register
+                    </Button>
                   );
                 }}
               />

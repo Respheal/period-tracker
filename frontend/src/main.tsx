@@ -8,7 +8,6 @@ import {
 import { routeTree } from "./routeTree.gen";
 import { TanStackDevtools } from "@tanstack/react-devtools";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { CookiesProvider } from "react-cookie";
 
 import { client } from "./client/client.gen";
 
@@ -55,11 +54,9 @@ createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <QueryClientProvider client={queryClient}>
       <ThemeProvider theme={lightTheme}>
-        <CookiesProvider>
-          <CssBaseline />
-          <RouterProvider router={router} />
-          <TanStackDevtools />
-        </CookiesProvider>
+        <CssBaseline />
+        <RouterProvider router={router} />
+        <TanStackDevtools />
       </ThemeProvider>
     </QueryClientProvider>
   </StrictMode>,

@@ -11,6 +11,8 @@ import ListItemText from "@mui/material/ListItemText";
 import MenuIcon from "@mui/icons-material/Menu";
 import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
+import Divider from "@mui/material/Divider";
+import LogoutIcon from "@mui/icons-material/Logout";
 
 const drawerWidth = 240;
 
@@ -27,12 +29,14 @@ export default function Sidebar({
   active,
   children,
   NavItemComponent = ListItemButton,
+  logoutFn,
 }: {
   title: string;
   nav_items: readonly (readonly [string, string, React.ReactNode, boolean?])[];
   active: string;
   children: React.ReactNode;
   NavItemComponent?: React.ComponentType<NavItemProps>;
+  logoutFn: () => void;
 }) {
   const [mobileOpen, setMobileOpen] = React.useState(false);
   const [isClosing, setIsClosing] = React.useState(false);
@@ -68,6 +72,15 @@ export default function Sidebar({
             </NavItemComponent>
           </ListItem>
         ))}
+        <Divider />
+        <ListItem disablePadding>
+          <NavItemComponent onClick={logoutFn}>
+            <ListItemIcon>
+              <LogoutIcon />
+            </ListItemIcon>
+            <ListItemText primary="Log Out" />
+          </NavItemComponent>
+        </ListItem>
       </List>
     </div>
   );
