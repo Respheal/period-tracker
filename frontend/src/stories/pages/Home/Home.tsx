@@ -1,6 +1,6 @@
 import DashboardIcon from "@mui/icons-material/Dashboard";
 import Dashboard from "../../templates/Dashboard/Dashboard";
-import SidebarLayout from "../../organisms/Sidebar/SidebarLayout";
+import Sidebar from "../../organisms/Sidebar/Sidebar";
 
 export default function Home() {
   const nav_items = [
@@ -11,12 +11,13 @@ export default function Home() {
 
   return (
     <>
-      <SidebarLayout
+      <Sidebar
         title="Period Tracker"
         nav_items={nav_items}
         active="/"
         children={<Dashboard />}
-      ></SidebarLayout>
+        logoutFn={() => {}}
+      ></Sidebar>
     </>
   );
 }

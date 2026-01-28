@@ -72,7 +72,9 @@ export default function Sidebar({
             </NavItemComponent>
           </ListItem>
         ))}
-        <Divider />
+      </List>
+      <Divider />
+      <List>
         <ListItem disablePadding>
           <NavItemComponent onClick={logoutFn}>
             <ListItemIcon>
@@ -88,6 +90,7 @@ export default function Sidebar({
   return (
     <Box sx={{ display: "flex" }}>
       <AppBar
+        role="banner"
         position="fixed"
         sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}
       >
@@ -112,6 +115,8 @@ export default function Sidebar({
         aria-label="navigation menu"
       >
         <Drawer
+          role="navigation"
+          aria-label="mobile sidebar"
           variant="temporary"
           open={mobileOpen}
           onTransitionEnd={handleDrawerTransitionEnd}
@@ -133,6 +138,8 @@ export default function Sidebar({
         </Drawer>
         <Drawer
           variant="permanent"
+          role="navigation"
+          aria-label="desktop sidebar"
           sx={{
             display: { xs: "none", sm: "block" },
             "& .MuiDrawer-paper": {
@@ -147,6 +154,7 @@ export default function Sidebar({
       </Box>
       <Box
         component="main"
+        role="main"
         sx={{
           flexGrow: 1,
           p: { xs: 1, sm: 2, md: 3 },
