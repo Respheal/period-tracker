@@ -3,8 +3,7 @@ import { defineConfig } from "@hey-api/openapi-ts";
 export default defineConfig({
   input: "./openapi.json",
   output: {
-    format: "prettier",
-    lint: "eslint",
+    postProcess: ["eslint", "prettier"],
     path: "./src/client",
     indexFile: false,
   },

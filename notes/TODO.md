@@ -12,6 +12,11 @@
 - https://auth0.com/blog/rs256-vs-hs256-whats-the-difference/
 - https://www.bestpractices.dev/en/criteria/0
 
+## Accessibility References
+
+- https://www.w3.org/WAI/ARIA/apg/example-index/
+- https://www.w3.org/TR/using-aria/#intro
+
 ## Similar Apps
 
 - https://github.com/moncycle-app/backend-api-web-app
