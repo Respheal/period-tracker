@@ -21,7 +21,7 @@
   "search.exclude": {
     "**/routeTree.gen.ts": true
   },
-  "typescript.preferences.autoImportSpecifierExcludeRegexes": ["^@mui/[^/]+$"],
+  "js/ts.preferences.autoImportSpecifierExcludeRegexes": ["^@mui/[^/]+$"],
   "editor.wordWrapColumn": 90,
   "editor.minimap.maxColumn": 90,
   "editor.rulers": [90],
