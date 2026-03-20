@@ -37,7 +37,7 @@ pip-audit = "^2.10.0"
 [tool.poetry.group.test.dependencies]
 pytest = "^9.0.2"
 httpx = "^0.28.1"
-fakeredis = "^2.32.1"
+fakeredis = "^2.34.1"
 pytest-env = "^1.6.0"
 pytest-cov = "^7.0.0"
 
