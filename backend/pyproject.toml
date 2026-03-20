@@ -38,7 +38,7 @@ pip-audit = "^2.10.0"
 pytest = "^9.0.2"
 httpx = "^0.28.1"
 fakeredis = "^2.32.1"
-pytest-env = "^1.2.0"
+pytest-env = "^1.6.0"
 pytest-cov = "^7.0.0"
 
 [tool.poetry.group.tox.dependencies]
@@ -79,7 +79,9 @@ addopts = ["--no-header", "-vv", "--color=yes", "--cache-clear"]
 testpaths = ["tests"]
 # filterwarnings = ["ignore::DeprecationWarning"]
 env = ["ENVIRONMENT = test"] # triggers alembic to read .env.test in test mode
-env_files = [".env.test"]
+
+[tool.pytest_env]
+env_files = ["../.env.test"]
 
 [tool.coverage.run]
 branch = true
