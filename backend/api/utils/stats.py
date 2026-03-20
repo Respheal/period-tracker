@@ -41,7 +41,7 @@ def compute_baseline(df: pd.DataFrame) -> pd.Series:
 def has_long_gap(df: pd.DataFrame) -> bool:
     if len(df) < 2:
         return False
-    gaps = df.dropna().index.to_series().diff().dt.days  # type: ignore
+    gaps = df.dropna().index.to_series().diff().dt.days
     return bool(gaps.max() is not None and gaps.max() > settings.MAX_MISSING_DAYS)
 
 

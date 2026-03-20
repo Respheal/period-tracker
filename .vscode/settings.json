@@ -16,7 +16,7 @@
   "editor.minimap.maxColumn": 90,
   "editor.rulers": [90],
   "editor.formatOnSave": true,
-  "editor.defaultFormatter": "prettier.prettier-vscode",
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
   "python.analysis.autoFormatStrings": true,
   "python.analysis.extraPaths": ["backend"],
   "flake8.cwd": "${workspaceFolder}/backend",
@@ -42,6 +42,6 @@
   "python.testing.unittestEnabled": false,
   "python.testing.pytestEnabled": true,
   "[json]": {
-    "editor.defaultFormatter": "prettier.prettier-vscode"
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
   }
 }
