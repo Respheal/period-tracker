@@ -118,7 +118,8 @@
     - Length
     - Skip/Limit (default: 0/100)
     - Also display count (refer to Netbox's API response)
-- [x] Endpoint to retrieve mentrual events as CSV (ref: https://medium.com/@liamwr17/supercharge-your-apis-with-csv-and-excel-exports-fastapi-pandas-a371b2c8f030)
+- [x] Endpoint to retrieve mentrual events as CSV (ref:
+      https://medium.com/@liamwr17/supercharge-your-apis-with-csv-and-excel-exports-fastapi-pandas-a371b2c8f030)
   - Same filters as above
 - [x] Endpoint to retrieve a specific mentrual event
 - [x] Endpoint to update a menstrual event (e.g. update the end date)

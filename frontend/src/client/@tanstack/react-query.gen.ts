@@ -6,9 +6,9 @@ import {
   infiniteQueryOptions,
   queryOptions,
   type UseMutationOptions,
-} from "@tanstack/react-query";
+} from '@tanstack/react-query';
 
-import { client } from "../client.gen";
+import { client } from '../client.gen';
 import {
   addPartnerUsersMePartnersPartnerIdPost,
   createPeriodEventPeriodPost,
@@ -54,7 +54,7 @@ import {
   updatePeriodPeriodMePeriodIdPatch,
   updateReadingTempMeTemperatureIdPatch,
   updateSymptomEventSymptomsMeSymptomIdPatch,
-} from "../sdk.gen";
+} from '../sdk.gen';
 import type {
   AddPartnerUsersMePartnersPartnerIdPostData,
   AddPartnerUsersMePartnersPartnerIdPostError,
@@ -172,7 +172,7 @@ import type {
   UpdateSymptomEventSymptomsMeSymptomIdPatchData,
   UpdateSymptomEventSymptomsMeSymptomIdPatchError,
   UpdateSymptomEventSymptomsMeSymptomIdPatchResponse,
-} from "../types.gen";
+} from '../types.gen';
 
 /**
  * Login
@@ -229,7 +229,7 @@ export const refreshTokensAuthRefreshPostMutation = (
 };
 
 export type QueryKey<TOptions extends Options> = [
-  Pick<TOptions, "baseUrl" | "body" | "headers" | "path" | "query"> & {
+  Pick<TOptions, 'baseUrl' | 'body' | 'headers' | 'path' | 'query'> & {
     _id: string;
     _infinite?: boolean;
     tags?: ReadonlyArray<string>;
@@ -244,8 +244,7 @@ const createQueryKey = <TOptions extends Options>(
 ): [QueryKey<TOptions>[0]] => {
   const params: QueryKey<TOptions>[0] = {
     _id: id,
-    baseUrl:
-      options?.baseUrl || (options?.client ?? client).getConfig().baseUrl,
+    baseUrl: options?.baseUrl || (options?.client ?? client).getConfig().baseUrl,
   } as QueryKey<TOptions>[0];
   if (infinite) {
     params._infinite = infinite;
@@ -268,9 +267,8 @@ const createQueryKey = <TOptions extends Options>(
   return [params];
 };
 
-export const getUsersUsersGetQueryKey = (
-  options?: Options<GetUsersUsersGetData>,
-) => createQueryKey("getUsersUsersGet", options);
+export const getUsersUsersGetQueryKey = (options?: Options<GetUsersUsersGetData>) =>
+  createQueryKey('getUsersUsersGet', options);
 
 /**
  * Get Users
@@ -280,9 +278,7 @@ export const getUsersUsersGetQueryKey = (
  * :return: A list of safe user representations (sans sensitive info)
  * :rtype: Sequence[UserSafe]
  */
-export const getUsersUsersGetOptions = (
-  options?: Options<GetUsersUsersGetData>,
-) =>
+export const getUsersUsersGetOptions = (options?: Options<GetUsersUsersGetData>) =>
   queryOptions<
     GetUsersUsersGetResponse,
     GetUsersUsersGetError,
@@ -302,7 +298,7 @@ export const getUsersUsersGetOptions = (
   });
 
 const createInfiniteParams = <
-  K extends Pick<QueryKey<Options>[0], "body" | "headers" | "path" | "query">,
+  K extends Pick<QueryKey<Options>[0], 'body' | 'headers' | 'path' | 'query'>,
 >(
   queryKey: QueryKey<Options>,
   page: K,
@@ -338,7 +334,7 @@ const createInfiniteParams = <
 export const getUsersUsersGetInfiniteQueryKey = (
   options?: Options<GetUsersUsersGetData>,
 ): QueryKey<Options<GetUsersUsersGetData>> =>
-  createQueryKey("getUsersUsersGet", options, true);
+  createQueryKey('getUsersUsersGet', options, true);
 
 /**
  * Get Users
@@ -359,7 +355,7 @@ export const getUsersUsersGetInfiniteOptions = (
     | number
     | Pick<
         QueryKey<Options<GetUsersUsersGetData>>[0],
-        "body" | "headers" | "path" | "query"
+        'body' | 'headers' | 'path' | 'query'
       >
   >(
     // @ts-ignore
@@ -368,9 +364,9 @@ export const getUsersUsersGetInfiniteOptions = (
         // @ts-ignore
         const page: Pick<
           QueryKey<Options<GetUsersUsersGetData>>[0],
-          "body" | "headers" | "path" | "query"
+          'body' | 'headers' | 'path' | 'query'
         > =
-          typeof pageParam === "object"
+          typeof pageParam === 'object'
             ? pageParam
             : {
                 query: {
@@ -444,16 +440,13 @@ export const deleteMeUsersMeDeleteMutation = (
   return mutationOptions;
 };
 
-export const readMeUsersMeGetQueryKey = (
-  options?: Options<ReadMeUsersMeGetData>,
-) => createQueryKey("readMeUsersMeGet", options);
+export const readMeUsersMeGetQueryKey = (options?: Options<ReadMeUsersMeGetData>) =>
+  createQueryKey('readMeUsersMeGet', options);
 
 /**
  * Read Me
  */
-export const readMeUsersMeGetOptions = (
-  options?: Options<ReadMeUsersMeGetData>,
-) =>
+export const readMeUsersMeGetOptions = (options?: Options<ReadMeUsersMeGetData>) =>
   queryOptions<
     ReadMeUsersMeGetResponse,
     DefaultError,
@@ -501,7 +494,7 @@ export const updateMeUsersMePatchMutation = (
 
 export const getMyEventsUsersMeEventsGetQueryKey = (
   options?: Options<GetMyEventsUsersMeEventsGetData>,
-) => createQueryKey("getMyEventsUsersMeEventsGet", options);
+) => createQueryKey('getMyEventsUsersMeEventsGet', options);
 
 /**
  * Get My Events
@@ -530,7 +523,7 @@ export const getMyEventsUsersMeEventsGetOptions = (
 export const getMyEventsUsersMeEventsGetInfiniteQueryKey = (
   options?: Options<GetMyEventsUsersMeEventsGetData>,
 ): QueryKey<Options<GetMyEventsUsersMeEventsGetData>> =>
-  createQueryKey("getMyEventsUsersMeEventsGet", options, true);
+  createQueryKey('getMyEventsUsersMeEventsGet', options, true);
 
 /**
  * Get My Events
@@ -546,7 +539,7 @@ export const getMyEventsUsersMeEventsGetInfiniteOptions = (
     | number
     | Pick<
         QueryKey<Options<GetMyEventsUsersMeEventsGetData>>[0],
-        "body" | "headers" | "path" | "query"
+        'body' | 'headers' | 'path' | 'query'
       >
   >(
     // @ts-ignore
@@ -555,9 +548,9 @@ export const getMyEventsUsersMeEventsGetInfiniteOptions = (
         // @ts-ignore
         const page: Pick<
           QueryKey<Options<GetMyEventsUsersMeEventsGetData>>[0],
-          "body" | "headers" | "path" | "query"
+          'body' | 'headers' | 'path' | 'query'
         > =
-          typeof pageParam === "object"
+          typeof pageParam === 'object'
             ? pageParam
             : {
                 query: {
@@ -579,7 +572,7 @@ export const getMyEventsUsersMeEventsGetInfiniteOptions = (
 
 export const getMyEventsCsvUsersMeEventsCsvGetQueryKey = (
   options?: Options<GetMyEventsCsvUsersMeEventsCsvGetData>,
-) => createQueryKey("getMyEventsCsvUsersMeEventsCsvGet", options);
+) => createQueryKey('getMyEventsCsvUsersMeEventsCsvGet', options);
 
 /**
  * Get My Events Csv
@@ -608,7 +601,7 @@ export const getMyEventsCsvUsersMeEventsCsvGetOptions = (
 export const getMyEventsCsvUsersMeEventsCsvGetInfiniteQueryKey = (
   options?: Options<GetMyEventsCsvUsersMeEventsCsvGetData>,
 ): QueryKey<Options<GetMyEventsCsvUsersMeEventsCsvGetData>> =>
-  createQueryKey("getMyEventsCsvUsersMeEventsCsvGet", options, true);
+  createQueryKey('getMyEventsCsvUsersMeEventsCsvGet', options, true);
 
 /**
  * Get My Events Csv
@@ -624,7 +617,7 @@ export const getMyEventsCsvUsersMeEventsCsvGetInfiniteOptions = (
     | number
     | Pick<
         QueryKey<Options<GetMyEventsCsvUsersMeEventsCsvGetData>>[0],
-        "body" | "headers" | "path" | "query"
+        'body' | 'headers' | 'path' | 'query'
       >
   >(
     // @ts-ignore
@@ -633,9 +626,9 @@ export const getMyEventsCsvUsersMeEventsCsvGetInfiniteOptions = (
         // @ts-ignore
         const page: Pick<
           QueryKey<Options<GetMyEventsCsvUsersMeEventsCsvGetData>>[0],
-          "body" | "headers" | "path" | "query"
+          'body' | 'headers' | 'path' | 'query'
         > =
-          typeof pageParam === "object"
+          typeof pageParam === 'object'
             ? pageParam
             : {
                 query: {
@@ -657,7 +650,7 @@ export const getMyEventsCsvUsersMeEventsCsvGetInfiniteOptions = (
 
 export const getMyPartnersUsersMePartnersGetQueryKey = (
   options?: Options<GetMyPartnersUsersMePartnersGetData>,
-) => createQueryKey("getMyPartnersUsersMePartnersGet", options);
+) => createQueryKey('getMyPartnersUsersMePartnersGet', options);
 
 /**
  * Get My Partners
@@ -739,7 +732,7 @@ export const addPartnerUsersMePartnersPartnerIdPostMutation = (
 
 export const getAllPeriodsPeriodGetQueryKey = (
   options?: Options<GetAllPeriodsPeriodGetData>,
-) => createQueryKey("getAllPeriodsPeriodGet", options);
+) => createQueryKey('getAllPeriodsPeriodGet', options);
 
 /**
  * Get All Periods
@@ -768,7 +761,7 @@ export const getAllPeriodsPeriodGetOptions = (
 export const getAllPeriodsPeriodGetInfiniteQueryKey = (
   options?: Options<GetAllPeriodsPeriodGetData>,
 ): QueryKey<Options<GetAllPeriodsPeriodGetData>> =>
-  createQueryKey("getAllPeriodsPeriodGet", options, true);
+  createQueryKey('getAllPeriodsPeriodGet', options, true);
 
 /**
  * Get All Periods
@@ -784,7 +777,7 @@ export const getAllPeriodsPeriodGetInfiniteOptions = (
     | number
     | Pick<
         QueryKey<Options<GetAllPeriodsPeriodGetData>>[0],
-        "body" | "headers" | "path" | "query"
+        'body' | 'headers' | 'path' | 'query'
       >
   >(
     // @ts-ignore
@@ -793,9 +786,9 @@ export const getAllPeriodsPeriodGetInfiniteOptions = (
         // @ts-ignore
         const page: Pick<
           QueryKey<Options<GetAllPeriodsPeriodGetData>>[0],
-          "body" | "headers" | "path" | "query"
+          'body' | 'headers' | 'path' | 'query'
         > =
-          typeof pageParam === "object"
+          typeof pageParam === 'object'
             ? pageParam
             : {
                 query: {
@@ -844,7 +837,7 @@ export const createPeriodEventPeriodPostMutation = (
 
 export const getMyPeriodsPeriodMeGetQueryKey = (
   options?: Options<GetMyPeriodsPeriodMeGetData>,
-) => createQueryKey("getMyPeriodsPeriodMeGet", options);
+) => createQueryKey('getMyPeriodsPeriodMeGet', options);
 
 /**
  * Get My Periods
@@ -873,7 +866,7 @@ export const getMyPeriodsPeriodMeGetOptions = (
 export const getMyPeriodsPeriodMeGetInfiniteQueryKey = (
   options?: Options<GetMyPeriodsPeriodMeGetData>,
 ): QueryKey<Options<GetMyPeriodsPeriodMeGetData>> =>
-  createQueryKey("getMyPeriodsPeriodMeGet", options, true);
+  createQueryKey('getMyPeriodsPeriodMeGet', options, true);
 
 /**
  * Get My Periods
@@ -889,7 +882,7 @@ export const getMyPeriodsPeriodMeGetInfiniteOptions = (
     | number
     | Pick<
         QueryKey<Options<GetMyPeriodsPeriodMeGetData>>[0],
-        "body" | "headers" | "path" | "query"
+        'body' | 'headers' | 'path' | 'query'
       >
   >(
     // @ts-ignore
@@ -898,9 +891,9 @@ export const getMyPeriodsPeriodMeGetInfiniteOptions = (
         // @ts-ignore
         const page: Pick<
           QueryKey<Options<GetMyPeriodsPeriodMeGetData>>[0],
-          "body" | "headers" | "path" | "query"
+          'body' | 'headers' | 'path' | 'query'
         > =
-          typeof pageParam === "object"
+          typeof pageParam === 'object'
             ? pageParam
             : {
                 query: {
@@ -949,7 +942,7 @@ export const deletePeriodPeriodMePeriodIdDeleteMutation = (
 
 export const getSinglePeriodPeriodMePeriodIdGetQueryKey = (
   options: Options<GetSinglePeriodPeriodMePeriodIdGetData>,
-) => createQueryKey("getSinglePeriodPeriodMePeriodIdGet", options);
+) => createQueryKey('getSinglePeriodPeriodMePeriodIdGet', options);
 
 /**
  * Get Single Period
@@ -1004,7 +997,7 @@ export const updatePeriodPeriodMePeriodIdPatchMutation = (
 
 export const getMyPeriodsCsvPeriodMeCsvGetQueryKey = (
   options?: Options<GetMyPeriodsCsvPeriodMeCsvGetData>,
-) => createQueryKey("getMyPeriodsCsvPeriodMeCsvGet", options);
+) => createQueryKey('getMyPeriodsCsvPeriodMeCsvGet', options);
 
 /**
  * Get My Periods Csv
@@ -1033,7 +1026,7 @@ export const getMyPeriodsCsvPeriodMeCsvGetOptions = (
 export const getMyPeriodsCsvPeriodMeCsvGetInfiniteQueryKey = (
   options?: Options<GetMyPeriodsCsvPeriodMeCsvGetData>,
 ): QueryKey<Options<GetMyPeriodsCsvPeriodMeCsvGetData>> =>
-  createQueryKey("getMyPeriodsCsvPeriodMeCsvGet", options, true);
+  createQueryKey('getMyPeriodsCsvPeriodMeCsvGet', options, true);
 
 /**
  * Get My Periods Csv
@@ -1049,7 +1042,7 @@ export const getMyPeriodsCsvPeriodMeCsvGetInfiniteOptions = (
     | number
     | Pick<
         QueryKey<Options<GetMyPeriodsCsvPeriodMeCsvGetData>>[0],
-        "body" | "headers" | "path" | "query"
+        'body' | 'headers' | 'path' | 'query'
       >
   >(
     // @ts-ignore
@@ -1058,9 +1051,9 @@ export const getMyPeriodsCsvPeriodMeCsvGetInfiniteOptions = (
         // @ts-ignore
         const page: Pick<
           QueryKey<Options<GetMyPeriodsCsvPeriodMeCsvGetData>>[0],
-          "body" | "headers" | "path" | "query"
+          'body' | 'headers' | 'path' | 'query'
         > =
-          typeof pageParam === "object"
+          typeof pageParam === 'object'
             ? pageParam
             : {
                 query: {
@@ -1082,7 +1075,7 @@ export const getMyPeriodsCsvPeriodMeCsvGetInfiniteOptions = (
 
 export const getNextPeriodPeriodMeNextGetQueryKey = (
   options?: Options<GetNextPeriodPeriodMeNextGetData>,
-) => createQueryKey("getNextPeriodPeriodMeNextGet", options);
+) => createQueryKey('getNextPeriodPeriodMeNextGet', options);
 
 /**
  * Get Next Period
@@ -1110,7 +1103,7 @@ export const getNextPeriodPeriodMeNextGetOptions = (
 
 export const getPartnerPeriodsPeriodPartnerPartnerIdGetQueryKey = (
   options: Options<GetPartnerPeriodsPeriodPartnerPartnerIdGetData>,
-) => createQueryKey("getPartnerPeriodsPeriodPartnerPartnerIdGet", options);
+) => createQueryKey('getPartnerPeriodsPeriodPartnerPartnerIdGet', options);
 
 /**
  * Get Partner Periods
@@ -1139,7 +1132,7 @@ export const getPartnerPeriodsPeriodPartnerPartnerIdGetOptions = (
 export const getPartnerPeriodsPeriodPartnerPartnerIdGetInfiniteQueryKey = (
   options: Options<GetPartnerPeriodsPeriodPartnerPartnerIdGetData>,
 ): QueryKey<Options<GetPartnerPeriodsPeriodPartnerPartnerIdGetData>> =>
-  createQueryKey("getPartnerPeriodsPeriodPartnerPartnerIdGet", options, true);
+  createQueryKey('getPartnerPeriodsPeriodPartnerPartnerIdGet', options, true);
 
 /**
  * Get Partner Periods
@@ -1155,7 +1148,7 @@ export const getPartnerPeriodsPeriodPartnerPartnerIdGetInfiniteOptions = (
     | number
     | Pick<
         QueryKey<Options<GetPartnerPeriodsPeriodPartnerPartnerIdGetData>>[0],
-        "body" | "headers" | "path" | "query"
+        'body' | 'headers' | 'path' | 'query'
       >
   >(
     // @ts-ignore
@@ -1164,9 +1157,9 @@ export const getPartnerPeriodsPeriodPartnerPartnerIdGetInfiniteOptions = (
         // @ts-ignore
         const page: Pick<
           QueryKey<Options<GetPartnerPeriodsPeriodPartnerPartnerIdGetData>>[0],
-          "body" | "headers" | "path" | "query"
+          'body' | 'headers' | 'path' | 'query'
         > =
-          typeof pageParam === "object"
+          typeof pageParam === 'object'
             ? pageParam
             : {
                 query: {
@@ -1182,15 +1175,13 @@ export const getPartnerPeriodsPeriodPartnerPartnerIdGetInfiniteOptions = (
         });
         return data;
       },
-      queryKey:
-        getPartnerPeriodsPeriodPartnerPartnerIdGetInfiniteQueryKey(options),
+      queryKey: getPartnerPeriodsPeriodPartnerPartnerIdGetInfiniteQueryKey(options),
     },
   );
 
 export const getPartnerPeriodsCsvPeriodPartnerPartnerIdCsvGetQueryKey = (
   options: Options<GetPartnerPeriodsCsvPeriodPartnerPartnerIdCsvGetData>,
-) =>
-  createQueryKey("getPartnerPeriodsCsvPeriodPartnerPartnerIdCsvGet", options);
+) => createQueryKey('getPartnerPeriodsCsvPeriodPartnerPartnerIdCsvGet', options);
 
 /**
  * Get Partner Periods Csv
@@ -1216,15 +1207,10 @@ export const getPartnerPeriodsCsvPeriodPartnerPartnerIdCsvGetOptions = (
     queryKey: getPartnerPeriodsCsvPeriodPartnerPartnerIdCsvGetQueryKey(options),
   });
 
-export const getPartnerPeriodsCsvPeriodPartnerPartnerIdCsvGetInfiniteQueryKey =
-  (
-    options: Options<GetPartnerPeriodsCsvPeriodPartnerPartnerIdCsvGetData>,
-  ): QueryKey<Options<GetPartnerPeriodsCsvPeriodPartnerPartnerIdCsvGetData>> =>
-    createQueryKey(
-      "getPartnerPeriodsCsvPeriodPartnerPartnerIdCsvGet",
-      options,
-      true,
-    );
+export const getPartnerPeriodsCsvPeriodPartnerPartnerIdCsvGetInfiniteQueryKey = (
+  options: Options<GetPartnerPeriodsCsvPeriodPartnerPartnerIdCsvGetData>,
+): QueryKey<Options<GetPartnerPeriodsCsvPeriodPartnerPartnerIdCsvGetData>> =>
+  createQueryKey('getPartnerPeriodsCsvPeriodPartnerPartnerIdCsvGet', options, true);
 
 /**
  * Get Partner Periods Csv
@@ -1239,10 +1225,8 @@ export const getPartnerPeriodsCsvPeriodPartnerPartnerIdCsvGetInfiniteOptions = (
     QueryKey<Options<GetPartnerPeriodsCsvPeriodPartnerPartnerIdCsvGetData>>,
     | number
     | Pick<
-        QueryKey<
-          Options<GetPartnerPeriodsCsvPeriodPartnerPartnerIdCsvGetData>
-        >[0],
-        "body" | "headers" | "path" | "query"
+        QueryKey<Options<GetPartnerPeriodsCsvPeriodPartnerPartnerIdCsvGetData>>[0],
+        'body' | 'headers' | 'path' | 'query'
       >
   >(
     // @ts-ignore
@@ -1250,12 +1234,10 @@ export const getPartnerPeriodsCsvPeriodPartnerPartnerIdCsvGetInfiniteOptions = (
       queryFn: async ({ pageParam, queryKey, signal }) => {
         // @ts-ignore
         const page: Pick<
-          QueryKey<
-            Options<GetPartnerPeriodsCsvPeriodPartnerPartnerIdCsvGetData>
-          >[0],
-          "body" | "headers" | "path" | "query"
+          QueryKey<Options<GetPartnerPeriodsCsvPeriodPartnerPartnerIdCsvGetData>>[0],
+          'body' | 'headers' | 'path' | 'query'
         > =
-          typeof pageParam === "object"
+          typeof pageParam === 'object'
             ? pageParam
             : {
                 query: {
@@ -1263,26 +1245,21 @@ export const getPartnerPeriodsCsvPeriodPartnerPartnerIdCsvGetInfiniteOptions = (
                 },
               };
         const params = createInfiniteParams(queryKey, page);
-        const { data } = await getPartnerPeriodsCsvPeriodPartnerPartnerIdCsvGet(
-          {
-            ...options,
-            ...params,
-            signal,
-            throwOnError: true,
-          },
-        );
+        const { data } = await getPartnerPeriodsCsvPeriodPartnerPartnerIdCsvGet({
+          ...options,
+          ...params,
+          signal,
+          throwOnError: true,
+        });
         return data;
       },
-      queryKey:
-        getPartnerPeriodsCsvPeriodPartnerPartnerIdCsvGetInfiniteQueryKey(
-          options,
-        ),
+      queryKey: getPartnerPeriodsCsvPeriodPartnerPartnerIdCsvGetInfiniteQueryKey(options),
     },
   );
 
 export const getTempReadingsTempGetQueryKey = (
   options?: Options<GetTempReadingsTempGetData>,
-) => createQueryKey("getTempReadingsTempGet", options);
+) => createQueryKey('getTempReadingsTempGet', options);
 
 /**
  * Get Temp Readings
@@ -1311,7 +1288,7 @@ export const getTempReadingsTempGetOptions = (
 export const getTempReadingsTempGetInfiniteQueryKey = (
   options?: Options<GetTempReadingsTempGetData>,
 ): QueryKey<Options<GetTempReadingsTempGetData>> =>
-  createQueryKey("getTempReadingsTempGet", options, true);
+  createQueryKey('getTempReadingsTempGet', options, true);
 
 /**
  * Get Temp Readings
@@ -1327,7 +1304,7 @@ export const getTempReadingsTempGetInfiniteOptions = (
     | number
     | Pick<
         QueryKey<Options<GetTempReadingsTempGetData>>[0],
-        "body" | "headers" | "path" | "query"
+        'body' | 'headers' | 'path' | 'query'
       >
   >(
     // @ts-ignore
@@ -1336,9 +1313,9 @@ export const getTempReadingsTempGetInfiniteOptions = (
         // @ts-ignore
         const page: Pick<
           QueryKey<Options<GetTempReadingsTempGetData>>[0],
-          "body" | "headers" | "path" | "query"
+          'body' | 'headers' | 'path' | 'query'
         > =
-          typeof pageParam === "object"
+          typeof pageParam === 'object'
             ? pageParam
             : {
                 query: {
@@ -1387,7 +1364,7 @@ export const createTempReadingTempPostMutation = (
 
 export const getMyReadingsTempMeGetQueryKey = (
   options?: Options<GetMyReadingsTempMeGetData>,
-) => createQueryKey("getMyReadingsTempMeGet", options);
+) => createQueryKey('getMyReadingsTempMeGet', options);
 
 /**
  * Get My Readings
@@ -1416,7 +1393,7 @@ export const getMyReadingsTempMeGetOptions = (
 export const getMyReadingsTempMeGetInfiniteQueryKey = (
   options?: Options<GetMyReadingsTempMeGetData>,
 ): QueryKey<Options<GetMyReadingsTempMeGetData>> =>
-  createQueryKey("getMyReadingsTempMeGet", options, true);
+  createQueryKey('getMyReadingsTempMeGet', options, true);
 
 /**
  * Get My Readings
@@ -1432,7 +1409,7 @@ export const getMyReadingsTempMeGetInfiniteOptions = (
     | number
     | Pick<
         QueryKey<Options<GetMyReadingsTempMeGetData>>[0],
-        "body" | "headers" | "path" | "query"
+        'body' | 'headers' | 'path' | 'query'
       >
   >(
     // @ts-ignore
@@ -1441,9 +1418,9 @@ export const getMyReadingsTempMeGetInfiniteOptions = (
         // @ts-ignore
         const page: Pick<
           QueryKey<Options<GetMyReadingsTempMeGetData>>[0],
-          "body" | "headers" | "path" | "query"
+          'body' | 'headers' | 'path' | 'query'
         > =
-          typeof pageParam === "object"
+          typeof pageParam === 'object'
             ? pageParam
             : {
                 query: {
@@ -1492,7 +1469,7 @@ export const deleteTempTempMeTemperatureIdDeleteMutation = (
 
 export const getSingleReadingTempMeTemperatureIdGetQueryKey = (
   options: Options<GetSingleReadingTempMeTemperatureIdGetData>,
-) => createQueryKey("getSingleReadingTempMeTemperatureIdGet", options);
+) => createQueryKey('getSingleReadingTempMeTemperatureIdGet', options);
 
 /**
  * Get Single Reading
@@ -1547,7 +1524,7 @@ export const updateReadingTempMeTemperatureIdPatchMutation = (
 
 export const getMyTempAveragesTempMeAveragesGetQueryKey = (
   options?: Options<GetMyTempAveragesTempMeAveragesGetData>,
-) => createQueryKey("getMyTempAveragesTempMeAveragesGet", options);
+) => createQueryKey('getMyTempAveragesTempMeAveragesGet', options);
 
 /**
  * Get My Temp Averages
@@ -1576,7 +1553,7 @@ export const getMyTempAveragesTempMeAveragesGetOptions = (
 export const getMyTempAveragesTempMeAveragesGetInfiniteQueryKey = (
   options?: Options<GetMyTempAveragesTempMeAveragesGetData>,
 ): QueryKey<Options<GetMyTempAveragesTempMeAveragesGetData>> =>
-  createQueryKey("getMyTempAveragesTempMeAveragesGet", options, true);
+  createQueryKey('getMyTempAveragesTempMeAveragesGet', options, true);
 
 /**
  * Get My Temp Averages
@@ -1592,7 +1569,7 @@ export const getMyTempAveragesTempMeAveragesGetInfiniteOptions = (
     | number
     | Pick<
         QueryKey<Options<GetMyTempAveragesTempMeAveragesGetData>>[0],
-        "body" | "headers" | "path" | "query"
+        'body' | 'headers' | 'path' | 'query'
       >
   >(
     // @ts-ignore
@@ -1601,9 +1578,9 @@ export const getMyTempAveragesTempMeAveragesGetInfiniteOptions = (
         // @ts-ignore
         const page: Pick<
           QueryKey<Options<GetMyTempAveragesTempMeAveragesGetData>>[0],
-          "body" | "headers" | "path" | "query"
+          'body' | 'headers' | 'path' | 'query'
         > =
-          typeof pageParam === "object"
+          typeof pageParam === 'object'
             ? pageParam
             : {
                 query: {
@@ -1625,7 +1602,7 @@ export const getMyTempAveragesTempMeAveragesGetInfiniteOptions = (
 
 export const getMyTempReadingsCsvTempMeCsvGetQueryKey = (
   options?: Options<GetMyTempReadingsCsvTempMeCsvGetData>,
-) => createQueryKey("getMyTempReadingsCsvTempMeCsvGet", options);
+) => createQueryKey('getMyTempReadingsCsvTempMeCsvGet', options);
 
 /**
  * Get My Temp Readings Csv
@@ -1654,7 +1631,7 @@ export const getMyTempReadingsCsvTempMeCsvGetOptions = (
 export const getMyTempReadingsCsvTempMeCsvGetInfiniteQueryKey = (
   options?: Options<GetMyTempReadingsCsvTempMeCsvGetData>,
 ): QueryKey<Options<GetMyTempReadingsCsvTempMeCsvGetData>> =>
-  createQueryKey("getMyTempReadingsCsvTempMeCsvGet", options, true);
+  createQueryKey('getMyTempReadingsCsvTempMeCsvGet', options, true);
 
 /**
  * Get My Temp Readings Csv
@@ -1670,7 +1647,7 @@ export const getMyTempReadingsCsvTempMeCsvGetInfiniteOptions = (
     | number
     | Pick<
         QueryKey<Options<GetMyTempReadingsCsvTempMeCsvGetData>>[0],
-        "body" | "headers" | "path" | "query"
+        'body' | 'headers' | 'path' | 'query'
       >
   >(
     // @ts-ignore
@@ -1679,9 +1656,9 @@ export const getMyTempReadingsCsvTempMeCsvGetInfiniteOptions = (
         // @ts-ignore
         const page: Pick<
           QueryKey<Options<GetMyTempReadingsCsvTempMeCsvGetData>>[0],
-          "body" | "headers" | "path" | "query"
+          'body' | 'headers' | 'path' | 'query'
         > =
-          typeof pageParam === "object"
+          typeof pageParam === 'object'
             ? pageParam
             : {
                 query: {
@@ -1703,7 +1680,7 @@ export const getMyTempReadingsCsvTempMeCsvGetInfiniteOptions = (
 
 export const getPartnerTemperaturesTempPartnerPartnerIdGetQueryKey = (
   options: Options<GetPartnerTemperaturesTempPartnerPartnerIdGetData>,
-) => createQueryKey("getPartnerTemperaturesTempPartnerPartnerIdGet", options);
+) => createQueryKey('getPartnerTemperaturesTempPartnerPartnerIdGet', options);
 
 /**
  * Get Partner Temperatures
@@ -1732,11 +1709,7 @@ export const getPartnerTemperaturesTempPartnerPartnerIdGetOptions = (
 export const getPartnerTemperaturesTempPartnerPartnerIdGetInfiniteQueryKey = (
   options: Options<GetPartnerTemperaturesTempPartnerPartnerIdGetData>,
 ): QueryKey<Options<GetPartnerTemperaturesTempPartnerPartnerIdGetData>> =>
-  createQueryKey(
-    "getPartnerTemperaturesTempPartnerPartnerIdGet",
-    options,
-    true,
-  );
+  createQueryKey('getPartnerTemperaturesTempPartnerPartnerIdGet', options, true);
 
 /**
  * Get Partner Temperatures
@@ -1752,7 +1725,7 @@ export const getPartnerTemperaturesTempPartnerPartnerIdGetInfiniteOptions = (
     | number
     | Pick<
         QueryKey<Options<GetPartnerTemperaturesTempPartnerPartnerIdGetData>>[0],
-        "body" | "headers" | "path" | "query"
+        'body' | 'headers' | 'path' | 'query'
       >
   >(
     // @ts-ignore
@@ -1760,12 +1733,10 @@ export const getPartnerTemperaturesTempPartnerPartnerIdGetInfiniteOptions = (
       queryFn: async ({ pageParam, queryKey, signal }) => {
         // @ts-ignore
         const page: Pick<
-          QueryKey<
-            Options<GetPartnerTemperaturesTempPartnerPartnerIdGetData>
-          >[0],
-          "body" | "headers" | "path" | "query"
+          QueryKey<Options<GetPartnerTemperaturesTempPartnerPartnerIdGetData>>[0],
+          'body' | 'headers' | 'path' | 'query'
         > =
-          typeof pageParam === "object"
+          typeof pageParam === 'object'
             ? pageParam
             : {
                 query: {
@@ -1781,18 +1752,13 @@ export const getPartnerTemperaturesTempPartnerPartnerIdGetInfiniteOptions = (
         });
         return data;
       },
-      queryKey:
-        getPartnerTemperaturesTempPartnerPartnerIdGetInfiniteQueryKey(options),
+      queryKey: getPartnerTemperaturesTempPartnerPartnerIdGetInfiniteQueryKey(options),
     },
   );
 
 export const getPartnerTempReadingsCsvTempPartnerPartnerIdCsvGetQueryKey = (
   options: Options<GetPartnerTempReadingsCsvTempPartnerPartnerIdCsvGetData>,
-) =>
-  createQueryKey(
-    "getPartnerTempReadingsCsvTempPartnerPartnerIdCsvGet",
-    options,
-  );
+) => createQueryKey('getPartnerTempReadingsCsvTempPartnerPartnerIdCsvGet', options);
 
 /**
  * Get Partner Temp Readings Csv
@@ -1804,93 +1770,74 @@ export const getPartnerTempReadingsCsvTempPartnerPartnerIdCsvGetOptions = (
     unknown,
     GetPartnerTempReadingsCsvTempPartnerPartnerIdCsvGetError,
     unknown,
-    ReturnType<
-      typeof getPartnerTempReadingsCsvTempPartnerPartnerIdCsvGetQueryKey
-    >
+    ReturnType<typeof getPartnerTempReadingsCsvTempPartnerPartnerIdCsvGetQueryKey>
   >({
     queryFn: async ({ queryKey, signal }) => {
-      const { data } =
-        await getPartnerTempReadingsCsvTempPartnerPartnerIdCsvGet({
-          ...options,
-          ...queryKey[0],
-          signal,
-          throwOnError: true,
-        });
+      const { data } = await getPartnerTempReadingsCsvTempPartnerPartnerIdCsvGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
       return data;
     },
-    queryKey:
-      getPartnerTempReadingsCsvTempPartnerPartnerIdCsvGetQueryKey(options),
+    queryKey: getPartnerTempReadingsCsvTempPartnerPartnerIdCsvGetQueryKey(options),
   });
 
-export const getPartnerTempReadingsCsvTempPartnerPartnerIdCsvGetInfiniteQueryKey =
-  (
-    options: Options<GetPartnerTempReadingsCsvTempPartnerPartnerIdCsvGetData>,
-  ): QueryKey<
-    Options<GetPartnerTempReadingsCsvTempPartnerPartnerIdCsvGetData>
-  > =>
-    createQueryKey(
-      "getPartnerTempReadingsCsvTempPartnerPartnerIdCsvGet",
-      options,
-      true,
-    );
+export const getPartnerTempReadingsCsvTempPartnerPartnerIdCsvGetInfiniteQueryKey = (
+  options: Options<GetPartnerTempReadingsCsvTempPartnerPartnerIdCsvGetData>,
+): QueryKey<Options<GetPartnerTempReadingsCsvTempPartnerPartnerIdCsvGetData>> =>
+  createQueryKey('getPartnerTempReadingsCsvTempPartnerPartnerIdCsvGet', options, true);
 
 /**
  * Get Partner Temp Readings Csv
  */
-export const getPartnerTempReadingsCsvTempPartnerPartnerIdCsvGetInfiniteOptions =
-  (options: Options<GetPartnerTempReadingsCsvTempPartnerPartnerIdCsvGetData>) =>
-    infiniteQueryOptions<
-      unknown,
-      GetPartnerTempReadingsCsvTempPartnerPartnerIdCsvGetError,
-      InfiniteData<unknown>,
-      QueryKey<
-        Options<GetPartnerTempReadingsCsvTempPartnerPartnerIdCsvGetData>
-      >,
-      | number
-      | Pick<
-          QueryKey<
-            Options<GetPartnerTempReadingsCsvTempPartnerPartnerIdCsvGetData>
-          >[0],
-          "body" | "headers" | "path" | "query"
-        >
-    >(
-      // @ts-ignore
-      {
-        queryFn: async ({ pageParam, queryKey, signal }) => {
-          // @ts-ignore
-          const page: Pick<
-            QueryKey<
-              Options<GetPartnerTempReadingsCsvTempPartnerPartnerIdCsvGetData>
-            >[0],
-            "body" | "headers" | "path" | "query"
-          > =
-            typeof pageParam === "object"
-              ? pageParam
-              : {
-                  query: {
-                    offset: pageParam,
-                  },
-                };
-          const params = createInfiniteParams(queryKey, page);
-          const { data } =
-            await getPartnerTempReadingsCsvTempPartnerPartnerIdCsvGet({
-              ...options,
-              ...params,
-              signal,
-              throwOnError: true,
-            });
-          return data;
-        },
-        queryKey:
-          getPartnerTempReadingsCsvTempPartnerPartnerIdCsvGetInfiniteQueryKey(
-            options,
-          ),
+export const getPartnerTempReadingsCsvTempPartnerPartnerIdCsvGetInfiniteOptions = (
+  options: Options<GetPartnerTempReadingsCsvTempPartnerPartnerIdCsvGetData>,
+) =>
+  infiniteQueryOptions<
+    unknown,
+    GetPartnerTempReadingsCsvTempPartnerPartnerIdCsvGetError,
+    InfiniteData<unknown>,
+    QueryKey<Options<GetPartnerTempReadingsCsvTempPartnerPartnerIdCsvGetData>>,
+    | number
+    | Pick<
+        QueryKey<Options<GetPartnerTempReadingsCsvTempPartnerPartnerIdCsvGetData>>[0],
+        'body' | 'headers' | 'path' | 'query'
+      >
+  >(
+    // @ts-ignore
+    {
+      queryFn: async ({ pageParam, queryKey, signal }) => {
+        // @ts-ignore
+        const page: Pick<
+          QueryKey<Options<GetPartnerTempReadingsCsvTempPartnerPartnerIdCsvGetData>>[0],
+          'body' | 'headers' | 'path' | 'query'
+        > =
+          typeof pageParam === 'object'
+            ? pageParam
+            : {
+                query: {
+                  offset: pageParam,
+                },
+              };
+        const params = createInfiniteParams(queryKey, page);
+        const { data } = await getPartnerTempReadingsCsvTempPartnerPartnerIdCsvGet({
+          ...options,
+          ...params,
+          signal,
+          throwOnError: true,
+        });
+        return data;
       },
-    );
+      queryKey:
+        getPartnerTempReadingsCsvTempPartnerPartnerIdCsvGetInfiniteQueryKey(options),
+    },
+  );
 
 export const getSymptomEventsSymptomsGetQueryKey = (
   options?: Options<GetSymptomEventsSymptomsGetData>,
-) => createQueryKey("getSymptomEventsSymptomsGet", options);
+) => createQueryKey('getSymptomEventsSymptomsGet', options);
 
 /**
  * Get Symptom Events
@@ -1919,7 +1866,7 @@ export const getSymptomEventsSymptomsGetOptions = (
 export const getSymptomEventsSymptomsGetInfiniteQueryKey = (
   options?: Options<GetSymptomEventsSymptomsGetData>,
 ): QueryKey<Options<GetSymptomEventsSymptomsGetData>> =>
-  createQueryKey("getSymptomEventsSymptomsGet", options, true);
+  createQueryKey('getSymptomEventsSymptomsGet', options, true);
 
 /**
  * Get Symptom Events
@@ -1935,7 +1882,7 @@ export const getSymptomEventsSymptomsGetInfiniteOptions = (
     | number
     | Pick<
         QueryKey<Options<GetSymptomEventsSymptomsGetData>>[0],
-        "body" | "headers" | "path" | "query"
+        'body' | 'headers' | 'path' | 'query'
       >
   >(
     // @ts-ignore
@@ -1944,9 +1891,9 @@ export const getSymptomEventsSymptomsGetInfiniteOptions = (
         // @ts-ignore
         const page: Pick<
           QueryKey<Options<GetSymptomEventsSymptomsGetData>>[0],
-          "body" | "headers" | "path" | "query"
+          'body' | 'headers' | 'path' | 'query'
         > =
-          typeof pageParam === "object"
+          typeof pageParam === 'object'
             ? pageParam
             : {
                 query: {
@@ -1995,7 +1942,7 @@ export const createSymptomEventSymptomsPostMutation = (
 
 export const getMySymptomEventsSymptomsMeGetQueryKey = (
   options?: Options<GetMySymptomEventsSymptomsMeGetData>,
-) => createQueryKey("getMySymptomEventsSymptomsMeGet", options);
+) => createQueryKey('getMySymptomEventsSymptomsMeGet', options);
 
 /**
  * Get My Symptom Events
@@ -2024,7 +1971,7 @@ export const getMySymptomEventsSymptomsMeGetOptions = (
 export const getMySymptomEventsSymptomsMeGetInfiniteQueryKey = (
   options?: Options<GetMySymptomEventsSymptomsMeGetData>,
 ): QueryKey<Options<GetMySymptomEventsSymptomsMeGetData>> =>
-  createQueryKey("getMySymptomEventsSymptomsMeGet", options, true);
+  createQueryKey('getMySymptomEventsSymptomsMeGet', options, true);
 
 /**
  * Get My Symptom Events
@@ -2040,7 +1987,7 @@ export const getMySymptomEventsSymptomsMeGetInfiniteOptions = (
     | number
     | Pick<
         QueryKey<Options<GetMySymptomEventsSymptomsMeGetData>>[0],
-        "body" | "headers" | "path" | "query"
+        'body' | 'headers' | 'path' | 'query'
       >
   >(
     // @ts-ignore
@@ -2049,9 +1996,9 @@ export const getMySymptomEventsSymptomsMeGetInfiniteOptions = (
         // @ts-ignore
         const page: Pick<
           QueryKey<Options<GetMySymptomEventsSymptomsMeGetData>>[0],
-          "body" | "headers" | "path" | "query"
+          'body' | 'headers' | 'path' | 'query'
         > =
-          typeof pageParam === "object"
+          typeof pageParam === 'object'
             ? pageParam
             : {
                 query: {
@@ -2100,7 +2047,7 @@ export const deleteSymptomEventSymptomsMeSymptomIdDeleteMutation = (
 
 export const getSingleSymptomEventSymptomsMeSymptomIdGetQueryKey = (
   options: Options<GetSingleSymptomEventSymptomsMeSymptomIdGetData>,
-) => createQueryKey("getSingleSymptomEventSymptomsMeSymptomIdGet", options);
+) => createQueryKey('getSingleSymptomEventSymptomsMeSymptomIdGet', options);
 
 /**
  * Get Single Symptom Event
@@ -2155,7 +2102,7 @@ export const updateSymptomEventSymptomsMeSymptomIdPatchMutation = (
 
 export const exportSymptomsCsvSymptomsMeCsvGetQueryKey = (
   options?: Options<ExportSymptomsCsvSymptomsMeCsvGetData>,
-) => createQueryKey("exportSymptomsCsvSymptomsMeCsvGet", options);
+) => createQueryKey('exportSymptomsCsvSymptomsMeCsvGet', options);
 
 /**
  * Export Symptoms Csv
@@ -2184,7 +2131,7 @@ export const exportSymptomsCsvSymptomsMeCsvGetOptions = (
 export const exportSymptomsCsvSymptomsMeCsvGetInfiniteQueryKey = (
   options?: Options<ExportSymptomsCsvSymptomsMeCsvGetData>,
 ): QueryKey<Options<ExportSymptomsCsvSymptomsMeCsvGetData>> =>
-  createQueryKey("exportSymptomsCsvSymptomsMeCsvGet", options, true);
+  createQueryKey('exportSymptomsCsvSymptomsMeCsvGet', options, true);
 
 /**
  * Export Symptoms Csv
@@ -2200,7 +2147,7 @@ export const exportSymptomsCsvSymptomsMeCsvGetInfiniteOptions = (
     | number
     | Pick<
         QueryKey<Options<ExportSymptomsCsvSymptomsMeCsvGetData>>[0],
-        "body" | "headers" | "path" | "query"
+        'body' | 'headers' | 'path' | 'query'
       >
   >(
     // @ts-ignore
@@ -2209,9 +2156,9 @@ export const exportSymptomsCsvSymptomsMeCsvGetInfiniteOptions = (
         // @ts-ignore
         const page: Pick<
           QueryKey<Options<ExportSymptomsCsvSymptomsMeCsvGetData>>[0],
-          "body" | "headers" | "path" | "query"
+          'body' | 'headers' | 'path' | 'query'
         > =
-          typeof pageParam === "object"
+          typeof pageParam === 'object'
             ? pageParam
             : {
                 query: {
@@ -2233,7 +2180,7 @@ export const exportSymptomsCsvSymptomsMeCsvGetInfiniteOptions = (
 
 export const getPartnerSymptomsSymptomsPartnerPartnerIdGetQueryKey = (
   options: Options<GetPartnerSymptomsSymptomsPartnerPartnerIdGetData>,
-) => createQueryKey("getPartnerSymptomsSymptomsPartnerPartnerIdGet", options);
+) => createQueryKey('getPartnerSymptomsSymptomsPartnerPartnerIdGet', options);
 
 /**
  * Get Partner Symptoms
@@ -2262,11 +2209,7 @@ export const getPartnerSymptomsSymptomsPartnerPartnerIdGetOptions = (
 export const getPartnerSymptomsSymptomsPartnerPartnerIdGetInfiniteQueryKey = (
   options: Options<GetPartnerSymptomsSymptomsPartnerPartnerIdGetData>,
 ): QueryKey<Options<GetPartnerSymptomsSymptomsPartnerPartnerIdGetData>> =>
-  createQueryKey(
-    "getPartnerSymptomsSymptomsPartnerPartnerIdGet",
-    options,
-    true,
-  );
+  createQueryKey('getPartnerSymptomsSymptomsPartnerPartnerIdGet', options, true);
 
 /**
  * Get Partner Symptoms
@@ -2282,7 +2225,7 @@ export const getPartnerSymptomsSymptomsPartnerPartnerIdGetInfiniteOptions = (
     | number
     | Pick<
         QueryKey<Options<GetPartnerSymptomsSymptomsPartnerPartnerIdGetData>>[0],
-        "body" | "headers" | "path" | "query"
+        'body' | 'headers' | 'path' | 'query'
       >
   >(
     // @ts-ignore
@@ -2290,12 +2233,10 @@ export const getPartnerSymptomsSymptomsPartnerPartnerIdGetInfiniteOptions = (
       queryFn: async ({ pageParam, queryKey, signal }) => {
         // @ts-ignore
         const page: Pick<
-          QueryKey<
-            Options<GetPartnerSymptomsSymptomsPartnerPartnerIdGetData>
-          >[0],
-          "body" | "headers" | "path" | "query"
+          QueryKey<Options<GetPartnerSymptomsSymptomsPartnerPartnerIdGetData>>[0],
+          'body' | 'headers' | 'path' | 'query'
         > =
-          typeof pageParam === "object"
+          typeof pageParam === 'object'
             ? pageParam
             : {
                 query: {
@@ -2311,18 +2252,13 @@ export const getPartnerSymptomsSymptomsPartnerPartnerIdGetInfiniteOptions = (
         });
         return data;
       },
-      queryKey:
-        getPartnerSymptomsSymptomsPartnerPartnerIdGetInfiniteQueryKey(options),
+      queryKey: getPartnerSymptomsSymptomsPartnerPartnerIdGetInfiniteQueryKey(options),
     },
   );
 
 export const exportPartnerSymptomsCsvSymptomsPartnerPartnerIdCsvGetQueryKey = (
   options: Options<ExportPartnerSymptomsCsvSymptomsPartnerPartnerIdCsvGetData>,
-) =>
-  createQueryKey(
-    "exportPartnerSymptomsCsvSymptomsPartnerPartnerIdCsvGet",
-    options,
-  );
+) => createQueryKey('exportPartnerSymptomsCsvSymptomsPartnerPartnerIdCsvGet', options);
 
 /**
  * Export Partner Symptoms Csv
@@ -2334,94 +2270,75 @@ export const exportPartnerSymptomsCsvSymptomsPartnerPartnerIdCsvGetOptions = (
     unknown,
     ExportPartnerSymptomsCsvSymptomsPartnerPartnerIdCsvGetError,
     unknown,
-    ReturnType<
-      typeof exportPartnerSymptomsCsvSymptomsPartnerPartnerIdCsvGetQueryKey
-    >
+    ReturnType<typeof exportPartnerSymptomsCsvSymptomsPartnerPartnerIdCsvGetQueryKey>
   >({
     queryFn: async ({ queryKey, signal }) => {
-      const { data } =
-        await exportPartnerSymptomsCsvSymptomsPartnerPartnerIdCsvGet({
-          ...options,
-          ...queryKey[0],
-          signal,
-          throwOnError: true,
-        });
+      const { data } = await exportPartnerSymptomsCsvSymptomsPartnerPartnerIdCsvGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
       return data;
     },
-    queryKey:
-      exportPartnerSymptomsCsvSymptomsPartnerPartnerIdCsvGetQueryKey(options),
+    queryKey: exportPartnerSymptomsCsvSymptomsPartnerPartnerIdCsvGetQueryKey(options),
   });
 
-export const exportPartnerSymptomsCsvSymptomsPartnerPartnerIdCsvGetInfiniteQueryKey =
-  (
-    options: Options<ExportPartnerSymptomsCsvSymptomsPartnerPartnerIdCsvGetData>,
-  ): QueryKey<
-    Options<ExportPartnerSymptomsCsvSymptomsPartnerPartnerIdCsvGetData>
-  > =>
-    createQueryKey(
-      "exportPartnerSymptomsCsvSymptomsPartnerPartnerIdCsvGet",
-      options,
-      true,
-    );
+export const exportPartnerSymptomsCsvSymptomsPartnerPartnerIdCsvGetInfiniteQueryKey = (
+  options: Options<ExportPartnerSymptomsCsvSymptomsPartnerPartnerIdCsvGetData>,
+): QueryKey<Options<ExportPartnerSymptomsCsvSymptomsPartnerPartnerIdCsvGetData>> =>
+  createQueryKey('exportPartnerSymptomsCsvSymptomsPartnerPartnerIdCsvGet', options, true);
 
 /**
  * Export Partner Symptoms Csv
  */
-export const exportPartnerSymptomsCsvSymptomsPartnerPartnerIdCsvGetInfiniteOptions =
-  (
-    options: Options<ExportPartnerSymptomsCsvSymptomsPartnerPartnerIdCsvGetData>,
-  ) =>
-    infiniteQueryOptions<
-      unknown,
-      ExportPartnerSymptomsCsvSymptomsPartnerPartnerIdCsvGetError,
-      InfiniteData<unknown>,
-      QueryKey<
-        Options<ExportPartnerSymptomsCsvSymptomsPartnerPartnerIdCsvGetData>
-      >,
-      | number
-      | Pick<
+export const exportPartnerSymptomsCsvSymptomsPartnerPartnerIdCsvGetInfiniteOptions = (
+  options: Options<ExportPartnerSymptomsCsvSymptomsPartnerPartnerIdCsvGetData>,
+) =>
+  infiniteQueryOptions<
+    unknown,
+    ExportPartnerSymptomsCsvSymptomsPartnerPartnerIdCsvGetError,
+    InfiniteData<unknown>,
+    QueryKey<Options<ExportPartnerSymptomsCsvSymptomsPartnerPartnerIdCsvGetData>>,
+    | number
+    | Pick<
+        QueryKey<Options<ExportPartnerSymptomsCsvSymptomsPartnerPartnerIdCsvGetData>>[0],
+        'body' | 'headers' | 'path' | 'query'
+      >
+  >(
+    // @ts-ignore
+    {
+      queryFn: async ({ pageParam, queryKey, signal }) => {
+        // @ts-ignore
+        const page: Pick<
           QueryKey<
             Options<ExportPartnerSymptomsCsvSymptomsPartnerPartnerIdCsvGetData>
           >[0],
-          "body" | "headers" | "path" | "query"
-        >
-    >(
-      // @ts-ignore
-      {
-        queryFn: async ({ pageParam, queryKey, signal }) => {
-          // @ts-ignore
-          const page: Pick<
-            QueryKey<
-              Options<ExportPartnerSymptomsCsvSymptomsPartnerPartnerIdCsvGetData>
-            >[0],
-            "body" | "headers" | "path" | "query"
-          > =
-            typeof pageParam === "object"
-              ? pageParam
-              : {
-                  query: {
-                    offset: pageParam,
-                  },
-                };
-          const params = createInfiniteParams(queryKey, page);
-          const { data } =
-            await exportPartnerSymptomsCsvSymptomsPartnerPartnerIdCsvGet({
-              ...options,
-              ...params,
-              signal,
-              throwOnError: true,
-            });
-          return data;
-        },
-        queryKey:
-          exportPartnerSymptomsCsvSymptomsPartnerPartnerIdCsvGetInfiniteQueryKey(
-            options,
-          ),
+          'body' | 'headers' | 'path' | 'query'
+        > =
+          typeof pageParam === 'object'
+            ? pageParam
+            : {
+                query: {
+                  offset: pageParam,
+                },
+              };
+        const params = createInfiniteParams(queryKey, page);
+        const { data } = await exportPartnerSymptomsCsvSymptomsPartnerPartnerIdCsvGet({
+          ...options,
+          ...params,
+          signal,
+          throwOnError: true,
+        });
+        return data;
       },
-    );
+      queryKey:
+        exportPartnerSymptomsCsvSymptomsPartnerPartnerIdCsvGetInfiniteQueryKey(options),
+    },
+  );
 
 export const rootGetQueryKey = (options?: Options<RootGetData>) =>
-  createQueryKey("rootGet", options);
+  createQueryKey('rootGet', options);
 
 /**
  * Root
@@ -2447,7 +2364,7 @@ export const rootGetOptions = (options?: Options<RootGetData>) =>
 
 export const healthCheckHealthGetQueryKey = (
   options?: Options<HealthCheckHealthGetData>,
-) => createQueryKey("healthCheckHealthGet", options);
+) => createQueryKey('healthCheckHealthGet', options);
 
 /**
  * Health Check

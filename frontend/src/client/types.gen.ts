@@ -131,10 +131,6 @@ export type Cycle = {
    */
   avg_period_length?: number | null;
   /**
-   * Last Period Start
-   */
-  last_period_start?: Date | null;
-  /**
    * Last Evaluated
    */
   last_evaluated?: Date | null;
@@ -144,9 +140,9 @@ export type Cycle = {
  * CycleState
  */
 export const CycleState = {
-  LEARNING: "learning",
-  STABLE: "stable",
-  UNSTABLE: "unstable",
+  LEARNING: 'learning',
+  STABLE: 'stable',
+  UNSTABLE: 'unstable',
 } as const;
 
 /**
@@ -158,11 +154,11 @@ export type CycleState = (typeof CycleState)[keyof typeof CycleState];
  * FlowIntensity
  */
 export const FlowIntensity = {
-  0: "0",
-  1: "1",
-  2: "2",
-  3: "3",
-  4: "4",
+  0: '0',
+  1: '1',
+  2: '2',
+  3: '3',
+  4: '4',
 } as const;
 
 /**
@@ -384,10 +380,10 @@ export type SymptomEvent = {
  * TempPhase
  */
 export const TempPhase = {
-  LEARNING: "learning",
-  LOW_PHASE: "low_phase",
-  ELEVATED_PHASE: "elevated_phase",
-  UNKNOWN: "unknown",
+  LEARNING: 'learning',
+  LOW_PHASE: 'low_phase',
+  ELEVATED_PHASE: 'elevated_phase',
+  UNKNOWN: 'unknown',
 } as const;
 
 /**
@@ -649,13 +645,23 @@ export type ValidationError = {
    * Error Type
    */
   type: string;
+  /**
+   * Input
+   */
+  input?: unknown;
+  /**
+   * Context
+   */
+  ctx?: {
+    [key: string]: unknown;
+  };
 };
 
 export type LoginAuthPostData = {
   body: BodyLoginAuthPost;
   path?: never;
   query?: never;
-  url: "/auth/";
+  url: '/auth/';
 };
 
 export type LoginAuthPostErrors = {
@@ -678,14 +684,13 @@ export type LoginAuthPostResponses = {
   200: LoginResponse;
 };
 
-export type LoginAuthPostResponse =
-  LoginAuthPostResponses[keyof LoginAuthPostResponses];
+export type LoginAuthPostResponse = LoginAuthPostResponses[keyof LoginAuthPostResponses];
 
 export type RefreshTokensAuthRefreshPostData = {
   body: RefreshToken;
   path?: never;
   query?: never;
-  url: "/auth/refresh";
+  url: '/auth/refresh';
 };
 
 export type RefreshTokensAuthRefreshPostErrors = {
@@ -725,7 +730,7 @@ export type GetUsersUsersGetData = {
      */
     limit?: number;
   };
-  url: "/users/";
+  url: '/users/';
 };
 
 export type GetUsersUsersGetErrors = {
@@ -739,8 +744,7 @@ export type GetUsersUsersGetErrors = {
   422: HttpValidationError;
 };
 
-export type GetUsersUsersGetError =
-  GetUsersUsersGetErrors[keyof GetUsersUsersGetErrors];
+export type GetUsersUsersGetError = GetUsersUsersGetErrors[keyof GetUsersUsersGetErrors];
 
 export type GetUsersUsersGetResponses = {
   /**
@@ -756,7 +760,7 @@ export type CreateUserUsersPostData = {
   body: UserCreate;
   path?: never;
   query?: never;
-  url: "/users/";
+  url: '/users/';
 };
 
 export type CreateUserUsersPostErrors = {
@@ -787,7 +791,7 @@ export type DeleteMeUsersMeDeleteData = {
   body?: never;
   path?: never;
   query?: never;
-  url: "/users/me/";
+  url: '/users/me/';
 };
 
 export type DeleteMeUsersMeDeleteErrors = {
@@ -811,7 +815,7 @@ export type ReadMeUsersMeGetData = {
   body?: never;
   path?: never;
   query?: never;
-  url: "/users/me/";
+  url: '/users/me/';
 };
 
 export type ReadMeUsersMeGetErrors = {
@@ -835,7 +839,7 @@ export type UpdateMeUsersMePatchData = {
   body: UserUpdate;
   path?: never;
   query?: never;
-  url: "/users/me/";
+  url: '/users/me/';
 };
 
 export type UpdateMeUsersMePatchErrors = {
@@ -887,7 +891,7 @@ export type GetMyEventsUsersMeEventsGetData = {
      */
     limit?: number;
   };
-  url: "/users/me/events/";
+  url: '/users/me/events/';
 };
 
 export type GetMyEventsUsersMeEventsGetErrors = {
@@ -939,7 +943,7 @@ export type GetMyEventsCsvUsersMeEventsCsvGetData = {
      */
     limit?: number;
   };
-  url: "/users/me/events/csv/";
+  url: '/users/me/events/csv/';
 };
 
 export type GetMyEventsCsvUsersMeEventsCsvGetErrors = {
@@ -967,7 +971,7 @@ export type GetMyPartnersUsersMePartnersGetData = {
   body?: never;
   path?: never;
   query?: never;
-  url: "/users/me/partners/";
+  url: '/users/me/partners/';
 };
 
 export type GetMyPartnersUsersMePartnersGetErrors = {
@@ -996,7 +1000,7 @@ export type RemovePartnerUsersMePartnersPartnerIdDeleteData = {
     partner_id: string;
   };
   query?: never;
-  url: "/users/me/partners/{partner_id}/";
+  url: '/users/me/partners/{partner_id}/';
 };
 
 export type RemovePartnerUsersMePartnersPartnerIdDeleteErrors = {
@@ -1032,7 +1036,7 @@ export type AddPartnerUsersMePartnersPartnerIdPostData = {
     partner_id: string;
   };
   query?: never;
-  url: "/users/me/partners/{partner_id}/";
+  url: '/users/me/partners/{partner_id}/';
 };
 
 export type AddPartnerUsersMePartnersPartnerIdPostErrors = {
@@ -1084,7 +1088,7 @@ export type GetAllPeriodsPeriodGetData = {
      */
     limit?: number;
   };
-  url: "/period/";
+  url: '/period/';
 };
 
 export type GetAllPeriodsPeriodGetErrors = {
@@ -1115,7 +1119,7 @@ export type CreatePeriodEventPeriodPostData = {
   body: CreatePeriodParams;
   path?: never;
   query?: never;
-  url: "/period/";
+  url: '/period/';
 };
 
 export type CreatePeriodEventPeriodPostErrors = {
@@ -1167,7 +1171,7 @@ export type GetMyPeriodsPeriodMeGetData = {
      */
     limit?: number;
   };
-  url: "/period/me/";
+  url: '/period/me/';
 };
 
 export type GetMyPeriodsPeriodMeGetErrors = {
@@ -1203,7 +1207,7 @@ export type DeletePeriodPeriodMePeriodIdDeleteData = {
     period_id: number;
   };
   query?: never;
-  url: "/period/me/{period_id}";
+  url: '/period/me/{period_id}';
 };
 
 export type DeletePeriodPeriodMePeriodIdDeleteErrors = {
@@ -1239,7 +1243,7 @@ export type GetSinglePeriodPeriodMePeriodIdGetData = {
     period_id: number;
   };
   query?: never;
-  url: "/period/me/{period_id}";
+  url: '/period/me/{period_id}';
 };
 
 export type GetSinglePeriodPeriodMePeriodIdGetErrors = {
@@ -1275,7 +1279,7 @@ export type UpdatePeriodPeriodMePeriodIdPatchData = {
     period_id: number;
   };
   query?: never;
-  url: "/period/me/{period_id}";
+  url: '/period/me/{period_id}';
 };
 
 export type UpdatePeriodPeriodMePeriodIdPatchErrors = {
@@ -1327,7 +1331,7 @@ export type GetMyPeriodsCsvPeriodMeCsvGetData = {
      */
     limit?: number;
   };
-  url: "/period/me/csv/";
+  url: '/period/me/csv/';
 };
 
 export type GetMyPeriodsCsvPeriodMeCsvGetErrors = {
@@ -1355,7 +1359,7 @@ export type GetNextPeriodPeriodMeNextGetData = {
   body?: never;
   path?: never;
   query?: never;
-  url: "/period/me/next/";
+  url: '/period/me/next/';
 };
 
 export type GetNextPeriodPeriodMeNextGetErrors = {
@@ -1407,7 +1411,7 @@ export type GetPartnerPeriodsPeriodPartnerPartnerIdGetData = {
      */
     limit?: number;
   };
-  url: "/period/partner/{partner_id}/";
+  url: '/period/partner/{partner_id}/';
 };
 
 export type GetPartnerPeriodsPeriodPartnerPartnerIdGetErrors = {
@@ -1464,7 +1468,7 @@ export type GetPartnerPeriodsCsvPeriodPartnerPartnerIdCsvGetData = {
      */
     limit?: number;
   };
-  url: "/period/partner/{partner_id}/csv/";
+  url: '/period/partner/{partner_id}/csv/';
 };
 
 export type GetPartnerPeriodsCsvPeriodPartnerPartnerIdCsvGetErrors = {
@@ -1513,7 +1517,7 @@ export type GetTempReadingsTempGetData = {
      */
     limit?: number;
   };
-  url: "/temp/";
+  url: '/temp/';
 };
 
 export type GetTempReadingsTempGetErrors = {
@@ -1544,7 +1548,7 @@ export type CreateTempReadingTempPostData = {
   body: CreateTempParams;
   path?: never;
   query?: never;
-  url: "/temp/";
+  url: '/temp/';
 };
 
 export type CreateTempReadingTempPostErrors = {
@@ -1596,7 +1600,7 @@ export type GetMyReadingsTempMeGetData = {
      */
     limit?: number;
   };
-  url: "/temp/me/";
+  url: '/temp/me/';
 };
 
 export type GetMyReadingsTempMeGetErrors = {
@@ -1632,7 +1636,7 @@ export type DeleteTempTempMeTemperatureIdDeleteData = {
     temperature_id: number;
   };
   query?: never;
-  url: "/temp/me/{temperature_id}";
+  url: '/temp/me/{temperature_id}';
 };
 
 export type DeleteTempTempMeTemperatureIdDeleteErrors = {
@@ -1668,7 +1672,7 @@ export type GetSingleReadingTempMeTemperatureIdGetData = {
     temperature_id: number;
   };
   query?: never;
-  url: "/temp/me/{temperature_id}";
+  url: '/temp/me/{temperature_id}';
 };
 
 export type GetSingleReadingTempMeTemperatureIdGetErrors = {
@@ -1704,7 +1708,7 @@ export type UpdateReadingTempMeTemperatureIdPatchData = {
     temperature_id: number;
   };
   query?: never;
-  url: "/temp/me/{temperature_id}";
+  url: '/temp/me/{temperature_id}';
 };
 
 export type UpdateReadingTempMeTemperatureIdPatchErrors = {
@@ -1762,7 +1766,7 @@ export type GetMyTempAveragesTempMeAveragesGetData = {
      */
     limit?: number;
   };
-  url: "/temp/me/averages/";
+  url: '/temp/me/averages/';
 };
 
 export type GetMyTempAveragesTempMeAveragesGetErrors = {
@@ -1822,7 +1826,7 @@ export type GetMyTempReadingsCsvTempMeCsvGetData = {
      */
     limit?: number;
   };
-  url: "/temp/me/csv/";
+  url: '/temp/me/csv/';
 };
 
 export type GetMyTempReadingsCsvTempMeCsvGetErrors = {
@@ -1876,7 +1880,7 @@ export type GetPartnerTemperaturesTempPartnerPartnerIdGetData = {
      */
     limit?: number;
   };
-  url: "/temp/partner/{partner_id}/";
+  url: '/temp/partner/{partner_id}/';
 };
 
 export type GetPartnerTemperaturesTempPartnerPartnerIdGetErrors = {
@@ -1939,7 +1943,7 @@ export type GetPartnerTempReadingsCsvTempPartnerPartnerIdCsvGetData = {
      */
     limit?: number;
   };
-  url: "/temp/partner/{partner_id}/csv/";
+  url: '/temp/partner/{partner_id}/csv/';
 };
 
 export type GetPartnerTempReadingsCsvTempPartnerPartnerIdCsvGetErrors = {
@@ -1988,7 +1992,7 @@ export type GetSymptomEventsSymptomsGetData = {
      */
     limit?: number;
   };
-  url: "/symptoms/";
+  url: '/symptoms/';
 };
 
 export type GetSymptomEventsSymptomsGetErrors = {
@@ -2019,7 +2023,7 @@ export type CreateSymptomEventSymptomsPostData = {
   body: CreateSymptomParams;
   path?: never;
   query?: never;
-  url: "/symptoms/";
+  url: '/symptoms/';
 };
 
 export type CreateSymptomEventSymptomsPostErrors = {
@@ -2071,7 +2075,7 @@ export type GetMySymptomEventsSymptomsMeGetData = {
      */
     limit?: number;
   };
-  url: "/symptoms/me/";
+  url: '/symptoms/me/';
 };
 
 export type GetMySymptomEventsSymptomsMeGetErrors = {
@@ -2107,7 +2111,7 @@ export type DeleteSymptomEventSymptomsMeSymptomIdDeleteData = {
     symptom_id: number;
   };
   query?: never;
-  url: "/symptoms/me/{symptom_id}";
+  url: '/symptoms/me/{symptom_id}';
 };
 
 export type DeleteSymptomEventSymptomsMeSymptomIdDeleteErrors = {
@@ -2143,7 +2147,7 @@ export type GetSingleSymptomEventSymptomsMeSymptomIdGetData = {
     symptom_id: number;
   };
   query?: never;
-  url: "/symptoms/me/{symptom_id}";
+  url: '/symptoms/me/{symptom_id}';
 };
 
 export type GetSingleSymptomEventSymptomsMeSymptomIdGetErrors = {
@@ -2179,7 +2183,7 @@ export type UpdateSymptomEventSymptomsMeSymptomIdPatchData = {
     symptom_id: number;
   };
   query?: never;
-  url: "/symptoms/me/{symptom_id}";
+  url: '/symptoms/me/{symptom_id}';
 };
 
 export type UpdateSymptomEventSymptomsMeSymptomIdPatchErrors = {
@@ -2231,7 +2235,7 @@ export type ExportSymptomsCsvSymptomsMeCsvGetData = {
      */
     limit?: number;
   };
-  url: "/symptoms/me/csv/";
+  url: '/symptoms/me/csv/';
 };
 
 export type ExportSymptomsCsvSymptomsMeCsvGetErrors = {
@@ -2285,7 +2289,7 @@ export type GetPartnerSymptomsSymptomsPartnerPartnerIdGetData = {
      */
     limit?: number;
   };
-  url: "/symptoms/partner/{partner_id}/";
+  url: '/symptoms/partner/{partner_id}/';
 };
 
 export type GetPartnerSymptomsSymptomsPartnerPartnerIdGetErrors = {
@@ -2342,7 +2346,7 @@ export type ExportPartnerSymptomsCsvSymptomsPartnerPartnerIdCsvGetData = {
      */
     limit?: number;
   };
-  url: "/symptoms/partner/{partner_id}/csv/";
+  url: '/symptoms/partner/{partner_id}/csv/';
 };
 
 export type ExportPartnerSymptomsCsvSymptomsPartnerPartnerIdCsvGetErrors = {
@@ -2370,7 +2374,7 @@ export type RootGetData = {
   body?: never;
   path?: never;
   query?: never;
-  url: "/";
+  url: '/';
 };
 
 export type RootGetResponses = {
@@ -2386,7 +2390,7 @@ export type HealthCheckHealthGetData = {
   body?: never;
   path?: never;
   query?: never;
-  url: "/health";
+  url: '/health';
 };
 
 export type HealthCheckHealthGetResponses = {

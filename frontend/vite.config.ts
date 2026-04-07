@@ -1,16 +1,16 @@
 /// <reference types="vitest/config" />
-import { defineConfig } from "vite";
-import { codecovVitePlugin } from "@codecov/vite-plugin";
-import react from "@vitejs/plugin-react";
-import { tanstackRouter } from "@tanstack/router-plugin/vite";
+import { defineConfig } from 'vite';
+import { codecovVitePlugin } from '@codecov/vite-plugin';
+import react from '@vitejs/plugin-react';
+import { tanstackRouter } from '@tanstack/router-plugin/vite';
 
 // https://vite.dev/config/
-import path from "node:path";
-import { fileURLToPath } from "node:url";
-import { storybookTest } from "@storybook/addon-vitest/vitest-plugin";
-import { playwright } from "@vitest/browser-playwright";
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { storybookTest } from '@storybook/addon-vitest/vitest-plugin';
+import { playwright } from '@vitest/browser-playwright';
 const dirname =
-  typeof __dirname !== "undefined"
+  typeof __dirname !== 'undefined'
     ? __dirname
     : path.dirname(fileURLToPath(import.meta.url));
 
@@ -18,20 +18,20 @@ const dirname =
 export default defineConfig({
   resolve: {
     alias: {
-      "@": path.resolve(__dirname, "src"),
-      "@components": path.resolve(__dirname, "src/components"),
-      "@hooks": path.resolve(__dirname, "src/hooks"),
+      '@': path.resolve(__dirname, 'src'),
+      '@components': path.resolve(__dirname, 'src/components'),
+      '@hooks': path.resolve(__dirname, 'src/hooks'),
     },
   },
   plugins: [
     tanstackRouter({
-      target: "react",
+      target: 'react',
       autoCodeSplitting: true,
     }),
     react(),
     codecovVitePlugin({
       enableBundleAnalysis: process.env.CODECOV_TOKEN !== undefined,
-      bundleName: "period-tracker",
+      bundleName: 'period-tracker',
       uploadToken: process.env.CODECOV_TOKEN,
     }),
   ],
@@ -43,22 +43,22 @@ export default defineConfig({
           // The plugin will run tests for the stories defined in your Storybook config
           // See options at: https://storybook.js.org/docs/next/writing-tests/integrations/vitest-addon#storybooktest
           storybookTest({
-            configDir: path.join(dirname, ".storybook"),
+            configDir: path.join(dirname, '.storybook'),
           }),
         ],
         test: {
-          name: "storybook",
+          name: 'storybook',
           browser: {
             enabled: true,
             headless: true,
             provider: playwright({}),
             instances: [
               {
-                browser: "chromium",
+                browser: 'chromium',
               },
             ],
           },
-          setupFiles: [".storybook/vitest.setup.ts"],
+          setupFiles: ['.storybook/vitest.setup.ts'],
         },
       },
     ],

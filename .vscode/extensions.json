@@ -1,17 +1,23 @@
 {
   "recommendations": [
+    // General
     "alexcvzz.vscode-sqlite",
-    "dbaeumer.vscode-eslint",
     "editorconfig.editorconfig",
-    "matangover.mypy",
+    "esbenp.prettier-vscode",
+    "redhat.vscode-yaml",
+
+    // Backend
+    "dbaeumer.vscode-eslint",
     "ms-playwright.playwright",
+    "vitest.explorer",
+
+    // Frontend
+    "ms-python.python",
+    "ms-python.vscode-pylance",
     "ms-python.black-formatter",
     "ms-python.debugpy",
     "ms-python.flake8",
     "ms-python.isort",
-    "ms-python.python",
-    "ms-python.vscode-pylance",
-    "esbenp.prettier-vscode",
-    "redhat.vscode-yaml"
+    "matangover.mypy"
   ]
 }

@@ -15,7 +15,7 @@ const useCookie = () => {
     }
     d.setTime(d.getTime() + exdays * 24 * 60 * 60 * 1000);
     const expires = `expires=${d.toUTCString()}`;
-    const secureFlag = secure ? "Secure; " : "";
+    const secureFlag = secure ? 'Secure; ' : '';
     const cookie = `${name}=${value}; ${expires}; ${secureFlag}SameSite=Strict; path=/`;
     document.cookie = cookie;
   };
@@ -23,21 +23,21 @@ const useCookie = () => {
   const getCookie = (name: string) => {
     const cname = `${name}=`;
     const decodedCookie = decodeURIComponent(document.cookie);
-    const ca = decodedCookie.split(";");
+    const ca = decodedCookie.split(';');
     for (let i = 0; i < ca.length; i++) {
       let c = ca[i];
-      while (c.charAt(0) == " ") {
+      while (c.charAt(0) == ' ') {
         c = c.substring(1);
       }
       if (c.indexOf(cname) == 0) {
         return c.substring(cname.length, c.length);
       }
     }
-    return "";
+    return '';
   };
 
   const expireCookie = (name: string) => {
-    setCookie(name, "", -1, true);
+    setCookie(name, '', -1, true);
   };
 
   return {

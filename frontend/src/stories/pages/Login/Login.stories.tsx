@@ -1,20 +1,20 @@
-import type { Meta, StoryObj } from "@storybook/react-vite";
-import { fn } from "storybook/test";
+import type { Meta, StoryObj } from '@storybook/react-vite';
+import { fn } from 'storybook/test';
 
-import Login from "./Login";
+import Login from './Login';
 
 const MockLoginFn = fn(async () => {
   return new Promise((resolve) => setTimeout(resolve, 1000));
-}).mockName("loginFn");
+}).mockName('loginFn');
 
-const MockNavigateFn = fn(() => {}).mockName("navigateFn");
+const MockNavigateFn = fn(() => {}).mockName('navigateFn');
 
 const meta = {
   component: Login,
-  title: "Pages/Login",
-  tags: ["autodocs"],
+  title: 'Pages/Login',
+  tags: ['autodocs'],
   parameters: {
-    layout: "fullscreen",
+    layout: 'fullscreen',
   },
   args: { loginFn: MockLoginFn, navigateFn: MockNavigateFn },
 } satisfies Meta<typeof Login>;

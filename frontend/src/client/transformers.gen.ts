@@ -5,16 +5,50 @@ import type {
   CreatePeriodEventPeriodPostResponse,
   CreateSymptomEventSymptomsPostResponse,
   CreateTempReadingTempPostResponse,
+  GetAllPeriodsPeriodGetResponse,
+  GetMyEventsUsersMeEventsGetResponse,
+  GetMyPartnersUsersMePartnersGetResponse,
+  GetMyPeriodsPeriodMeGetResponse,
+  GetMyReadingsTempMeGetResponse,
+  GetMySymptomEventsSymptomsMeGetResponse,
+  GetNextPeriodPeriodMeNextGetResponse,
+  GetPartnerPeriodsPeriodPartnerPartnerIdGetResponse,
+  GetPartnerSymptomsSymptomsPartnerPartnerIdGetResponse,
+  GetPartnerTemperaturesTempPartnerPartnerIdGetResponse,
   GetSinglePeriodPeriodMePeriodIdGetResponse,
   GetSingleReadingTempMeTemperatureIdGetResponse,
   GetSingleSymptomEventSymptomsMeSymptomIdGetResponse,
+  GetSymptomEventsSymptomsGetResponse,
+  GetTempReadingsTempGetResponse,
+  GetUsersUsersGetResponse,
   HealthCheckHealthGetResponse,
   ReadMeUsersMeGetResponse,
   UpdateMeUsersMePatchResponse,
   UpdatePeriodPeriodMePeriodIdPatchResponse,
   UpdateReadingTempMeTemperatureIdPatchResponse,
   UpdateSymptomEventSymptomsMeSymptomIdPatchResponse,
-} from "./types.gen";
+} from './types.gen';
+
+const temperatureSchemaResponseTransformer = (data: any) => {
+  data.timestamp = new Date(data.timestamp);
+  return data;
+};
+
+const responseSchemaResponseTransformer = (data: any) => {
+  for (const key of Object.keys(data.data)) {
+    data.data[key] = data.data[key].map((item: any) =>
+      temperatureSchemaResponseTransformer(item),
+    );
+  }
+  return data;
+};
+
+export const getUsersUsersGetResponseTransformer = async (
+  data: any,
+): Promise<GetUsersUsersGetResponse> => {
+  data = responseSchemaResponseTransformer(data);
+  return data;
+};
 
 const temperatureStateSchemaResponseTransformer = (data: any) => {
   if (data.last_evaluated) {
@@ -24,9 +58,6 @@ const temperatureStateSchemaResponseTransformer = (data: any) => {
 };
 
 const cycleSchemaResponseTransformer = (data: any) => {
-  if (data.last_period_start) {
-    data.last_period_start = new Date(data.last_period_start);
-  }
   if (data.last_evaluated) {
     data.last_evaluated = new Date(data.last_evaluated);
   }
@@ -35,9 +66,7 @@ const cycleSchemaResponseTransformer = (data: any) => {
 
 const userProfileSchemaResponseTransformer = (data: any) => {
   if (data.temp_state) {
-    data.temp_state = temperatureStateSchemaResponseTransformer(
-      data.temp_state,
-    );
+    data.temp_state = temperatureStateSchemaResponseTransformer(data.temp_state);
   }
   if (data.cycle_state) {
     data.cycle_state = cycleSchemaResponseTransformer(data.cycle_state);
@@ -59,10 +88,31 @@ export const updateMeUsersMePatchResponseTransformer = async (
   return data;
 };
 
+export const getMyEventsUsersMeEventsGetResponseTransformer = async (
+  data: any,
+): Promise<GetMyEventsUsersMeEventsGetResponse> => {
+  data = responseSchemaResponseTransformer(data);
+  return data;
+};
+
+export const getMyPartnersUsersMePartnersGetResponseTransformer = async (
+  data: any,
+): Promise<GetMyPartnersUsersMePartnersGetResponse> => {
+  data = responseSchemaResponseTransformer(data);
+  return data;
+};
+
 export const addPartnerUsersMePartnersPartnerIdPostResponseTransformer = async (
   data: any,
 ): Promise<AddPartnerUsersMePartnersPartnerIdPostResponse> => {
   data = userProfileSchemaResponseTransformer(data);
+  return data;
+};
+
+export const getAllPeriodsPeriodGetResponseTransformer = async (
+  data: any,
+): Promise<GetAllPeriodsPeriodGetResponse> => {
+  data = responseSchemaResponseTransformer(data);
   return data;
 };
 
@@ -81,6 +131,13 @@ export const createPeriodEventPeriodPostResponseTransformer = async (
   return data;
 };
 
+export const getMyPeriodsPeriodMeGetResponseTransformer = async (
+  data: any,
+): Promise<GetMyPeriodsPeriodMeGetResponse> => {
+  data = responseSchemaResponseTransformer(data);
+  return data;
+};
+
 export const getSinglePeriodPeriodMePeriodIdGetResponseTransformer = async (
   data: any,
 ): Promise<GetSinglePeriodPeriodMePeriodIdGetResponse> => {
@@ -95,8 +152,32 @@ export const updatePeriodPeriodMePeriodIdPatchResponseTransformer = async (
   return data;
 };
 
-const temperatureSchemaResponseTransformer = (data: any) => {
-  data.timestamp = new Date(data.timestamp);
+const predictedPeriodSchemaResponseTransformer = (data: any) => {
+  data.start_date = new Date(data.start_date);
+  data.end_date = new Date(data.end_date);
+  return data;
+};
+
+export const getNextPeriodPeriodMeNextGetResponseTransformer = async (
+  data: any,
+): Promise<GetNextPeriodPeriodMeNextGetResponse> => {
+  if (data) {
+    data = predictedPeriodSchemaResponseTransformer(data);
+  }
+  return data;
+};
+
+export const getPartnerPeriodsPeriodPartnerPartnerIdGetResponseTransformer = async (
+  data: any,
+): Promise<GetPartnerPeriodsPeriodPartnerPartnerIdGetResponse> => {
+  data = responseSchemaResponseTransformer(data);
+  return data;
+};
+
+export const getTempReadingsTempGetResponseTransformer = async (
+  data: any,
+): Promise<GetTempReadingsTempGetResponse> => {
+  data = responseSchemaResponseTransformer(data);
   return data;
 };
 
@@ -104,6 +185,13 @@ export const createTempReadingTempPostResponseTransformer = async (
   data: any,
 ): Promise<CreateTempReadingTempPostResponse> => {
   data = temperatureSchemaResponseTransformer(data);
+  return data;
+};
+
+export const getMyReadingsTempMeGetResponseTransformer = async (
+  data: any,
+): Promise<GetMyReadingsTempMeGetResponse> => {
+  data = responseSchemaResponseTransformer(data);
   return data;
 };
 
@@ -121,6 +209,20 @@ export const updateReadingTempMeTemperatureIdPatchResponseTransformer = async (
   return data;
 };
 
+export const getPartnerTemperaturesTempPartnerPartnerIdGetResponseTransformer = async (
+  data: any,
+): Promise<GetPartnerTemperaturesTempPartnerPartnerIdGetResponse> => {
+  data = responseSchemaResponseTransformer(data);
+  return data;
+};
+
+export const getSymptomEventsSymptomsGetResponseTransformer = async (
+  data: any,
+): Promise<GetSymptomEventsSymptomsGetResponse> => {
+  data = responseSchemaResponseTransformer(data);
+  return data;
+};
+
 const symptomEventSchemaResponseTransformer = (data: any) => {
   data.date = new Date(data.date);
   return data;
@@ -133,21 +235,33 @@ export const createSymptomEventSymptomsPostResponseTransformer = async (
   return data;
 };
 
-export const getSingleSymptomEventSymptomsMeSymptomIdGetResponseTransformer =
-  async (
-    data: any,
-  ): Promise<GetSingleSymptomEventSymptomsMeSymptomIdGetResponse> => {
-    data = symptomEventSchemaResponseTransformer(data);
-    return data;
-  };
+export const getMySymptomEventsSymptomsMeGetResponseTransformer = async (
+  data: any,
+): Promise<GetMySymptomEventsSymptomsMeGetResponse> => {
+  data = responseSchemaResponseTransformer(data);
+  return data;
+};
 
-export const updateSymptomEventSymptomsMeSymptomIdPatchResponseTransformer =
-  async (
-    data: any,
-  ): Promise<UpdateSymptomEventSymptomsMeSymptomIdPatchResponse> => {
-    data = symptomEventSchemaResponseTransformer(data);
-    return data;
-  };
+export const getSingleSymptomEventSymptomsMeSymptomIdGetResponseTransformer = async (
+  data: any,
+): Promise<GetSingleSymptomEventSymptomsMeSymptomIdGetResponse> => {
+  data = symptomEventSchemaResponseTransformer(data);
+  return data;
+};
+
+export const updateSymptomEventSymptomsMeSymptomIdPatchResponseTransformer = async (
+  data: any,
+): Promise<UpdateSymptomEventSymptomsMeSymptomIdPatchResponse> => {
+  data = symptomEventSchemaResponseTransformer(data);
+  return data;
+};
+
+export const getPartnerSymptomsSymptomsPartnerPartnerIdGetResponseTransformer = async (
+  data: any,
+): Promise<GetPartnerSymptomsSymptomsPartnerPartnerIdGetResponse> => {
+  data = responseSchemaResponseTransformer(data);
+  return data;
+};
 
 const healthCheckSchemaResponseTransformer = (data: any) => {
   data.timestamp = new Date(data.timestamp);

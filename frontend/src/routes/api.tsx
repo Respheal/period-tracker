@@ -1,8 +1,8 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { useQuery } from "@tanstack/react-query";
-import { healthCheckHealthGetOptions } from "../client/@tanstack/react-query.gen";
+import { createFileRoute } from '@tanstack/react-router';
+import { useQuery } from '@tanstack/react-query';
+import { healthCheckHealthGetOptions } from '../client/@tanstack/react-query.gen';
 
-export const Route = createFileRoute("/api")({
+export const Route = createFileRoute('/api')({
   component: RouteComponent,
 });
 

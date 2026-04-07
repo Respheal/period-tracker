@@ -1,26 +1,26 @@
-import { defineConfig } from "@hey-api/openapi-ts";
+import { defineConfig } from '@hey-api/openapi-ts';
 
 export default defineConfig({
-  input: "./openapi.json",
+  input: './openapi.json',
   output: {
-    postProcess: ["eslint", "prettier"],
-    path: "./src/client",
+    postProcess: ['eslint', 'prettier'],
+    path: './src/client',
     indexFile: false,
   },
   plugins: [
-    "@hey-api/schemas",
+    '@hey-api/schemas',
     {
       dates: true,
-      name: "@hey-api/transformers",
+      name: '@hey-api/transformers',
     },
     {
-      enums: "javascript",
-      name: "@hey-api/typescript",
+      enums: 'javascript',
+      name: '@hey-api/typescript',
     },
     {
-      name: "@hey-api/sdk",
+      name: '@hey-api/sdk',
       transformer: true,
     },
-    "@tanstack/react-query",
+    '@tanstack/react-query',
   ],
 });

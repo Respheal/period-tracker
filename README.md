@@ -15,7 +15,8 @@ So far the project is exclusively a backend, but a frontend is on the [todo list
 
 ## To Run (Locally)
 
-Copy `.env.sample` to `.env` and update the values for your personal use. Most analysis variables can be finetuned as needed through the environmental variable configuration.
+Copy `.env.sample` to `.env` and update the values for your personal use. Most analysis variables can be finetuned as needed through the environmental
+variable configuration.
 
 ```bash
 cd backend
@@ -29,10 +30,10 @@ poetry run uvicorn api.main:app --reload
 
 ## To Run (Docker)
 
-> [!WARNING]
-> Persistent volumes have not been configured yet. Data will be lost if the container is deleted.
+> [!WARNING] Persistent volumes have not been configured yet. Data will be lost if the container is deleted.
 
-Copy `.env.sample` to `.env` and update the values for your personal use. Most analysis variables can be finetuned as needed through the environmental variable configuration.
+Copy `.env.sample` to `.env` and update the values for your personal use. Most analysis variables can be finetuned as needed through the environmental
+variable configuration.
 
 ```bash
 docker compose up -d --build
@@ -53,7 +54,8 @@ The backend app will be available on port 5000.
 
 ### Database Models and Migrations
 
-To update the database structure, update the models in **`api/db/models.py`**. After updates, you can generate an alembic migration to make use of the new model.
+To update the database structure, update the models in **`api/db/models.py`**. After updates, you can generate an alembic migration to make use of the
+new model.
 
 ```bash
 poetry run alembic revision --autogenerate -m "description"

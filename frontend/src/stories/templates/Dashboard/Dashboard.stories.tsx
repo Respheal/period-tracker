@@ -1,13 +1,13 @@
-import type { Meta, StoryObj } from "@storybook/react-vite";
+import type { Meta, StoryObj } from '@storybook/react-vite';
 
-import Dashboard from "./Dashboard";
+import Dashboard from './Dashboard';
 
 const meta = {
   component: Dashboard,
-  title: "Templates/Dashboard",
-  tags: ["autodocs"],
+  title: 'Templates/Dashboard',
+  tags: ['autodocs'],
   parameters: {
-    layout: "centered",
+    layout: 'centered',
   },
 } satisfies Meta<typeof Dashboard>;
 export default meta;

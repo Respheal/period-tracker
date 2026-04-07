@@ -1,17 +1,17 @@
-import { useState } from "react";
-import { useForm } from "@tanstack/react-form";
+import { useState } from 'react';
+import { useForm } from '@tanstack/react-form';
 
-import Box from "@mui/material/Box";
-import Button from "@mui/material/Button";
-import Card from "@mui/material/Card";
-import CardActions from "@mui/material/CardActions";
-import CardContent from "@mui/material/CardContent";
-import Container from "@mui/material/Container";
-import Stack from "@mui/material/Stack";
-import TextField from "@mui/material/TextField";
+import Box from '@mui/material/Box';
+import Button from '@mui/material/Button';
+import Card from '@mui/material/Card';
+import CardActions from '@mui/material/CardActions';
+import CardContent from '@mui/material/CardContent';
+import Container from '@mui/material/Container';
+import Stack from '@mui/material/Stack';
+import TextField from '@mui/material/TextField';
 
-import type { UserCreate } from "@/client/types.gen";
-import Typography from "@mui/material/Typography";
+import type { UserCreate } from '@/client/types.gen';
+import Typography from '@mui/material/Typography';
 
 export default function Register({
   registerFn,
@@ -23,10 +23,10 @@ export default function Register({
   const [loading, setLoading] = useState(false);
   const form = useForm({
     defaultValues: {
-      username: "",
-      password: "",
-      confirm_password: "",
-      display_name: "",
+      username: '',
+      password: '',
+      confirm_password: '',
+      display_name: '',
     },
     onSubmit: async ({ value }) => {
       const data: UserCreate = {
@@ -40,35 +40,33 @@ export default function Register({
   });
 
   return (
-    <Container maxWidth="xs">
+    <Container maxWidth='xs'>
       <Box
-        display="flex"
-        alignItems="center"
-        justifyContent="center"
-        height="100vh"
-        sx={{ minWidth: 275 }}
-      >
-        <Card variant="outlined">
+        display='flex'
+        alignItems='center'
+        justifyContent='center'
+        height='100vh'
+        sx={{ minWidth: 275 }}>
+        <Card variant='outlined'>
           <form
             onSubmit={(e) => {
               e.preventDefault();
               e.stopPropagation();
               setLoading(true);
               form.handleSubmit();
-            }}
-          >
+            }}>
             <CardContent sx={{ paddingBottom: 0 }}>
-              <Typography variant="h5" component="div" gutterBottom>
+              <Typography variant='h5' component='div' gutterBottom>
                 Register
               </Typography>
-              <Stack direction="column" spacing={1}>
+              <Stack direction='column' spacing={1}>
                 <form.Field
-                  name="username"
+                  name='username'
                   children={(field) => {
                     return (
                       <TextField
                         required
-                        label="Username"
+                        label='Username'
                         id={field.name}
                         name={field.name}
                         value={field.state.value}
@@ -78,10 +76,10 @@ export default function Register({
                   }}
                 />
                 <form.Field
-                  name="display_name"
+                  name='display_name'
                   children={(field) => (
                     <TextField
-                      label="Display Name"
+                      label='Display Name'
                       id={field.name}
                       name={field.name}
                       value={field.state.value}
@@ -90,11 +88,11 @@ export default function Register({
                   )}
                 />
                 <form.Field
-                  name="password"
+                  name='password'
                   children={(field) => (
                     <TextField
                       required
-                      label="Password"
+                      label='Password'
                       id={field.name}
                       name={field.name}
                       value={field.state.value}
@@ -103,39 +101,36 @@ export default function Register({
                   )}
                 />
                 <form.Field
-                  name="confirm_password"
+                  name='confirm_password'
                   validators={{
-                    onChangeListenTo: ["password"],
+                    onChangeListenTo: ['password'],
                     onChange: ({ value, fieldApi }) => {
                       if (
-                        form.getFieldMeta("confirm_password")?.isTouched &&
-                        value !== fieldApi.form.getFieldValue("password")
+                        form.getFieldMeta('confirm_password')?.isTouched &&
+                        value !== fieldApi.form.getFieldValue('password')
                       ) {
-                        return "Passwords do not match";
+                        return 'Passwords do not match';
                       }
                       return undefined;
                     },
-                  }}
-                >
+                  }}>
                   {(field) => (
                     <>
                       <TextField
                         required
-                        label="Confirm Password"
+                        label='Confirm Password'
                         value={field.state.value}
                         onChange={(e) => field.handleChange(e.target.value)}
                         error={field.state.meta.errors.length > 0}
-                        helperText={field.state.meta.errors.join(", ") || " "}
+                        helperText={field.state.meta.errors.join(', ') || ' '}
                       />
                     </>
                   )}
                 </form.Field>
               </Stack>
             </CardContent>
-            <CardActions sx={{ paddingBottom: 2, justifyContent: "flex-end" }}>
-              <Button onClick={() => navigateFn({ to: "/login" })}>
-                Login
-              </Button>
+            <CardActions sx={{ paddingBottom: 2, justifyContent: 'flex-end' }}>
+              <Button onClick={() => navigateFn({ to: '/login' })}>Login</Button>
               <form.Subscribe
                 selector={(state) => ({
                   canSubmit: state.canSubmit,
@@ -151,11 +146,10 @@ export default function Register({
                     !state.canSubmit || state.isSubmitting || !allFieldsFilled;
                   return (
                     <Button
-                      variant="contained"
-                      type="submit"
+                      variant='contained'
+                      type='submit'
                       loading={loading}
-                      disabled={disabled}
-                    >
+                      disabled={disabled}>
                       Register
                     </Button>
                   );

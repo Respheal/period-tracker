@@ -3,17 +3,17 @@
 export const ApplicationInfoSchema = {
   properties: {
     app_name: {
-      type: "string",
-      title: "App Name",
+      type: 'string',
+      title: 'App Name',
     },
     version: {
-      type: "string",
-      title: "Version",
+      type: 'string',
+      title: 'Version',
     },
   },
-  type: "object",
-  required: ["app_name", "version"],
-  title: "ApplicationInfo",
+  type: 'object',
+  required: ['app_name', 'version'],
+  title: 'ApplicationInfo',
 } as const;
 
 export const Body_login_auth__postSchema = {
@@ -21,84 +21,84 @@ export const Body_login_auth__postSchema = {
     grant_type: {
       anyOf: [
         {
-          type: "string",
-          pattern: "^password$",
+          type: 'string',
+          pattern: '^password$',
         },
         {
-          type: "null",
+          type: 'null',
         },
       ],
-      title: "Grant Type",
+      title: 'Grant Type',
     },
     username: {
-      type: "string",
-      title: "Username",
+      type: 'string',
+      title: 'Username',
     },
     password: {
-      type: "string",
-      format: "password",
-      title: "Password",
+      type: 'string',
+      format: 'password',
+      title: 'Password',
     },
     scope: {
-      type: "string",
-      title: "Scope",
-      default: "",
+      type: 'string',
+      title: 'Scope',
+      default: '',
     },
     client_id: {
       anyOf: [
         {
-          type: "string",
+          type: 'string',
         },
         {
-          type: "null",
+          type: 'null',
         },
       ],
-      title: "Client Id",
+      title: 'Client Id',
     },
     client_secret: {
       anyOf: [
         {
-          type: "string",
+          type: 'string',
         },
         {
-          type: "null",
+          type: 'null',
         },
       ],
-      format: "password",
-      title: "Client Secret",
+      format: 'password',
+      title: 'Client Secret',
     },
   },
-  type: "object",
-  required: ["username", "password"],
-  title: "Body_login_auth__post",
+  type: 'object',
+  required: ['username', 'password'],
+  title: 'Body_login_auth__post',
 } as const;
 
 export const CreatePeriodParamsSchema = {
   properties: {
     start_date: {
-      type: "string",
-      pattern: "^\\d{4}-\\d{2}-\\d{2}$",
-      title: "Start Date",
-      description: "Start date",
-      default: "2026-01-22",
+      type: 'string',
+      pattern: '^\\d{4}-\\d{2}-\\d{2}$',
+      title: 'Start Date',
+      description: 'Start date',
+      default: '2026-03-30',
     },
     end_date: {
       anyOf: [
         {
-          type: "string",
-          pattern: "^\\d{4}-\\d{2}-\\d{2}$",
+          type: 'string',
+          pattern: '^\\d{4}-\\d{2}-\\d{2}$',
         },
         {
-          type: "null",
+          type: 'null',
         },
       ],
-      title: "End Date",
-      description: "End date (Optional)",
-      default: "2026-01-25",
+      title: 'End Date',
+      description: 'End date (Optional)',
+      default: '2026-04-02',
     },
   },
-  type: "object",
-  title: "CreatePeriodParams",
+  type: 'object',
+  title: 'CreatePeriodParams',
 } as const;
 
 export const CreateSymptomParamsSchema = {
@@ -106,23 +106,23 @@ export const CreateSymptomParamsSchema = {
     date: {
       anyOf: [
         {
-          type: "string",
-          pattern: "^\\d{4}-\\d{2}-\\d{2}$",
+          type: 'string',
+          pattern: '^\\d{4}-\\d{2}-\\d{2}$',
         },
         {
-          type: "null",
+          type: 'null',
         },
       ],
-      title: "Date",
-      description: "Date of the symptom event",
+      title: 'Date',
+      description: 'Date of the symptom event',
     },
     flow_intensity: {
       anyOf: [
         {
-          $ref: "#/components/schemas/FlowIntensity",
+          $ref: '#/components/schemas/FlowIntensity',
         },
         {
-          type: "null",
+          type: 'null',
         },
       ],
     },
@@ -130,86 +130,86 @@ export const CreateSymptomParamsSchema = {
       anyOf: [
         {
           items: {
-            type: "string",
+            type: 'string',
           },
-          type: "array",
+          type: 'array',
         },
         {
-          type: "null",
+          type: 'null',
         },
       ],
-      title: "Symptoms",
+      title: 'Symptoms',
     },
     mood: {
       anyOf: [
         {
           items: {
-            type: "string",
+            type: 'string',
           },
-          type: "array",
+          type: 'array',
         },
         {
-          type: "null",
+          type: 'null',
         },
       ],
-      title: "Mood",
+      title: 'Mood',
     },
     ovulation_test: {
       anyOf: [
         {
-          type: "boolean",
+          type: 'boolean',
         },
         {
-          type: "null",
+          type: 'null',
         },
       ],
-      title: "Ovulation Test",
+      title: 'Ovulation Test',
     },
     discharge: {
       anyOf: [
         {
           items: {
-            type: "string",
+            type: 'string',
           },
-          type: "array",
+          type: 'array',
         },
         {
-          type: "null",
+          type: 'null',
         },
       ],
-      title: "Discharge",
+      title: 'Discharge',
     },
     sex: {
       anyOf: [
         {
           items: {
-            type: "string",
+            type: 'string',
           },
-          type: "array",
+          type: 'array',
         },
         {
-          type: "null",
+          type: 'null',
         },
       ],
-      title: "Sex",
+      title: 'Sex',
     },
   },
-  type: "object",
-  title: "CreateSymptomParams",
+  type: 'object',
+  title: 'CreateSymptomParams',
 } as const;
 
 export const CreateTempParamsSchema = {
   properties: {
     temperature: {
-      type: "number",
+      type: 'number',
       maximum: 40,
       minimum: 30,
-      title: "Temperature",
+      title: 'Temperature',
     },
   },
-  type: "object",
-  required: ["temperature"],
-  title: "CreateTempParams",
+  type: 'object',
+  required: ['temperature'],
+  title: 'CreateTempParams',
 } as const;
 
 export const CycleSchema = {
@@ -217,192 +217,180 @@ export const CycleSchema = {
     pid: {
       anyOf: [
         {
-          type: "integer",
+          type: 'integer',
         },
         {
-          type: "null",
+          type: 'null',
         },
       ],
-      title: "Pid",
+      title: 'Pid',
     },
     user_id: {
-      type: "string",
-      title: "User Id",
+      type: 'string',
+      title: 'User Id',
     },
     state: {
-      $ref: "#/components/schemas/CycleState",
-      default: "learning",
+      $ref: '#/components/schemas/CycleState',
+      default: 'learning',
     },
     avg_cycle_length: {
       anyOf: [
         {
-          type: "integer",
+          type: 'integer',
         },
         {
-          type: "null",
+          type: 'null',
         },
       ],
-      title: "Avg Cycle Length",
+      title: 'Avg Cycle Length',
     },
     avg_period_length: {
       anyOf: [
         {
-          type: "integer",
+          type: 'integer',
         },
         {
-          type: "null",
+          type: 'null',
         },
       ],
-      title: "Avg Period Length",
-    },
-    last_period_start: {
-      anyOf: [
-        {
-          type: "string",
-          format: "date-time",
-        },
-        {
-          type: "null",
-        },
-      ],
-      title: "Last Period Start",
+      title: 'Avg Period Length',
     },
     last_evaluated: {
       anyOf: [
         {
-          type: "string",
-          format: "date-time",
+          type: 'string',
+          format: 'date-time',
         },
         {
-          type: "null",
+          type: 'null',
         },
       ],
-      title: "Last Evaluated",
+      title: 'Last Evaluated',
     },
   },
-  type: "object",
-  required: ["user_id"],
-  title: "Cycle",
+  type: 'object',
+  required: ['user_id'],
+  title: 'Cycle',
 } as const;
 
 export const CycleStateSchema = {
-  type: "string",
-  enum: ["learning", "stable", "unstable"],
-  title: "CycleState",
+  type: 'string',
+  enum: ['learning', 'stable', 'unstable'],
+  title: 'CycleState',
 } as const;
 
 export const FlowIntensitySchema = {
-  type: "string",
-  enum: ["0", "1", "2", "3", "4"],
-  title: "FlowIntensity",
+  type: 'string',
+  enum: ['0', '1', '2', '3', '4'],
+  title: 'FlowIntensity',
 } as const;
 
 export const HTTPValidationErrorSchema = {
   properties: {
     detail: {
       items: {
-        $ref: "#/components/schemas/ValidationError",
+        $ref: '#/components/schemas/ValidationError',
       },
-      type: "array",
-      title: "Detail",
+      type: 'array',
+      title: 'Detail',
     },
   },
-  type: "object",
-  title: "HTTPValidationError",
+  type: 'object',
+  title: 'HTTPValidationError',
 } as const;
 
 export const HealthCheckSchema = {
   properties: {
     status: {
-      type: "string",
-      title: "Status",
+      type: 'string',
+      title: 'Status',
     },
     timestamp: {
-      type: "string",
-      format: "date-time",
-      title: "Timestamp",
+      type: 'string',
+      format: 'date-time',
+      title: 'Timestamp',
     },
   },
-  type: "object",
-  required: ["status", "timestamp"],
-  title: "HealthCheck",
+  type: 'object',
+  required: ['status', 'timestamp'],
+  title: 'HealthCheck',
 } as const;
 
 export const LoginResponseSchema = {
   properties: {
     access_token: {
-      type: "string",
-      title: "Access Token",
+      type: 'string',
+      title: 'Access Token',
     },
     refresh_token: {
-      type: "string",
-      title: "Refresh Token",
+      type: 'string',
+      title: 'Refresh Token',
     },
     token_type: {
-      type: "string",
-      title: "Token Type",
+      type: 'string',
+      title: 'Token Type',
     },
   },
-  type: "object",
-  required: ["access_token", "refresh_token", "token_type"],
-  title: "LoginResponse",
+  type: 'object',
+  required: ['access_token', 'refresh_token', 'token_type'],
+  title: 'LoginResponse',
 } as const;
 
 export const PeriodSchema = {
   properties: {
     user_id: {
-      type: "string",
-      title: "User Id",
+      type: 'string',
+      title: 'User Id',
     },
     start_date: {
-      type: "string",
-      format: "date-time",
-      title: "Start Date",
+      type: 'string',
+      format: 'date-time',
+      title: 'Start Date',
     },
     end_date: {
       anyOf: [
         {
-          type: "string",
-          format: "date-time",
+          type: 'string',
+          format: 'date-time',
         },
         {
-          type: "null",
+          type: 'null',
         },
       ],
-      title: "End Date",
+      title: 'End Date',
     },
     duration: {
       anyOf: [
         {
-          type: "integer",
+          type: 'integer',
         },
         {
-          type: "null",
+          type: 'null',
         },
       ],
-      title: "Duration",
+      title: 'Duration',
     },
     pid: {
-      type: "integer",
-      title: "Pid",
+      type: 'integer',
+      title: 'Pid',
     },
     luteal_length: {
       anyOf: [
         {
-          type: "integer",
+          type: 'integer',
         },
         {
-          type: "null",
+          type: 'null',
         },
       ],
-      title: "Luteal Length",
+      title: 'Luteal Length',
     },
   },
-  type: "object",
-  required: ["user_id", "start_date"],
-  title: "Period",
+  type: 'object',
+  required: ['user_id', 'start_date'],
+  title: 'Period',
   description:
-    "Period Event model.\n\nThis is the class representing the Period table in the database.\n\n- user_id\n- start_date, assume TZ-naive on read due to SQLite limitations\n- end_date, assume TZ-naive on read due to SQLite limitations\n- duration",
+    'Period Event model.\n\nThis is the class representing the Period table in the database.\n\n- user_id\n- start_date, assume TZ-naive on read due to SQLite limitations\n- end_date, assume TZ-naive on read due to SQLite limitations\n- duration',
 } as const;
 
 export const PeriodUpdateSchema = {
@@ -410,145 +398,145 @@ export const PeriodUpdateSchema = {
     start_date: {
       anyOf: [
         {
-          type: "string",
-          pattern: "^\\d{4}-\\d{2}-\\d{2}$",
+          type: 'string',
+          pattern: '^\\d{4}-\\d{2}-\\d{2}$',
         },
         {
-          type: "null",
+          type: 'null',
         },
       ],
-      title: "Start Date",
-      description: "YYYY-MM-DD format",
+      title: 'Start Date',
+      description: 'YYYY-MM-DD format',
     },
     end_date: {
       anyOf: [
         {
-          type: "string",
-          pattern: "^\\d{4}-\\d{2}-\\d{2}$",
+          type: 'string',
+          pattern: '^\\d{4}-\\d{2}-\\d{2}$',
         },
         {
-          type: "null",
+          type: 'null',
         },
       ],
-      title: "End Date",
-      description: "YYYY-MM-DD format",
+      title: 'End Date',
+      description: 'YYYY-MM-DD format',
     },
   },
-  type: "object",
-  title: "PeriodUpdate",
+  type: 'object',
+  title: 'PeriodUpdate',
 } as const;
 
 export const PredictedPeriodSchema = {
   properties: {
     start_date: {
-      type: "string",
-      format: "date",
-      title: "Start Date",
+      type: 'string',
+      format: 'date',
+      title: 'Start Date',
     },
     end_date: {
-      type: "string",
-      format: "date",
-      title: "End Date",
+      type: 'string',
+      format: 'date',
+      title: 'End Date',
     },
     confidence: {
       anyOf: [
         {
-          type: "number",
+          type: 'number',
         },
         {
-          type: "null",
+          type: 'null',
         },
       ],
-      title: "Confidence",
+      title: 'Confidence',
     },
   },
-  type: "object",
-  required: ["start_date", "end_date"],
-  title: "PredictedPeriod",
+  type: 'object',
+  required: ['start_date', 'end_date'],
+  title: 'PredictedPeriod',
 } as const;
 
 export const RefreshTokenSchema = {
   properties: {
     refresh_token: {
-      type: "string",
-      title: "Refresh Token",
+      type: 'string',
+      title: 'Refresh Token',
     },
   },
-  type: "object",
-  required: ["refresh_token"],
-  title: "RefreshToken",
+  type: 'object',
+  required: ['refresh_token'],
+  title: 'RefreshToken',
 } as const;
 
 export const ResourceDeleteResponseSchema = {
   properties: {
     resource_type: {
-      type: "string",
-      title: "Resource Type",
+      type: 'string',
+      title: 'Resource Type',
     },
     resource_id: {
-      type: "string",
-      title: "Resource Id",
+      type: 'string',
+      title: 'Resource Id',
     },
   },
-  type: "object",
-  required: ["resource_type", "resource_id"],
-  title: "ResourceDeleteResponse",
+  type: 'object',
+  required: ['resource_type', 'resource_id'],
+  title: 'ResourceDeleteResponse',
 } as const;
 
 export const ResponseSchema = {
   properties: {
     count: {
-      type: "integer",
-      title: "Count",
+      type: 'integer',
+      title: 'Count',
     },
     data: {
       additionalProperties: {
         items: {
           anyOf: [
             {
-              $ref: "#/components/schemas/Temperature",
+              $ref: '#/components/schemas/Temperature',
             },
             {
-              $ref: "#/components/schemas/Period",
+              $ref: '#/components/schemas/Period',
             },
             {
-              $ref: "#/components/schemas/SymptomEvent",
+              $ref: '#/components/schemas/SymptomEvent',
             },
             {
-              $ref: "#/components/schemas/UserSafe",
+              $ref: '#/components/schemas/UserSafe',
             },
           ],
         },
-        type: "array",
+        type: 'array',
       },
-      type: "object",
-      title: "Data",
+      type: 'object',
+      title: 'Data',
     },
   },
-  type: "object",
-  required: ["count", "data"],
-  title: "Response",
-  description: "Base response model with count field used for list endpoints.",
+  type: 'object',
+  required: ['count', 'data'],
+  title: 'Response',
+  description: 'Base response model with count field used for list endpoints.',
 } as const;
 
 export const SymptomEventSchema = {
   properties: {
     user_id: {
-      type: "string",
-      title: "User Id",
+      type: 'string',
+      title: 'User Id',
     },
     date: {
-      type: "string",
-      format: "date-time",
-      title: "Date",
+      type: 'string',
+      format: 'date-time',
+      title: 'Date',
     },
     flow_intensity: {
       anyOf: [
         {
-          $ref: "#/components/schemas/FlowIntensity",
+          $ref: '#/components/schemas/FlowIntensity',
         },
         {
-          type: "null",
+          type: 'null',
         },
       ],
     },
@@ -556,93 +544,85 @@ export const SymptomEventSchema = {
       anyOf: [
         {
           items: {
-            type: "string",
+            type: 'string',
           },
-          type: "array",
+          type: 'array',
         },
         {
-          type: "null",
+          type: 'null',
         },
       ],
-      title: "Symptoms",
+      title: 'Symptoms',
     },
     mood: {
       anyOf: [
         {
           items: {
-            type: "string",
+            type: 'string',
           },
-          type: "array",
+          type: 'array',
         },
         {
-          type: "null",
+          type: 'null',
         },
       ],
-      title: "Mood",
+      title: 'Mood',
     },
     ovulation_test: {
       anyOf: [
         {
-          type: "boolean",
+          type: 'boolean',
         },
         {
-          type: "null",
+          type: 'null',
         },
       ],
-      title: "Ovulation Test",
+      title: 'Ovulation Test',
     },
     discharge: {
       anyOf: [
         {
           items: {
-            type: "string",
+            type: 'string',
           },
-          type: "array",
+          type: 'array',
         },
         {
-          type: "null",
+          type: 'null',
         },
       ],
-      title: "Discharge",
+      title: 'Discharge',
     },
     sex: {
       anyOf: [
         {
           items: {
-            type: "string",
+            type: 'string',
           },
-          type: "array",
+          type: 'array',
         },
         {
-          type: "null",
+          type: 'null',
         },
       ],
-      title: "Sex",
+      title: 'Sex',
     },
     pid: {
-      type: "integer",
-      title: "Pid",
+      type: 'integer',
+      title: 'Pid',
     },
   },
-  type: "object",
-  required: [
-    "user_id",
-    "date",
-    "flow_intensity",
-    "symptoms",
-    "mood",
-    "discharge",
-    "sex",
-  ],
-  title: "SymptomEvent",
+  type: 'object',
+  required: ['user_id', 'date', 'flow_intensity', 'symptoms', 'mood', 'discharge', 'sex'],
+  title: 'SymptomEvent',
   description:
-    "Symptom Event model.\n\nThis is the class representing the Symptom Event table in the database.\n- user_id\n- date\n- flow_intensity\n- symptoms\n- mood\n- ovulation_test\n- discharge\n- sex",
+    'Symptom Event model.\n\nThis is the class representing the Symptom Event table in the database.\n- user_id\n- date\n- flow_intensity\n- symptoms\n- mood\n- ovulation_test\n- discharge\n- sex',
 } as const;
 
 export const TempPhaseSchema = {
-  type: "string",
-  enum: ["learning", "low_phase", "elevated_phase", "unknown"],
-  title: "TempPhase",
+  type: 'string',
+  enum: ['learning', 'low_phase', 'elevated_phase', 'unknown'],
+  title: 'TempPhase',
 } as const;
 
 export const TempUpdateSchema = {
@@ -650,92 +630,92 @@ export const TempUpdateSchema = {
     temperature: {
       anyOf: [
         {
-          type: "number",
+          type: 'number',
           maximum: 40,
           minimum: 30,
         },
         {
-          type: "null",
+          type: 'null',
         },
       ],
-      title: "Temperature",
+      title: 'Temperature',
     },
     timestamp: {
       anyOf: [
         {
-          type: "string",
-          pattern: "^\\d{4}-\\d{2}-\\d{2}$",
+          type: 'string',
+          pattern: '^\\d{4}-\\d{2}-\\d{2}$',
         },
         {
-          type: "null",
+          type: 'null',
         },
       ],
-      title: "Timestamp",
-      description: "YYYY-MM-DD format",
+      title: 'Timestamp',
+      description: 'YYYY-MM-DD format',
     },
   },
-  type: "object",
-  title: "TempUpdate",
+  type: 'object',
+  title: 'TempUpdate',
 } as const;
 
 export const TemperatureSchema = {
   properties: {
     temperature: {
-      type: "number",
+      type: 'number',
       maximum: 40,
       minimum: 30,
-      title: "Temperature",
+      title: 'Temperature',
     },
     user_id: {
-      type: "string",
-      title: "User Id",
+      type: 'string',
+      title: 'User Id',
     },
     timestamp: {
-      type: "string",
-      format: "date-time",
-      title: "Timestamp",
+      type: 'string',
+      format: 'date-time',
+      title: 'Timestamp',
     },
     pid: {
       anyOf: [
         {
-          type: "integer",
+          type: 'integer',
         },
         {
-          type: "null",
+          type: 'null',
         },
       ],
-      title: "Pid",
+      title: 'Pid',
     },
   },
-  type: "object",
-  required: ["temperature", "user_id", "timestamp"],
-  title: "Temperature",
+  type: 'object',
+  required: ['temperature', 'user_id', 'timestamp'],
+  title: 'Temperature',
   description:
-    "Temperature Event model.\n\nThis is the class representing the Temperature table in the database.\n\n- user_id\n- temperature\n- pid\n- timestamp, assume TZ-naive on read due to SQLite limitations",
+    'Temperature Event model.\n\nThis is the class representing the Temperature table in the database.\n\n- user_id\n- temperature\n- pid\n- timestamp, assume TZ-naive on read due to SQLite limitations',
 } as const;
 
 export const TemperatureEMASchema = {
   properties: {
     timestamp: {
-      type: "string",
-      title: "Timestamp",
+      type: 'string',
+      title: 'Timestamp',
     },
     temperature: {
-      type: "number",
-      title: "Temperature",
+      type: 'number',
+      title: 'Temperature',
     },
     ewm: {
-      type: "number",
-      title: "Ewm",
+      type: 'number',
+      title: 'Ewm',
     },
     baseline: {
-      type: "number",
-      title: "Baseline",
+      type: 'number',
+      title: 'Baseline',
     },
   },
-  type: "object",
-  required: ["timestamp", "temperature", "ewm", "baseline"],
-  title: "TemperatureEMA",
+  type: 'object',
+  required: ['timestamp', 'temperature', 'ewm', 'baseline'],
+  title: 'TemperatureEMA',
 } as const;
 
 export const TemperatureStateSchema = {
@@ -743,49 +723,49 @@ export const TemperatureStateSchema = {
     pid: {
       anyOf: [
         {
-          type: "integer",
+          type: 'integer',
         },
         {
-          type: "null",
+          type: 'null',
         },
       ],
-      title: "Pid",
+      title: 'Pid',
     },
     user_id: {
-      type: "string",
-      title: "User Id",
+      type: 'string',
+      title: 'User Id',
     },
     phase: {
-      $ref: "#/components/schemas/TempPhase",
-      default: "learning",
+      $ref: '#/components/schemas/TempPhase',
+      default: 'learning',
     },
     baseline: {
       anyOf: [
         {
-          type: "number",
+          type: 'number',
         },
         {
-          type: "null",
+          type: 'null',
         },
       ],
-      title: "Baseline",
+      title: 'Baseline',
     },
     last_evaluated: {
       anyOf: [
         {
-          type: "string",
-          format: "date-time",
+          type: 'string',
+          format: 'date-time',
         },
         {
-          type: "null",
+          type: 'null',
         },
       ],
-      title: "Last Evaluated",
+      title: 'Last Evaluated',
     },
   },
-  type: "object",
-  required: ["user_id"],
-  title: "TemperatureState",
+  type: 'object',
+  required: ['user_id'],
+  title: 'TemperatureState',
 } as const;
 
 export const UpdateSymptomEventSchema = {
@@ -793,23 +773,23 @@ export const UpdateSymptomEventSchema = {
     date: {
       anyOf: [
         {
-          type: "string",
-          pattern: "^\\d{4}-\\d{2}-\\d{2}$",
+          type: 'string',
+          pattern: '^\\d{4}-\\d{2}-\\d{2}$',
         },
         {
-          type: "null",
+          type: 'null',
         },
       ],
-      title: "Date",
-      description: "YYYY-MM-DD format",
+      title: 'Date',
+      description: 'YYYY-MM-DD format',
     },
     flow_intensity: {
       anyOf: [
         {
-          $ref: "#/components/schemas/FlowIntensity",
+          $ref: '#/components/schemas/FlowIntensity',
         },
         {
-          type: "null",
+          type: 'null',
         },
       ],
     },
@@ -817,159 +797,159 @@ export const UpdateSymptomEventSchema = {
       anyOf: [
         {
           items: {
-            type: "string",
+            type: 'string',
           },
-          type: "array",
+          type: 'array',
         },
         {
-          type: "null",
+          type: 'null',
         },
       ],
-      title: "Symptoms",
+      title: 'Symptoms',
     },
     mood: {
       anyOf: [
         {
           items: {
-            type: "string",
+            type: 'string',
           },
-          type: "array",
+          type: 'array',
         },
         {
-          type: "null",
+          type: 'null',
         },
       ],
-      title: "Mood",
+      title: 'Mood',
     },
     ovulation_test: {
       anyOf: [
         {
-          type: "boolean",
+          type: 'boolean',
         },
         {
-          type: "null",
+          type: 'null',
         },
       ],
-      title: "Ovulation Test",
+      title: 'Ovulation Test',
     },
     discharge: {
       anyOf: [
         {
           items: {
-            type: "string",
+            type: 'string',
           },
-          type: "array",
+          type: 'array',
         },
         {
-          type: "null",
+          type: 'null',
         },
       ],
-      title: "Discharge",
+      title: 'Discharge',
     },
     sex: {
       anyOf: [
         {
           items: {
-            type: "string",
+            type: 'string',
           },
-          type: "array",
+          type: 'array',
         },
         {
-          type: "null",
+          type: 'null',
         },
       ],
-      title: "Sex",
+      title: 'Sex',
     },
   },
-  type: "object",
-  title: "UpdateSymptomEvent",
+  type: 'object',
+  title: 'UpdateSymptomEvent',
 } as const;
 
 export const UserCreateSchema = {
   properties: {
     is_disabled: {
-      type: "boolean",
-      title: "Is Disabled",
+      type: 'boolean',
+      title: 'Is Disabled',
       default: false,
     },
     is_admin: {
-      type: "boolean",
-      title: "Is Admin",
+      type: 'boolean',
+      title: 'Is Admin',
       default: false,
     },
     username: {
-      type: "string",
-      title: "Username",
+      type: 'string',
+      title: 'Username',
     },
     display_name: {
       anyOf: [
         {
-          type: "string",
+          type: 'string',
         },
         {
-          type: "null",
+          type: 'null',
         },
       ],
-      title: "Display Name",
+      title: 'Display Name',
     },
     password: {
-      type: "string",
-      title: "Password",
+      type: 'string',
+      title: 'Password',
     },
   },
-  type: "object",
-  required: ["username", "password"],
-  title: "UserCreate",
+  type: 'object',
+  required: ['username', 'password'],
+  title: 'UserCreate',
 } as const;
 
 export const UserProfileSchema = {
   properties: {
     is_disabled: {
-      type: "boolean",
-      title: "Is Disabled",
+      type: 'boolean',
+      title: 'Is Disabled',
       default: false,
     },
     is_admin: {
-      type: "boolean",
-      title: "Is Admin",
+      type: 'boolean',
+      title: 'Is Admin',
       default: false,
     },
     username: {
-      type: "string",
-      title: "Username",
+      type: 'string',
+      title: 'Username',
     },
     display_name: {
       anyOf: [
         {
-          type: "string",
+          type: 'string',
         },
         {
-          type: "null",
+          type: 'null',
         },
       ],
-      title: "Display Name",
+      title: 'Display Name',
     },
     user_id: {
-      type: "string",
-      title: "User Id",
+      type: 'string',
+      title: 'User Id',
     },
     temp_state: {
       anyOf: [
         {
-          $ref: "#/components/schemas/TemperatureState",
+          $ref: '#/components/schemas/TemperatureState',
         },
         {
-          type: "null",
+          type: 'null',
         },
       ],
     },
     cycle_state: {
       anyOf: [
         {
-          $ref: "#/components/schemas/Cycle",
+          $ref: '#/components/schemas/Cycle',
         },
         {
-          type: "null",
+          type: 'null',
         },
       ],
     },
@@ -977,61 +957,61 @@ export const UserProfileSchema = {
       anyOf: [
         {
           items: {
-            $ref: "#/components/schemas/UserSafe",
+            $ref: '#/components/schemas/UserSafe',
           },
-          type: "array",
+          type: 'array',
         },
         {
-          type: "null",
+          type: 'null',
         },
       ],
-      title: "Partners",
+      title: 'Partners',
     },
   },
-  type: "object",
-  required: ["username"],
-  title: "UserProfile",
+  type: 'object',
+  required: ['username'],
+  title: 'UserProfile',
   description:
-    "Everything but the hashed password.\n- user_id\n- username\n- display_name\n- is_disabled\n- is_admin\n- partners",
+    'Everything but the hashed password.\n- user_id\n- username\n- display_name\n- is_disabled\n- is_admin\n- partners',
 } as const;
 
 export const UserSafeSchema = {
   properties: {
     is_disabled: {
-      type: "boolean",
-      title: "Is Disabled",
+      type: 'boolean',
+      title: 'Is Disabled',
       default: false,
     },
     is_admin: {
-      type: "boolean",
-      title: "Is Admin",
+      type: 'boolean',
+      title: 'Is Admin',
       default: false,
     },
     username: {
-      type: "string",
-      title: "Username",
+      type: 'string',
+      title: 'Username',
     },
     display_name: {
       anyOf: [
         {
-          type: "string",
+          type: 'string',
         },
         {
-          type: "null",
+          type: 'null',
         },
       ],
-      title: "Display Name",
+      title: 'Display Name',
     },
     user_id: {
-      type: "string",
-      title: "User Id",
+      type: 'string',
+      title: 'User Id',
     },
   },
-  type: "object",
-  required: ["username"],
-  title: "UserSafe",
+  type: 'object',
+  required: ['username'],
+  title: 'UserSafe',
   description:
-    "Everything but the hashed password and period stats.\n- user_id\n- username\n- display_name\n- is_disabled\n- is_admin",
+    'Everything but the hashed password and period stats.\n- user_id\n- username\n- display_name\n- is_disabled\n- is_admin',
 } as const;
 
 export const UserUpdateSchema = {
@@ -1039,28 +1019,28 @@ export const UserUpdateSchema = {
     display_name: {
       anyOf: [
         {
-          type: "string",
+          type: 'string',
         },
         {
-          type: "null",
+          type: 'null',
         },
       ],
-      title: "Display Name",
+      title: 'Display Name',
     },
     password: {
       anyOf: [
         {
-          type: "string",
+          type: 'string',
         },
         {
-          type: "null",
+          type: 'null',
         },
       ],
-      title: "Password",
+      title: 'Password',
     },
   },
-  type: "object",
-  title: "UserUpdate",
+  type: 'object',
+  title: 'UserUpdate',
 } as const;
 
 export const ValidationErrorSchema = {
@@ -1069,26 +1049,33 @@ export const ValidationErrorSchema = {
       items: {
         anyOf: [
           {
-            type: "string",
+            type: 'string',
           },
           {
-            type: "integer",
+            type: 'integer',
           },
         ],
       },
-      type: "array",
-      title: "Location",
+      type: 'array',
+      title: 'Location',
     },
     msg: {
-      type: "string",
-      title: "Message",
+      type: 'string',
+      title: 'Message',
     },
     type: {
-      type: "string",
-      title: "Error Type",
+      type: 'string',
+      title: 'Error Type',
+    },
+    input: {
+      title: 'Input',
+    },
+    ctx: {
+      type: 'object',
+      title: 'Context',
     },
   },
-  type: "object",
-  required: ["loc", "msg", "type"],
-  title: "ValidationError",
+  type: 'object',
+  required: ['loc', 'msg', 'type'],
+  title: 'ValidationError',
 } as const;

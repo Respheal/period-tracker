@@ -1,20 +1,20 @@
-import type { Meta, StoryObj } from "@storybook/react-vite";
+import type { Meta, StoryObj } from '@storybook/react-vite';
 // import { expect } from "storybook/test";
-import { fn } from "storybook/test";
-import DashboardIcon from "@mui/icons-material/Dashboard";
+import { fn } from 'storybook/test';
+import DashboardIcon from '@mui/icons-material/Dashboard';
 
-import Sidebar from "./Sidebar";
+import Sidebar from './Sidebar';
 
 const MockLogoutFn = fn(async () => {
   return new Promise((resolve) => setTimeout(resolve, 1000));
-}).mockName("logoutFn");
+}).mockName('logoutFn');
 
 const meta = {
-  title: "Organisms/Sidebar",
+  title: 'Organisms/Sidebar',
   component: Sidebar,
-  tags: ["autodocs"],
+  tags: ['autodocs'],
   parameters: {
-    layout: "fullscreen",
+    layout: 'fullscreen',
   },
 } satisfies Meta<typeof Sidebar>;
 
@@ -22,14 +22,14 @@ export default meta;
 
 type Story = StoryObj<typeof meta>;
 
-const nav_items = [["/", "Home", <DashboardIcon />]] as const;
+const nav_items = [['/', 'Home', <DashboardIcon />]] as const;
 
 export const Dashboard: Story = {
   args: {
-    title: "Period Tracker",
+    title: 'Period Tracker',
     nav_items: nav_items,
-    active: "/",
-    children: <div style={{ height: "20vh" }}>Dashboard content here</div>,
+    active: '/',
+    children: <div style={{ height: '20vh' }}>Dashboard content here</div>,
     logoutFn: MockLogoutFn,
   },
   // play: async ({ page, canvas, userEvent }) => {
@@ -46,10 +46,10 @@ export const Dashboard: Story = {
 
 export const LongDashboard: Story = {
   args: {
-    title: "Period Tracker",
+    title: 'Period Tracker',
     nav_items: nav_items,
-    active: "/",
-    children: <div style={{ height: "50vh" }}>Long scrollable content</div>,
+    active: '/',
+    children: <div style={{ height: '50vh' }}>Long scrollable content</div>,
     logoutFn: MockLogoutFn,
   },
 };

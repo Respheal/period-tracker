@@ -47,7 +47,6 @@ def upgrade() -> None:
         ),
         sa.Column("avg_cycle_length", sa.Integer(), nullable=True),
         sa.Column("avg_period_length", sa.Integer(), nullable=True),
-        sa.Column("last_period_start", sa.DateTime(), nullable=True),
         sa.Column("last_evaluated", sa.DateTime(), nullable=True),
         sa.ForeignKeyConstraint(["user_id"], ["user.user_id"], ondelete="CASCADE"),
         sa.PrimaryKeyConstraint("pid"),

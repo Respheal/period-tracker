@@ -1,8 +1,8 @@
-import useAuth from "@/hooks/useAuth";
-import Register from "@/stories/pages/Register/Register";
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import useAuth from '@/hooks/useAuth';
+import Register from '@/stories/pages/Register/Register';
+import { createFileRoute, useNavigate } from '@tanstack/react-router';
 
-export const Route = createFileRoute("/register")({
+export const Route = createFileRoute('/register')({
   component: RouteComponent,
 });
 

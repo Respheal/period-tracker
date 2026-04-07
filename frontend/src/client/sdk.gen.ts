@@ -5,23 +5,36 @@ import {
   type Options as Options2,
   type TDataShape,
   urlSearchParamsBodySerializer,
-} from "./client";
-import { client } from "./client.gen";
+} from './client';
+import { client } from './client.gen';
 import {
   addPartnerUsersMePartnersPartnerIdPostResponseTransformer,
   createPeriodEventPeriodPostResponseTransformer,
   createSymptomEventSymptomsPostResponseTransformer,
   createTempReadingTempPostResponseTransformer,
+  getAllPeriodsPeriodGetResponseTransformer,
+  getMyEventsUsersMeEventsGetResponseTransformer,
+  getMyPartnersUsersMePartnersGetResponseTransformer,
+  getMyPeriodsPeriodMeGetResponseTransformer,
+  getMyReadingsTempMeGetResponseTransformer,
+  getMySymptomEventsSymptomsMeGetResponseTransformer,
+  getNextPeriodPeriodMeNextGetResponseTransformer,
+  getPartnerPeriodsPeriodPartnerPartnerIdGetResponseTransformer,
+  getPartnerSymptomsSymptomsPartnerPartnerIdGetResponseTransformer,
+  getPartnerTemperaturesTempPartnerPartnerIdGetResponseTransformer,
   getSinglePeriodPeriodMePeriodIdGetResponseTransformer,
   getSingleReadingTempMeTemperatureIdGetResponseTransformer,
   getSingleSymptomEventSymptomsMeSymptomIdGetResponseTransformer,
+  getSymptomEventsSymptomsGetResponseTransformer,
+  getTempReadingsTempGetResponseTransformer,
+  getUsersUsersGetResponseTransformer,
   healthCheckHealthGetResponseTransformer,
   readMeUsersMeGetResponseTransformer,
   updateMeUsersMePatchResponseTransformer,
   updatePeriodPeriodMePeriodIdPatchResponseTransformer,
   updateReadingTempMeTemperatureIdPatchResponseTransformer,
   updateSymptomEventSymptomsMeSymptomIdPatchResponseTransformer,
-} from "./transformers.gen";
+} from './transformers.gen';
 import type {
   AddPartnerUsersMePartnersPartnerIdPostData,
   AddPartnerUsersMePartnersPartnerIdPostErrors,
@@ -150,7 +163,7 @@ import type {
   UpdateSymptomEventSymptomsMeSymptomIdPatchData,
   UpdateSymptomEventSymptomsMeSymptomIdPatchErrors,
   UpdateSymptomEventSymptomsMeSymptomIdPatchResponses,
-} from "./types.gen";
+} from './types.gen';
 
 export type Options<
   TData extends TDataShape = TDataShape,
@@ -181,10 +194,10 @@ export const loginAuthPost = <ThrowOnError extends boolean = false>(
     ThrowOnError
   >({
     ...urlSearchParamsBodySerializer,
-    url: "/auth/",
+    url: '/auth/',
     ...options,
     headers: {
-      "Content-Type": "application/x-www-form-urlencoded",
+      'Content-Type': 'application/x-www-form-urlencoded',
       ...options.headers,
     },
   });
@@ -192,9 +205,7 @@ export const loginAuthPost = <ThrowOnError extends boolean = false>(
 /**
  * Refresh Tokens
  */
-export const refreshTokensAuthRefreshPost = <
-  ThrowOnError extends boolean = false,
->(
+export const refreshTokensAuthRefreshPost = <ThrowOnError extends boolean = false>(
   options: Options<RefreshTokensAuthRefreshPostData, ThrowOnError>,
 ) =>
   (options.client ?? client).post<
@@ -202,10 +213,10 @@ export const refreshTokensAuthRefreshPost = <
     RefreshTokensAuthRefreshPostErrors,
     ThrowOnError
   >({
-    url: "/auth/refresh",
+    url: '/auth/refresh',
     ...options,
     headers: {
-      "Content-Type": "application/json",
+      'Content-Type': 'application/json',
       ...options.headers,
     },
   });
@@ -226,8 +237,9 @@ export const getUsersUsersGet = <ThrowOnError extends boolean = false>(
     GetUsersUsersGetErrors,
     ThrowOnError
   >({
-    security: [{ scheme: "bearer", type: "http" }],
-    url: "/users/",
+    responseTransformer: getUsersUsersGetResponseTransformer,
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/users/',
     ...options,
   });
 
@@ -242,10 +254,10 @@ export const createUserUsersPost = <ThrowOnError extends boolean = false>(
     CreateUserUsersPostErrors,
     ThrowOnError
   >({
-    url: "/users/",
+    url: '/users/',
     ...options,
     headers: {
-      "Content-Type": "application/json",
+      'Content-Type': 'application/json',
       ...options.headers,
     },
   });
@@ -261,8 +273,8 @@ export const deleteMeUsersMeDelete = <ThrowOnError extends boolean = false>(
     DeleteMeUsersMeDeleteErrors,
     ThrowOnError
   >({
-    security: [{ scheme: "bearer", type: "http" }],
-    url: "/users/me/",
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/users/me/',
     ...options,
   });
 
@@ -278,8 +290,8 @@ export const readMeUsersMeGet = <ThrowOnError extends boolean = false>(
     ThrowOnError
   >({
     responseTransformer: readMeUsersMeGetResponseTransformer,
-    security: [{ scheme: "bearer", type: "http" }],
-    url: "/users/me/",
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/users/me/',
     ...options,
   });
 
@@ -295,11 +307,11 @@ export const updateMeUsersMePatch = <ThrowOnError extends boolean = false>(
     ThrowOnError
   >({
     responseTransformer: updateMeUsersMePatchResponseTransformer,
-    security: [{ scheme: "bearer", type: "http" }],
-    url: "/users/me/",
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/users/me/',
     ...options,
     headers: {
-      "Content-Type": "application/json",
+      'Content-Type': 'application/json',
       ...options.headers,
     },
   });
@@ -307,9 +319,7 @@ export const updateMeUsersMePatch = <ThrowOnError extends boolean = false>(
 /**
  * Get My Events
  */
-export const getMyEventsUsersMeEventsGet = <
-  ThrowOnError extends boolean = false,
->(
+export const getMyEventsUsersMeEventsGet = <ThrowOnError extends boolean = false>(
   options?: Options<GetMyEventsUsersMeEventsGetData, ThrowOnError>,
 ) =>
   (options?.client ?? client).get<
@@ -317,17 +327,16 @@ export const getMyEventsUsersMeEventsGet = <
     GetMyEventsUsersMeEventsGetErrors,
     ThrowOnError
   >({
-    security: [{ scheme: "bearer", type: "http" }],
-    url: "/users/me/events/",
+    responseTransformer: getMyEventsUsersMeEventsGetResponseTransformer,
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/users/me/events/',
     ...options,
   });
 
 /**
  * Get My Events Csv
  */
-export const getMyEventsCsvUsersMeEventsCsvGet = <
-  ThrowOnError extends boolean = false,
->(
+export const getMyEventsCsvUsersMeEventsCsvGet = <ThrowOnError extends boolean = false>(
   options?: Options<GetMyEventsCsvUsersMeEventsCsvGetData, ThrowOnError>,
 ) =>
   (options?.client ?? client).get<
@@ -335,17 +344,15 @@ export const getMyEventsCsvUsersMeEventsCsvGet = <
     GetMyEventsCsvUsersMeEventsCsvGetErrors,
     ThrowOnError
   >({
-    security: [{ scheme: "bearer", type: "http" }],
-    url: "/users/me/events/csv/",
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/users/me/events/csv/',
     ...options,
   });
 
 /**
  * Get My Partners
  */
-export const getMyPartnersUsersMePartnersGet = <
-  ThrowOnError extends boolean = false,
->(
+export const getMyPartnersUsersMePartnersGet = <ThrowOnError extends boolean = false>(
   options?: Options<GetMyPartnersUsersMePartnersGetData, ThrowOnError>,
 ) =>
   (options?.client ?? client).get<
@@ -353,8 +360,9 @@ export const getMyPartnersUsersMePartnersGet = <
     GetMyPartnersUsersMePartnersGetErrors,
     ThrowOnError
   >({
-    security: [{ scheme: "bearer", type: "http" }],
-    url: "/users/me/partners/",
+    responseTransformer: getMyPartnersUsersMePartnersGetResponseTransformer,
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/users/me/partners/',
     ...options,
   });
 
@@ -364,18 +372,15 @@ export const getMyPartnersUsersMePartnersGet = <
 export const removePartnerUsersMePartnersPartnerIdDelete = <
   ThrowOnError extends boolean = false,
 >(
-  options: Options<
-    RemovePartnerUsersMePartnersPartnerIdDeleteData,
-    ThrowOnError
-  >,
+  options: Options<RemovePartnerUsersMePartnersPartnerIdDeleteData, ThrowOnError>,
 ) =>
   (options.client ?? client).delete<
     RemovePartnerUsersMePartnersPartnerIdDeleteResponses,
     RemovePartnerUsersMePartnersPartnerIdDeleteErrors,
     ThrowOnError
   >({
-    security: [{ scheme: "bearer", type: "http" }],
-    url: "/users/me/partners/{partner_id}/",
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/users/me/partners/{partner_id}/',
     ...options,
   });
 
@@ -392,10 +397,9 @@ export const addPartnerUsersMePartnersPartnerIdPost = <
     AddPartnerUsersMePartnersPartnerIdPostErrors,
     ThrowOnError
   >({
-    responseTransformer:
-      addPartnerUsersMePartnersPartnerIdPostResponseTransformer,
-    security: [{ scheme: "bearer", type: "http" }],
-    url: "/users/me/partners/{partner_id}/",
+    responseTransformer: addPartnerUsersMePartnersPartnerIdPostResponseTransformer,
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/users/me/partners/{partner_id}/',
     ...options,
   });
 
@@ -410,17 +414,16 @@ export const getAllPeriodsPeriodGet = <ThrowOnError extends boolean = false>(
     GetAllPeriodsPeriodGetErrors,
     ThrowOnError
   >({
-    security: [{ scheme: "bearer", type: "http" }],
-    url: "/period/",
+    responseTransformer: getAllPeriodsPeriodGetResponseTransformer,
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/period/',
     ...options,
   });
 
 /**
  * Create Period Event
  */
-export const createPeriodEventPeriodPost = <
-  ThrowOnError extends boolean = false,
->(
+export const createPeriodEventPeriodPost = <ThrowOnError extends boolean = false>(
   options: Options<CreatePeriodEventPeriodPostData, ThrowOnError>,
 ) =>
   (options.client ?? client).post<
@@ -429,11 +432,11 @@ export const createPeriodEventPeriodPost = <
     ThrowOnError
   >({
     responseTransformer: createPeriodEventPeriodPostResponseTransformer,
-    security: [{ scheme: "bearer", type: "http" }],
-    url: "/period/",
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/period/',
     ...options,
     headers: {
-      "Content-Type": "application/json",
+      'Content-Type': 'application/json',
       ...options.headers,
     },
   });
@@ -449,17 +452,16 @@ export const getMyPeriodsPeriodMeGet = <ThrowOnError extends boolean = false>(
     GetMyPeriodsPeriodMeGetErrors,
     ThrowOnError
   >({
-    security: [{ scheme: "bearer", type: "http" }],
-    url: "/period/me/",
+    responseTransformer: getMyPeriodsPeriodMeGetResponseTransformer,
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/period/me/',
     ...options,
   });
 
 /**
  * Delete Period
  */
-export const deletePeriodPeriodMePeriodIdDelete = <
-  ThrowOnError extends boolean = false,
->(
+export const deletePeriodPeriodMePeriodIdDelete = <ThrowOnError extends boolean = false>(
   options: Options<DeletePeriodPeriodMePeriodIdDeleteData, ThrowOnError>,
 ) =>
   (options.client ?? client).delete<
@@ -467,17 +469,15 @@ export const deletePeriodPeriodMePeriodIdDelete = <
     DeletePeriodPeriodMePeriodIdDeleteErrors,
     ThrowOnError
   >({
-    security: [{ scheme: "bearer", type: "http" }],
-    url: "/period/me/{period_id}",
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/period/me/{period_id}',
     ...options,
   });
 
 /**
  * Get Single Period
  */
-export const getSinglePeriodPeriodMePeriodIdGet = <
-  ThrowOnError extends boolean = false,
->(
+export const getSinglePeriodPeriodMePeriodIdGet = <ThrowOnError extends boolean = false>(
   options: Options<GetSinglePeriodPeriodMePeriodIdGetData, ThrowOnError>,
 ) =>
   (options.client ?? client).get<
@@ -486,17 +486,15 @@ export const getSinglePeriodPeriodMePeriodIdGet = <
     ThrowOnError
   >({
     responseTransformer: getSinglePeriodPeriodMePeriodIdGetResponseTransformer,
-    security: [{ scheme: "bearer", type: "http" }],
-    url: "/period/me/{period_id}",
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/period/me/{period_id}',
     ...options,
   });
 
 /**
  * Update Period
  */
-export const updatePeriodPeriodMePeriodIdPatch = <
-  ThrowOnError extends boolean = false,
->(
+export const updatePeriodPeriodMePeriodIdPatch = <ThrowOnError extends boolean = false>(
   options: Options<UpdatePeriodPeriodMePeriodIdPatchData, ThrowOnError>,
 ) =>
   (options.client ?? client).patch<
@@ -505,11 +503,11 @@ export const updatePeriodPeriodMePeriodIdPatch = <
     ThrowOnError
   >({
     responseTransformer: updatePeriodPeriodMePeriodIdPatchResponseTransformer,
-    security: [{ scheme: "bearer", type: "http" }],
-    url: "/period/me/{period_id}",
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/period/me/{period_id}',
     ...options,
     headers: {
-      "Content-Type": "application/json",
+      'Content-Type': 'application/json',
       ...options.headers,
     },
   });
@@ -517,9 +515,7 @@ export const updatePeriodPeriodMePeriodIdPatch = <
 /**
  * Get My Periods Csv
  */
-export const getMyPeriodsCsvPeriodMeCsvGet = <
-  ThrowOnError extends boolean = false,
->(
+export const getMyPeriodsCsvPeriodMeCsvGet = <ThrowOnError extends boolean = false>(
   options?: Options<GetMyPeriodsCsvPeriodMeCsvGetData, ThrowOnError>,
 ) =>
   (options?.client ?? client).get<
@@ -527,17 +523,15 @@ export const getMyPeriodsCsvPeriodMeCsvGet = <
     GetMyPeriodsCsvPeriodMeCsvGetErrors,
     ThrowOnError
   >({
-    security: [{ scheme: "bearer", type: "http" }],
-    url: "/period/me/csv/",
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/period/me/csv/',
     ...options,
   });
 
 /**
  * Get Next Period
  */
-export const getNextPeriodPeriodMeNextGet = <
-  ThrowOnError extends boolean = false,
->(
+export const getNextPeriodPeriodMeNextGet = <ThrowOnError extends boolean = false>(
   options?: Options<GetNextPeriodPeriodMeNextGetData, ThrowOnError>,
 ) =>
   (options?.client ?? client).get<
@@ -545,8 +539,9 @@ export const getNextPeriodPeriodMeNextGet = <
     GetNextPeriodPeriodMeNextGetErrors,
     ThrowOnError
   >({
-    security: [{ scheme: "bearer", type: "http" }],
-    url: "/period/me/next/",
+    responseTransformer: getNextPeriodPeriodMeNextGetResponseTransformer,
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/period/me/next/',
     ...options,
   });
 
@@ -556,18 +551,16 @@ export const getNextPeriodPeriodMeNextGet = <
 export const getPartnerPeriodsPeriodPartnerPartnerIdGet = <
   ThrowOnError extends boolean = false,
 >(
-  options: Options<
-    GetPartnerPeriodsPeriodPartnerPartnerIdGetData,
-    ThrowOnError
-  >,
+  options: Options<GetPartnerPeriodsPeriodPartnerPartnerIdGetData, ThrowOnError>,
 ) =>
   (options.client ?? client).get<
     GetPartnerPeriodsPeriodPartnerPartnerIdGetResponses,
     GetPartnerPeriodsPeriodPartnerPartnerIdGetErrors,
     ThrowOnError
   >({
-    security: [{ scheme: "bearer", type: "http" }],
-    url: "/period/partner/{partner_id}/",
+    responseTransformer: getPartnerPeriodsPeriodPartnerPartnerIdGetResponseTransformer,
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/period/partner/{partner_id}/',
     ...options,
   });
 
@@ -577,18 +570,15 @@ export const getPartnerPeriodsPeriodPartnerPartnerIdGet = <
 export const getPartnerPeriodsCsvPeriodPartnerPartnerIdCsvGet = <
   ThrowOnError extends boolean = false,
 >(
-  options: Options<
-    GetPartnerPeriodsCsvPeriodPartnerPartnerIdCsvGetData,
-    ThrowOnError
-  >,
+  options: Options<GetPartnerPeriodsCsvPeriodPartnerPartnerIdCsvGetData, ThrowOnError>,
 ) =>
   (options.client ?? client).get<
     GetPartnerPeriodsCsvPeriodPartnerPartnerIdCsvGetResponses,
     GetPartnerPeriodsCsvPeriodPartnerPartnerIdCsvGetErrors,
     ThrowOnError
   >({
-    security: [{ scheme: "bearer", type: "http" }],
-    url: "/period/partner/{partner_id}/csv/",
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/period/partner/{partner_id}/csv/',
     ...options,
   });
 
@@ -603,8 +593,9 @@ export const getTempReadingsTempGet = <ThrowOnError extends boolean = false>(
     GetTempReadingsTempGetErrors,
     ThrowOnError
   >({
-    security: [{ scheme: "bearer", type: "http" }],
-    url: "/temp/",
+    responseTransformer: getTempReadingsTempGetResponseTransformer,
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/temp/',
     ...options,
   });
 
@@ -620,11 +611,11 @@ export const createTempReadingTempPost = <ThrowOnError extends boolean = false>(
     ThrowOnError
   >({
     responseTransformer: createTempReadingTempPostResponseTransformer,
-    security: [{ scheme: "bearer", type: "http" }],
-    url: "/temp/",
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/temp/',
     ...options,
     headers: {
-      "Content-Type": "application/json",
+      'Content-Type': 'application/json',
       ...options.headers,
     },
   });
@@ -640,17 +631,16 @@ export const getMyReadingsTempMeGet = <ThrowOnError extends boolean = false>(
     GetMyReadingsTempMeGetErrors,
     ThrowOnError
   >({
-    security: [{ scheme: "bearer", type: "http" }],
-    url: "/temp/me/",
+    responseTransformer: getMyReadingsTempMeGetResponseTransformer,
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/temp/me/',
     ...options,
   });
 
 /**
  * Delete Temp
  */
-export const deleteTempTempMeTemperatureIdDelete = <
-  ThrowOnError extends boolean = false,
->(
+export const deleteTempTempMeTemperatureIdDelete = <ThrowOnError extends boolean = false>(
   options: Options<DeleteTempTempMeTemperatureIdDeleteData, ThrowOnError>,
 ) =>
   (options.client ?? client).delete<
@@ -658,8 +648,8 @@ export const deleteTempTempMeTemperatureIdDelete = <
     DeleteTempTempMeTemperatureIdDeleteErrors,
     ThrowOnError
   >({
-    security: [{ scheme: "bearer", type: "http" }],
-    url: "/temp/me/{temperature_id}",
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/temp/me/{temperature_id}',
     ...options,
   });
 
@@ -676,10 +666,9 @@ export const getSingleReadingTempMeTemperatureIdGet = <
     GetSingleReadingTempMeTemperatureIdGetErrors,
     ThrowOnError
   >({
-    responseTransformer:
-      getSingleReadingTempMeTemperatureIdGetResponseTransformer,
-    security: [{ scheme: "bearer", type: "http" }],
-    url: "/temp/me/{temperature_id}",
+    responseTransformer: getSingleReadingTempMeTemperatureIdGetResponseTransformer,
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/temp/me/{temperature_id}',
     ...options,
   });
 
@@ -696,13 +685,12 @@ export const updateReadingTempMeTemperatureIdPatch = <
     UpdateReadingTempMeTemperatureIdPatchErrors,
     ThrowOnError
   >({
-    responseTransformer:
-      updateReadingTempMeTemperatureIdPatchResponseTransformer,
-    security: [{ scheme: "bearer", type: "http" }],
-    url: "/temp/me/{temperature_id}",
+    responseTransformer: updateReadingTempMeTemperatureIdPatchResponseTransformer,
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/temp/me/{temperature_id}',
     ...options,
     headers: {
-      "Content-Type": "application/json",
+      'Content-Type': 'application/json',
       ...options.headers,
     },
   });
@@ -710,9 +698,7 @@ export const updateReadingTempMeTemperatureIdPatch = <
 /**
  * Get My Temp Averages
  */
-export const getMyTempAveragesTempMeAveragesGet = <
-  ThrowOnError extends boolean = false,
->(
+export const getMyTempAveragesTempMeAveragesGet = <ThrowOnError extends boolean = false>(
   options?: Options<GetMyTempAveragesTempMeAveragesGetData, ThrowOnError>,
 ) =>
   (options?.client ?? client).get<
@@ -720,17 +706,15 @@ export const getMyTempAveragesTempMeAveragesGet = <
     GetMyTempAveragesTempMeAveragesGetErrors,
     ThrowOnError
   >({
-    security: [{ scheme: "bearer", type: "http" }],
-    url: "/temp/me/averages/",
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/temp/me/averages/',
     ...options,
   });
 
 /**
  * Get My Temp Readings Csv
  */
-export const getMyTempReadingsCsvTempMeCsvGet = <
-  ThrowOnError extends boolean = false,
->(
+export const getMyTempReadingsCsvTempMeCsvGet = <ThrowOnError extends boolean = false>(
   options?: Options<GetMyTempReadingsCsvTempMeCsvGetData, ThrowOnError>,
 ) =>
   (options?.client ?? client).get<
@@ -738,8 +722,8 @@ export const getMyTempReadingsCsvTempMeCsvGet = <
     GetMyTempReadingsCsvTempMeCsvGetErrors,
     ThrowOnError
   >({
-    security: [{ scheme: "bearer", type: "http" }],
-    url: "/temp/me/csv/",
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/temp/me/csv/',
     ...options,
   });
 
@@ -749,18 +733,16 @@ export const getMyTempReadingsCsvTempMeCsvGet = <
 export const getPartnerTemperaturesTempPartnerPartnerIdGet = <
   ThrowOnError extends boolean = false,
 >(
-  options: Options<
-    GetPartnerTemperaturesTempPartnerPartnerIdGetData,
-    ThrowOnError
-  >,
+  options: Options<GetPartnerTemperaturesTempPartnerPartnerIdGetData, ThrowOnError>,
 ) =>
   (options.client ?? client).get<
     GetPartnerTemperaturesTempPartnerPartnerIdGetResponses,
     GetPartnerTemperaturesTempPartnerPartnerIdGetErrors,
     ThrowOnError
   >({
-    security: [{ scheme: "bearer", type: "http" }],
-    url: "/temp/partner/{partner_id}/",
+    responseTransformer: getPartnerTemperaturesTempPartnerPartnerIdGetResponseTransformer,
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/temp/partner/{partner_id}/',
     ...options,
   });
 
@@ -770,27 +752,22 @@ export const getPartnerTemperaturesTempPartnerPartnerIdGet = <
 export const getPartnerTempReadingsCsvTempPartnerPartnerIdCsvGet = <
   ThrowOnError extends boolean = false,
 >(
-  options: Options<
-    GetPartnerTempReadingsCsvTempPartnerPartnerIdCsvGetData,
-    ThrowOnError
-  >,
+  options: Options<GetPartnerTempReadingsCsvTempPartnerPartnerIdCsvGetData, ThrowOnError>,
 ) =>
   (options.client ?? client).get<
     GetPartnerTempReadingsCsvTempPartnerPartnerIdCsvGetResponses,
     GetPartnerTempReadingsCsvTempPartnerPartnerIdCsvGetErrors,
     ThrowOnError
   >({
-    security: [{ scheme: "bearer", type: "http" }],
-    url: "/temp/partner/{partner_id}/csv/",
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/temp/partner/{partner_id}/csv/',
     ...options,
   });
 
 /**
  * Get Symptom Events
  */
-export const getSymptomEventsSymptomsGet = <
-  ThrowOnError extends boolean = false,
->(
+export const getSymptomEventsSymptomsGet = <ThrowOnError extends boolean = false>(
   options?: Options<GetSymptomEventsSymptomsGetData, ThrowOnError>,
 ) =>
   (options?.client ?? client).get<
@@ -798,17 +775,16 @@ export const getSymptomEventsSymptomsGet = <
     GetSymptomEventsSymptomsGetErrors,
     ThrowOnError
   >({
-    security: [{ scheme: "bearer", type: "http" }],
-    url: "/symptoms/",
+    responseTransformer: getSymptomEventsSymptomsGetResponseTransformer,
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/symptoms/',
     ...options,
   });
 
 /**
  * Create Symptom Event
  */
-export const createSymptomEventSymptomsPost = <
-  ThrowOnError extends boolean = false,
->(
+export const createSymptomEventSymptomsPost = <ThrowOnError extends boolean = false>(
   options: Options<CreateSymptomEventSymptomsPostData, ThrowOnError>,
 ) =>
   (options.client ?? client).post<
@@ -817,11 +793,11 @@ export const createSymptomEventSymptomsPost = <
     ThrowOnError
   >({
     responseTransformer: createSymptomEventSymptomsPostResponseTransformer,
-    security: [{ scheme: "bearer", type: "http" }],
-    url: "/symptoms/",
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/symptoms/',
     ...options,
     headers: {
-      "Content-Type": "application/json",
+      'Content-Type': 'application/json',
       ...options.headers,
     },
   });
@@ -829,9 +805,7 @@ export const createSymptomEventSymptomsPost = <
 /**
  * Get My Symptom Events
  */
-export const getMySymptomEventsSymptomsMeGet = <
-  ThrowOnError extends boolean = false,
->(
+export const getMySymptomEventsSymptomsMeGet = <ThrowOnError extends boolean = false>(
   options?: Options<GetMySymptomEventsSymptomsMeGetData, ThrowOnError>,
 ) =>
   (options?.client ?? client).get<
@@ -839,8 +813,9 @@ export const getMySymptomEventsSymptomsMeGet = <
     GetMySymptomEventsSymptomsMeGetErrors,
     ThrowOnError
   >({
-    security: [{ scheme: "bearer", type: "http" }],
-    url: "/symptoms/me/",
+    responseTransformer: getMySymptomEventsSymptomsMeGetResponseTransformer,
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/symptoms/me/',
     ...options,
   });
 
@@ -850,18 +825,15 @@ export const getMySymptomEventsSymptomsMeGet = <
 export const deleteSymptomEventSymptomsMeSymptomIdDelete = <
   ThrowOnError extends boolean = false,
 >(
-  options: Options<
-    DeleteSymptomEventSymptomsMeSymptomIdDeleteData,
-    ThrowOnError
-  >,
+  options: Options<DeleteSymptomEventSymptomsMeSymptomIdDeleteData, ThrowOnError>,
 ) =>
   (options.client ?? client).delete<
     DeleteSymptomEventSymptomsMeSymptomIdDeleteResponses,
     DeleteSymptomEventSymptomsMeSymptomIdDeleteErrors,
     ThrowOnError
   >({
-    security: [{ scheme: "bearer", type: "http" }],
-    url: "/symptoms/me/{symptom_id}",
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/symptoms/me/{symptom_id}',
     ...options,
   });
 
@@ -871,20 +843,16 @@ export const deleteSymptomEventSymptomsMeSymptomIdDelete = <
 export const getSingleSymptomEventSymptomsMeSymptomIdGet = <
   ThrowOnError extends boolean = false,
 >(
-  options: Options<
-    GetSingleSymptomEventSymptomsMeSymptomIdGetData,
-    ThrowOnError
-  >,
+  options: Options<GetSingleSymptomEventSymptomsMeSymptomIdGetData, ThrowOnError>,
 ) =>
   (options.client ?? client).get<
     GetSingleSymptomEventSymptomsMeSymptomIdGetResponses,
     GetSingleSymptomEventSymptomsMeSymptomIdGetErrors,
     ThrowOnError
   >({
-    responseTransformer:
-      getSingleSymptomEventSymptomsMeSymptomIdGetResponseTransformer,
-    security: [{ scheme: "bearer", type: "http" }],
-    url: "/symptoms/me/{symptom_id}",
+    responseTransformer: getSingleSymptomEventSymptomsMeSymptomIdGetResponseTransformer,
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/symptoms/me/{symptom_id}',
     ...options,
   });
 
@@ -894,23 +862,19 @@ export const getSingleSymptomEventSymptomsMeSymptomIdGet = <
 export const updateSymptomEventSymptomsMeSymptomIdPatch = <
   ThrowOnError extends boolean = false,
 >(
-  options: Options<
-    UpdateSymptomEventSymptomsMeSymptomIdPatchData,
-    ThrowOnError
-  >,
+  options: Options<UpdateSymptomEventSymptomsMeSymptomIdPatchData, ThrowOnError>,
 ) =>
   (options.client ?? client).patch<
     UpdateSymptomEventSymptomsMeSymptomIdPatchResponses,
     UpdateSymptomEventSymptomsMeSymptomIdPatchErrors,
     ThrowOnError
   >({
-    responseTransformer:
-      updateSymptomEventSymptomsMeSymptomIdPatchResponseTransformer,
-    security: [{ scheme: "bearer", type: "http" }],
-    url: "/symptoms/me/{symptom_id}",
+    responseTransformer: updateSymptomEventSymptomsMeSymptomIdPatchResponseTransformer,
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/symptoms/me/{symptom_id}',
     ...options,
     headers: {
-      "Content-Type": "application/json",
+      'Content-Type': 'application/json',
       ...options.headers,
     },
   });
@@ -918,9 +882,7 @@ export const updateSymptomEventSymptomsMeSymptomIdPatch = <
 /**
  * Export Symptoms Csv
  */
-export const exportSymptomsCsvSymptomsMeCsvGet = <
-  ThrowOnError extends boolean = false,
->(
+export const exportSymptomsCsvSymptomsMeCsvGet = <ThrowOnError extends boolean = false>(
   options?: Options<ExportSymptomsCsvSymptomsMeCsvGetData, ThrowOnError>,
 ) =>
   (options?.client ?? client).get<
@@ -928,8 +890,8 @@ export const exportSymptomsCsvSymptomsMeCsvGet = <
     ExportSymptomsCsvSymptomsMeCsvGetErrors,
     ThrowOnError
   >({
-    security: [{ scheme: "bearer", type: "http" }],
-    url: "/symptoms/me/csv/",
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/symptoms/me/csv/',
     ...options,
   });
 
@@ -939,18 +901,16 @@ export const exportSymptomsCsvSymptomsMeCsvGet = <
 export const getPartnerSymptomsSymptomsPartnerPartnerIdGet = <
   ThrowOnError extends boolean = false,
 >(
-  options: Options<
-    GetPartnerSymptomsSymptomsPartnerPartnerIdGetData,
-    ThrowOnError
-  >,
+  options: Options<GetPartnerSymptomsSymptomsPartnerPartnerIdGetData, ThrowOnError>,
 ) =>
   (options.client ?? client).get<
     GetPartnerSymptomsSymptomsPartnerPartnerIdGetResponses,
     GetPartnerSymptomsSymptomsPartnerPartnerIdGetErrors,
     ThrowOnError
   >({
-    security: [{ scheme: "bearer", type: "http" }],
-    url: "/symptoms/partner/{partner_id}/",
+    responseTransformer: getPartnerSymptomsSymptomsPartnerPartnerIdGetResponseTransformer,
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/symptoms/partner/{partner_id}/',
     ...options,
   });
 
@@ -970,8 +930,8 @@ export const exportPartnerSymptomsCsvSymptomsPartnerPartnerIdCsvGet = <
     ExportPartnerSymptomsCsvSymptomsPartnerPartnerIdCsvGetErrors,
     ThrowOnError
   >({
-    security: [{ scheme: "bearer", type: "http" }],
-    url: "/symptoms/partner/{partner_id}/csv/",
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/symptoms/partner/{partner_id}/csv/',
     ...options,
   });
 
@@ -982,7 +942,7 @@ export const rootGet = <ThrowOnError extends boolean = false>(
   options?: Options<RootGetData, ThrowOnError>,
 ) =>
   (options?.client ?? client).get<RootGetResponses, unknown, ThrowOnError>({
-    url: "/",
+    url: '/',
     ...options,
   });
 
@@ -992,12 +952,8 @@ export const rootGet = <ThrowOnError extends boolean = false>(
 export const healthCheckHealthGet = <ThrowOnError extends boolean = false>(
   options?: Options<HealthCheckHealthGetData, ThrowOnError>,
 ) =>
-  (options?.client ?? client).get<
-    HealthCheckHealthGetResponses,
-    unknown,
-    ThrowOnError
-  >({
+  (options?.client ?? client).get<HealthCheckHealthGetResponses, unknown, ThrowOnError>({
     responseTransformer: healthCheckHealthGetResponseTransformer,
-    url: "/health",
+    url: '/health',
     ...options,
   });

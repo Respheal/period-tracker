@@ -369,7 +369,6 @@ class Cycle(SQLModel, table=True):
     state: CycleState = Field(default=CycleState.LEARNING)
     avg_cycle_length: int | None = None
     avg_period_length: int | None = None
-    last_period_start: datetime | None = None
     last_evaluated: datetime | None = Field(default=None, sa_column=Column(DateTime()))
     user: User = Relationship(back_populates="cycle_state")
 

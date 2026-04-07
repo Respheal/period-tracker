@@ -1,13 +1,13 @@
-import type { Meta, StoryObj } from "@storybook/react-vite";
+import type { Meta, StoryObj } from '@storybook/react-vite';
 
-import PeriodLogger from "./PeriodLogger";
+import PeriodLogger from './PeriodLogger';
 
 const meta = {
   component: PeriodLogger,
-  title: "Organisms/PeriodLogger",
-  tags: ["autodocs"],
+  title: 'Organisms/PeriodLogger',
+  tags: ['autodocs'],
   parameters: {
-    layout: "centered",
+    layout: 'centered',
   },
 } satisfies Meta<typeof PeriodLogger>;
 export default meta;
