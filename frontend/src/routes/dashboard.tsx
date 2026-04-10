@@ -3,26 +3,42 @@ import { createFileRoute } from '@tanstack/react-router';
 import {
   Container,
   Box,
+  Grid,
+  Center,
   GridItem,
   DatePicker,
   Tabs,
   Heading,
-  SimpleGrid,
 } from '@chakra-ui/react';
+import dayjs from 'dayjs';
 
 import Logo from '@/components/Logo';
+import { DatePickerDayTable } from '@/components/day-table';
 
 export const Route = createFileRoute('/dashboard')({
   component: RouteComponent,
 });
 
+const mockEvent = {
+  startDate: dayjs(),
+  symptoms: ['tummy hurt', 'big mad'],
+};
+
 function RouteComponent() {
   return (
-    <Container centerContent={true}>
-      <SimpleGrid columns={{ base: 1, md: 3 }} gap={{ base: 1, md: 2 }}>
+    <Container
+      fluid
+      centerContent={true}
+      maxWidth={{ base: '100dvw', md: '90dvw', lg: '3xl' }}>
+      <Logo />
+      <Grid
+        w='full'
+        mt={{ base: 5, md: 10 }}
+        templateColumns={{ base: '1fr', md: '{sizes.60} 1fr' }}
+        gap={{ base: 1, md: 2 }}>
         {/* Log Event */}
-        <GridItem colSpan={{ base: 3, md: 1 }}>
-          <Box height='full' borderWidth='1px' borderColor='border.inverted'>
+        <GridItem>
+          <Box p={2} height='full' borderWidth='1px' borderColor='border.inverted'>
             <Heading>Log Event</Heading>
             <Tabs.Root variant='plain'>
               <Tabs.List bg='bg.muted' rounded='l3' p='1'>
@@ -36,44 +52,44 @@ function RouteComponent() {
           </Box>
         </GridItem>
         {/* Data */}
-        <GridItem colSpan={{ base: 3, md: 1 }}>
-          <Box height='full' borderWidth='1px' borderColor='border.inverted'>
+        <GridItem>
+          <Box p={2} height='full' borderWidth='1px' borderColor='border.inverted'>
             <Heading>Cycle Data??</Heading>
           </Box>
         </GridItem>
         {/* Calendar */}
         <GridItem
-          colSpan={{ base: 3, md: 2 }}
           rowSpan={{ base: 1, md: 2 }}
           colStart={{ base: 1, md: 2 }}
           rowStart={{ base: 3, md: 1 }}>
-          <Box borderWidth='1px' borderColor='border.inverted'>
-            <Logo />
-            <DatePicker.Root selectionMode='range' inline width='fit-content'>
-              <DatePicker.Content unstyled>
-                <DatePicker.View view='day'>
-                  <DatePicker.Header />
-                  <DatePicker.DayTable />
-                </DatePicker.View>
-                <DatePicker.View view='month'>
-                  <DatePicker.Header />
-                  <DatePicker.MonthTable />
-                </DatePicker.View>
-                <DatePicker.View view='year'>
-                  <DatePicker.Header />
-                  <DatePicker.YearTable />
-                </DatePicker.View>
-              </DatePicker.Content>
-            </DatePicker.Root>
+          <Box p={2} borderWidth='1px' borderColor='border.inverted'>
+            <Center>
+              <DatePicker.Root readOnly inline>
+                <DatePicker.Content unstyled>
+                  <DatePicker.View view='day'>
+                    <DatePicker.Header />
+                    <DatePickerDayTable events={[mockEvent]} />
+                  </DatePicker.View>
+                  <DatePicker.View view='month'>
+                    <DatePicker.Header />
+                    <DatePicker.MonthTable />
+                  </DatePicker.View>
+                  <DatePicker.View view='year'>
+                    <DatePicker.Header />
+                    <DatePicker.YearTable />
+                  </DatePicker.View>
+                </DatePicker.Content>
+              </DatePicker.Root>
+            </Center>
           </Box>
         </GridItem>
         {/* Graph */}
-        <GridItem colSpan={3}>
-          <Box borderWidth='1px' borderColor='border.inverted'>
+        <GridItem colSpan={{ base: 1, md: 2 }}>
+          <Box p={2} borderWidth='1px' borderColor='border.inverted'>
             aaaaa
           </Box>
         </GridItem>
-      </SimpleGrid>
+      </Grid>
     </Container>
   );
 }

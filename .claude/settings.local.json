@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "mcp__chakra-ui__get_component_props",
+      "mcp__chakra-ui__get_component_example"
+    ]
+  }
+}
