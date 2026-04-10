@@ -7,13 +7,6 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 import { client } from './client/client.gen';
 
-import { ThemeProvider } from '@emotion/react';
-import { CssBaseline } from '@mui/material';
-import { lightTheme } from '../src/themes';
-import '@fontsource/roboto/300.css';
-import '@fontsource/roboto/400.css';
-import '@fontsource/roboto/500.css';
-import '@fontsource/roboto/700.css';
 import './index.css';
 
 // Configure the API client
@@ -49,11 +42,8 @@ declare module '@tanstack/react-router' {
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <QueryClientProvider client={queryClient}>
-      <ThemeProvider theme={lightTheme}>
-        <CssBaseline />
-        <RouterProvider router={router} />
-        <TanStackDevtools />
-      </ThemeProvider>
+      <RouterProvider router={router} />
+      <TanStackDevtools />
     </QueryClientProvider>
   </StrictMode>,
 );

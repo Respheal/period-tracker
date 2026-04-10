@@ -13,6 +13,7 @@
     "**/.venv/**": true,
     "**/dist/**": true,
     "**/node_modules/**": true,
+    "**/.tanstack/**": true,
     "**/test-results/**": true,
     "**/playwright-report/**": true
   },
@@ -41,7 +42,6 @@
     "**/dist": true,
     ".history": true
   },
-  "js/ts.preferences.autoImportSpecifierExcludeRegexes": ["^@mui/[^/]+$"],
   "editor.formatOnSave": true,
   "editor.insertSpaces": true,
   "editor.tabSize": 2,

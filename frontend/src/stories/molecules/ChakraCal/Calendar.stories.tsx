@@ -1,15 +1,15 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
-import PeriodLogger from './PeriodLogger';
+import ChakraCal from './Calendar';
 
 const meta = {
-  component: PeriodLogger,
-  title: 'Organisms/PeriodLogger',
+  component: ChakraCal,
+  title: 'Molecules/ChakraCal',
   tags: ['autodocs'],
   parameters: {
     layout: 'centered',
   },
-} satisfies Meta<typeof PeriodLogger>;
+} satisfies Meta<typeof ChakraCal>;
 export default meta;
 
 type Story = StoryObj<typeof meta>;

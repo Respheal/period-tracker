@@ -3,10 +3,10 @@ import {
   createUserUsersPostMutation,
   loginAuthPostMutation,
   refreshTokensAuthRefreshPostMutation,
-} from '../client/@tanstack/react-query.gen';
+} from '@/client/@tanstack/react-query.gen';
 import { useNavigate } from '@tanstack/react-router';
 import type { BodyLoginAuthPost } from '@/client/types.gen';
-import useCookie from '@hooks/useCookie';
+import useCookie from '@/hooks/useCookie';
 
 const isLoggedIn = () => {
   return localStorage.getItem('access_token') !== null;
