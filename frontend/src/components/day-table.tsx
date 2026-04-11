@@ -1,5 +1,6 @@
 'use client';
 
+import type { Period, Response, SymptomEvent, Temperature } from '@/client/types.gen';
 import {
   DatePickerTable,
   DatePickerTableBody,
@@ -18,6 +19,7 @@ import {
   type DatePickerTableProps,
   Popover,
   For,
+  Heading,
   Stack,
   type DateValue,
 } from '@chakra-ui/react';
@@ -27,33 +29,95 @@ import LocalizedFormat from 'dayjs/plugin/localizedFormat';
 export interface DatePickerDayTableProps extends DatePickerTableProps {
   offset?: number;
   weekNumberLabel?: string;
-  events: Event[];
+  events?: Response;
 }
 
-interface Event {
-  startDate: dayjs.Dayjs;
-  symptoms: string[];
-}
-
-function formatDate({ day }: { day: DateValue }) {
+function formatDate({ day }: { day: DateValue }): string {
   dayjs.extend(LocalizedFormat);
   return dayjs(new Date(day.year, day.month - 1, day.day)).format('ll');
 }
 
-function TableCell({ day, events }: { day: DateValue; events?: Event[] }) {
-  console.log(dayjs(new Date(day.year, day.month - 1, day.day)));
-  const hasEvents =
-    events?.some((obj) =>
-      obj.startDate.isSame(dayjs(new Date(day.year, day.month - 1, day.day)), 'day'),
-    ) || false;
+/**
+ * Determine if the calendar day matches a provided event's date
+ */
+function isSameDay(calDay: DateValue, eventDate: Date): boolean {
+  return dayjs(eventDate).isSame(
+    dayjs(new Date(calDay.year, calDay.month - 1, calDay.day)),
+    'day',
+  );
+}
 
-  if (hasEvents) {
-    console.log('aaaaa');
+function formatSymptomEvent(event: SymptomEvent) {
+  return (
+    <Stack gap='2'>
+      <Heading>Symptoms</Heading>
+      {formatBadgeList(event.symptoms)}
+      <Heading>Mood</Heading>
+      {formatBadgeList(event.mood)}
+    </Stack>
+  );
+}
+
+function formatBadgeList(symptoms: string[] | null) {
+  if (symptoms) {
+    return (
+      <Stack direction='row'>
+        <For each={symptoms}>
+          {(symptom) => (
+            <Badge size='md' variant='surface'>
+              {symptom}
+            </Badge>
+          )}
+        </For>
+      </Stack>
+    );
+  }
+}
+
+function formatTemperatures(temps: Temperature[]) {
+  return (
+    <Stack direction='row'>
+      <For each={temps}>
+        {(temp) => (
+          <Badge size='md' variant='surface'>
+            {temp.temperature}
+          </Badge>
+        )}
+      </For>
+    </Stack>
+  );
+}
+
+function TableCell({ day, events }: { day: DateValue; events?: Response }) {
+  const eventData = events?.data || { periods: [], symptoms: [], temperatures: [] };
+  // Extract only events matching the calendar day in question
+  const dayEvents = Object.fromEntries(
+    Object.entries(eventData).map(([key, items]) => {
+      const filteredItems = items.filter((item) => {
+        switch (key) {
+          case 'periods':
+            return isSameDay(day, (item as Period).start_date);
+          case 'temperatures':
+            return isSameDay(day, (item as Temperature).timestamp);
+          case 'symptoms':
+            return isSameDay(day, (item as SymptomEvent).date);
+          default:
+            return false;
+        }
+      });
+      return [key, filteredItems];
+    }),
+  ) as Response['data'];
+
+  if (Object.values(dayEvents).some((arr) => arr.length > 0)) {
     return (
       <Popover.Root lazyMount unmountOnExit>
         <Popover.Trigger asChild>
           <DatePickerTableCellTrigger>
-            <DayCell day={day.day} hasEvents={hasEvents} />
+            {day.day}
+            <Float placement='bottom-end' offsetX='1' offsetY='1'>
+              <Circle bg='green.500' size='8px' outline='0.2em solid' outlineColor='bg' />
+            </Float>
           </DatePickerTableCellTrigger>
         </Popover.Trigger>
         <Popover.Positioner>
@@ -61,15 +125,10 @@ function TableCell({ day, events }: { day: DateValue; events?: Event[] }) {
             <Popover.Arrow />
             <Popover.Body>
               <Popover.Title fontWeight='bold'>{formatDate({ day })}</Popover.Title>
-              <Stack direction='row'>
-                <For each={['weh']}>
-                  {(symptom) => (
-                    <Badge size='md' variant='surface'>
-                      {symptom}
-                    </Badge>
-                  )}
-                </For>
-              </Stack>
+              <For each={dayEvents['symptoms']}>
+                {(event) => formatSymptomEvent(event as SymptomEvent)}
+              </For>
+              {formatTemperatures(dayEvents['temperatures'] as Temperature[])}
             </Popover.Body>
           </Popover.Content>
         </Popover.Positioner>
@@ -77,20 +136,6 @@ function TableCell({ day, events }: { day: DateValue; events?: Event[] }) {
     );
   }
   return <DatePickerTableCellTrigger>{day.day}</DatePickerTableCellTrigger>;
-}
-
-function DayCell({ day, hasEvents }: { day: number; hasEvents: boolean }) {
-  if (hasEvents) {
-    return (
-      <>
-        {day}
-        <Float placement='bottom-end' offsetX='1' offsetY='1'>
-          <Circle bg='green.500' size='8px' outline='0.2em solid' outlineColor='bg' />
-        </Float>
-      </>
-    );
-  }
-  return <>{day}</>;
 }
 
 export const DatePickerDayTable = (props: DatePickerDayTableProps) => {

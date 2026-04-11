@@ -11,6 +11,7 @@ import {
   Heading,
 } from '@chakra-ui/react';
 import dayjs from 'dayjs';
+import type { Period, Response, SymptomEvent, Temperature } from '@/client/types.gen';
 
 import Logo from '@/components/Logo';
 import { DatePickerDayTable } from '@/components/day-table';
@@ -19,9 +20,43 @@ export const Route = createFileRoute('/dashboard')({
   component: RouteComponent,
 });
 
-const mockEvent = {
-  startDate: dayjs(),
-  symptoms: ['tummy hurt', 'big mad'],
+const mockSymptoms: SymptomEvent[] = [
+  {
+    user_id: '1',
+    flow_intensity: null,
+    sex: null,
+    mood: null,
+    ovulation_test: null,
+    discharge: null,
+    date: dayjs().toDate(),
+    symptoms: ['tummy hurt', 'big mad'],
+  },
+];
+
+const mockPeriods: Period[] = [
+  {
+    user_id: '1',
+    start_date: dayjs().toDate(),
+    end_date: dayjs().add(3, 'day').toDate(),
+  },
+];
+
+const mockTemps: Temperature[] = [
+  {
+    user_id: '1',
+    temperature: 32.0,
+    timestamp: dayjs().toDate(),
+  },
+  {
+    user_id: '1',
+    temperature: 31.0,
+    timestamp: dayjs().add(1, 'day').toDate(),
+  },
+];
+
+const mockEvents: Response = {
+  count: 4,
+  data: { symptoms: mockSymptoms, periods: mockPeriods, temperatures: mockTemps },
 };
 
 function RouteComponent() {
@@ -68,7 +103,7 @@ function RouteComponent() {
                 <DatePicker.Content unstyled>
                   <DatePicker.View view='day'>
                     <DatePicker.Header />
-                    <DatePickerDayTable events={[mockEvent]} />
+                    <DatePickerDayTable events={mockEvents} />
                   </DatePicker.View>
                   <DatePicker.View view='month'>
                     <DatePicker.Header />
