@@ -130,13 +130,15 @@ function EventSummaryPopover(events: SymptomEvent[]): (JSX.Element | undefined)[
   }
   if (summary.flowIntensity > 0) {
     const icons = Array.from({ length: summary.flowIntensity }, (_, i) => (
-      <Circle key={i} bg='red' size={3} />
+      <Circle key={i} bg='red' size={3.5} />
     ));
     flowIntensityNode = (
       <DataList.Item key='flow-intensity'>
         <DataList.ItemLabel>Flow Intensity</DataList.ItemLabel>
         <DataList.ItemValue>
-          <Stack direction={'row'}>{icons}</Stack>
+          <Stack direction={'row'} gap={1}>
+            {icons}
+          </Stack>
         </DataList.ItemValue>
       </DataList.Item>
     );
@@ -183,8 +185,8 @@ function formatBadgeList(items: string[]) {
   return (
     <Wrap align='top'>
       <For each={items}>
-        {(item) => (
-          <Badge size='md' variant='surface'>
+        {(item, index) => (
+          <Badge key={index} size='md' variant='surface'>
             {item}
           </Badge>
         )}
@@ -194,25 +196,29 @@ function formatBadgeList(items: string[]) {
 }
 
 function formatTemperatures(temps: Temperature[]) {
-  return (
-    <DataList.Item key='temperatures'>
-      <DataList.ItemLabel>Temperatures</DataList.ItemLabel>
-      <DataList.ItemValue>
-        <For each={temps}>
-          {(temp) => (
-            <Badge size='md' variant='surface'>
-              <FormatNumber
-                style='unit'
-                unit='celsius'
-                maximumFractionDigits={1}
-                value={temp.temperature}
-              />
-            </Badge>
-          )}
-        </For>
-      </DataList.ItemValue>
-    </DataList.Item>
-  );
+  if (temps.length > 0) {
+    return (
+      <DataList.Item key='temperatures'>
+        <DataList.ItemLabel>Temperatures</DataList.ItemLabel>
+        <DataList.ItemValue>
+          <Stack direction={'row'}>
+            <For each={temps}>
+              {(temp, index) => (
+                <Badge key={index} size='md' variant='surface'>
+                  <FormatNumber
+                    style='unit'
+                    unit='celsius'
+                    maximumFractionDigits={1}
+                    value={temp.temperature}
+                  />
+                </Badge>
+              )}
+            </For>
+          </Stack>
+        </DataList.ItemValue>
+      </DataList.Item>
+    );
+  }
 }
 
 function TableCell({ day, events }: { day: DateValue; events?: Response }) {
@@ -268,7 +274,7 @@ function TableCell({ day, events }: { day: DateValue; events?: Response }) {
               <ScrollArea.Root maxHeight='12rem'>
                 <ScrollArea.Viewport>
                   <ScrollArea.Content>
-                    <DataList.Root orientation='horizontal'>
+                    <DataList.Root orientation='horizontal' variant={'bold'}>
                       {EventSummaryPopover(dayEvents['symptoms'] as SymptomEvent[])}
                       {formatTemperatures(dayEvents['temperatures'] as Temperature[])}
                     </DataList.Root>
