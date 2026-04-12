@@ -5,8 +5,8 @@ import dayjs from 'dayjs';
 import type { Period, Response, SymptomEvent, Temperature } from '@/client/types.gen';
 
 import Logo from '@/components/Logo';
-import { RangePicker } from '@/components/date-range-picker';
-import { EventCalendar } from '@/components/EventCalendar/EventCalendar';
+import { EventCalendar } from '@/components/EventCalendar';
+import { LogPeriod } from '@/components/EventForm';
 
 export const Route = createFileRoute('/dashboard')({
   component: RouteComponent,
@@ -115,7 +115,7 @@ function RouteComponent() {
                 <Tabs.Indicator />
               </Tabs.List>
               <Tabs.Content value='period'>
-                <RangePicker />
+                <LogPeriod />
               </Tabs.Content>
               <Tabs.Content value='symptoms'>another tab</Tabs.Content>
               <Tabs.Content value='temperature'>cursed</Tabs.Content>
