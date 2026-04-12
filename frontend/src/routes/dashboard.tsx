@@ -1,21 +1,12 @@
 import { createFileRoute } from '@tanstack/react-router';
 
-import {
-  Container,
-  Box,
-  Grid,
-  Center,
-  GridItem,
-  DatePicker,
-  Tabs,
-  Heading,
-} from '@chakra-ui/react';
+import { Container, Box, Grid, Center, GridItem, Tabs, Heading } from '@chakra-ui/react';
 import dayjs from 'dayjs';
 import type { Period, Response, SymptomEvent, Temperature } from '@/client/types.gen';
 
 import Logo from '@/components/Logo';
-import { DatePickerDayTable } from '@/components/day-table';
 import { RangePicker } from '@/components/date-range-picker';
+import { EventCalendar } from '@/components/EventCalendar/EventCalendar';
 
 export const Route = createFileRoute('/dashboard')({
   component: RouteComponent,
@@ -144,22 +135,7 @@ function RouteComponent() {
           rowStart={{ base: 2, md: 1 }}>
           <Box p={2} borderWidth='1px' borderColor='border.inverted'>
             <Center>
-              <DatePicker.Root readOnly inline fixedWeeks>
-                <DatePicker.Content unstyled>
-                  <DatePicker.View view='day'>
-                    <DatePicker.Header />
-                    <DatePickerDayTable events={mockEvents} />
-                  </DatePicker.View>
-                  <DatePicker.View view='month'>
-                    <DatePicker.Header />
-                    <DatePicker.MonthTable />
-                  </DatePicker.View>
-                  <DatePicker.View view='year'>
-                    <DatePicker.Header />
-                    <DatePicker.YearTable />
-                  </DatePicker.View>
-                </DatePicker.Content>
-              </DatePicker.Root>
+              <EventCalendar events={mockEvents} />
             </Center>
           </Box>
         </GridItem>
