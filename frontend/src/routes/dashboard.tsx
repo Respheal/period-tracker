@@ -23,13 +23,43 @@ export const Route = createFileRoute('/dashboard')({
 const mockSymptoms: SymptomEvent[] = [
   {
     user_id: '1',
-    flow_intensity: null,
+    flow_intensity: '2',
+    sex: ['protected'],
+    mood: ['big mad'],
+    ovulation_test: true,
+    discharge: ['terrible', 'gross'],
+    date: dayjs().toDate(),
+    symptoms: ['tummy hurt', 'headache', 'everything bad', 'aaaaaaaaaaaaaaaaa'],
+  },
+  {
+    user_id: '1',
+    flow_intensity: '0',
+    sex: null,
+    mood: ['big mad'],
+    ovulation_test: false,
+    discharge: null,
+    date: dayjs().add(1, 'day').toDate(),
+    symptoms: null,
+  },
+  {
+    user_id: '1',
+    flow_intensity: '0',
     sex: null,
     mood: null,
-    ovulation_test: null,
+    ovulation_test: true,
     discharge: null,
-    date: dayjs().toDate(),
-    symptoms: ['tummy hurt', 'big mad'],
+    date: dayjs().add(5, 'day').toDate(),
+    symptoms: null,
+  },
+  {
+    user_id: '1',
+    flow_intensity: '0',
+    sex: null,
+    mood: ['weh'],
+    ovulation_test: false,
+    discharge: null,
+    date: dayjs().add(5, 'day').toDate(),
+    symptoms: null,
   },
 ];
 
@@ -45,6 +75,11 @@ const mockTemps: Temperature[] = [
   {
     user_id: '1',
     temperature: 32.0,
+    timestamp: dayjs().toDate(),
+  },
+  {
+    user_id: '1',
+    temperature: 31.2,
     timestamp: dayjs().toDate(),
   },
   {
