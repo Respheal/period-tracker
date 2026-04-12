@@ -20,7 +20,6 @@ import {
   DatePickerTableCell,
   Float,
   ScrollArea,
-  Text,
   Badge,
   Circle,
   Wrap,
@@ -28,6 +27,7 @@ import {
   FormatNumber,
   Flex,
   Popover,
+  DataList,
   For,
   Stack,
   type DatePickerTableProps,
@@ -43,7 +43,6 @@ export interface DatePickerDayTableProps extends DatePickerTableProps {
   events?: Response;
 }
 
-const summaryHeaderStyle = { textStyle: 'md', fontWeight: 'bold' };
 const periodDayStyle = (periodDay: boolean) => {
   return {
     variant: 'surface',
@@ -115,18 +114,18 @@ function EventSummaryPopover(events: SymptomEvent[]): (JSX.Element | undefined)[
 
   if (summary.symptoms.length > 0) {
     symptomNode = (
-      <Stack direction='row' align='top'>
-        <Text css={summaryHeaderStyle}>Symptoms</Text>
-        {formatBadgeList(summary.symptoms)}
-      </Stack>
+      <DataList.Item key='symptoms' alignItems={'flex-start'}>
+        <DataList.ItemLabel>Symptoms</DataList.ItemLabel>
+        <DataList.ItemValue>{formatBadgeList(summary.symptoms)}</DataList.ItemValue>
+      </DataList.Item>
     );
   }
   if (summary.mood.length > 0) {
     moodNode = (
-      <Stack direction='row' align='top'>
-        <Text css={summaryHeaderStyle}>Mood</Text>
-        {formatBadgeList(summary.mood)}
-      </Stack>
+      <DataList.Item key='mood' alignItems={'flex-start'}>
+        <DataList.ItemLabel>Mood</DataList.ItemLabel>
+        <DataList.ItemValue>{formatBadgeList(summary.mood)}</DataList.ItemValue>
+      </DataList.Item>
     );
   }
   if (summary.flowIntensity > 0) {
@@ -134,36 +133,40 @@ function EventSummaryPopover(events: SymptomEvent[]): (JSX.Element | undefined)[
       <Circle key={i} bg='red' size={3} />
     ));
     flowIntensityNode = (
-      <Stack direction='row' align='center'>
-        <Text css={summaryHeaderStyle}>Flow Intensity</Text>
-        {icons}
-      </Stack>
+      <DataList.Item key='flow-intensity'>
+        <DataList.ItemLabel>Flow Intensity</DataList.ItemLabel>
+        <DataList.ItemValue>
+          <Stack direction={'row'}>{icons}</Stack>
+        </DataList.ItemValue>
+      </DataList.Item>
     );
   }
   if (typeof summary.ovulationTest !== 'undefined') {
     ovulationTestNode = (
-      <Stack direction='row' align='top'>
-        <Text css={summaryHeaderStyle}>Ovulation Test</Text>
-        <Badge colorPalette={summary.ovulationTest ? 'green' : 'gray'}>
-          {summary.ovulationTest ? 'Positive' : 'Negative'}
-        </Badge>
-      </Stack>
+      <DataList.Item key='ovulation-test'>
+        <DataList.ItemLabel>Ovulation Test</DataList.ItemLabel>
+        <DataList.ItemValue>
+          <Badge colorPalette={summary.ovulationTest ? 'green' : 'gray'}>
+            {summary.ovulationTest ? 'Positive' : 'Negative'}
+          </Badge>
+        </DataList.ItemValue>
+      </DataList.Item>
     );
   }
   if (summary.discharge.length > 0) {
     dischargeNode = (
-      <Stack direction='row' align='top'>
-        <Text css={summaryHeaderStyle}>Discharge</Text>
-        {formatBadgeList(summary.discharge)}
-      </Stack>
+      <DataList.Item key='discharge' alignItems={'flex-start'}>
+        <DataList.ItemLabel>Discharge</DataList.ItemLabel>
+        <DataList.ItemValue>{formatBadgeList(summary.discharge)}</DataList.ItemValue>
+      </DataList.Item>
     );
   }
   if (summary.sex.length > 0) {
     sexNode = (
-      <Stack direction='row' align='top'>
-        <Text css={summaryHeaderStyle}>Sex</Text>
-        {formatBadgeList(summary.sex)}
-      </Stack>
+      <DataList.Item key='sex' alignItems={'flex-start'}>
+        <DataList.ItemLabel>Sex</DataList.ItemLabel>
+        <DataList.ItemValue>{formatBadgeList(summary.sex)}</DataList.ItemValue>
+      </DataList.Item>
     );
   }
   return [
@@ -192,21 +195,23 @@ function formatBadgeList(items: string[]) {
 
 function formatTemperatures(temps: Temperature[]) {
   return (
-    <Stack direction='row'>
-      <Text css={summaryHeaderStyle}>Temperatures</Text>
-      <For each={temps}>
-        {(temp) => (
-          <Badge size='md' variant='surface'>
-            <FormatNumber
-              style='unit'
-              unit='celsius'
-              maximumFractionDigits={1}
-              value={temp.temperature}
-            />
-          </Badge>
-        )}
-      </For>
-    </Stack>
+    <DataList.Item key='temperatures'>
+      <DataList.ItemLabel>Temperatures</DataList.ItemLabel>
+      <DataList.ItemValue>
+        <For each={temps}>
+          {(temp) => (
+            <Badge size='md' variant='surface'>
+              <FormatNumber
+                style='unit'
+                unit='celsius'
+                maximumFractionDigits={1}
+                value={temp.temperature}
+              />
+            </Badge>
+          )}
+        </For>
+      </DataList.ItemValue>
+    </DataList.Item>
   );
 }
 
@@ -263,10 +268,10 @@ function TableCell({ day, events }: { day: DateValue; events?: Response }) {
               <ScrollArea.Root maxHeight='12rem'>
                 <ScrollArea.Viewport>
                   <ScrollArea.Content>
-                    <Stack direction='column'>
+                    <DataList.Root orientation='horizontal'>
                       {EventSummaryPopover(dayEvents['symptoms'] as SymptomEvent[])}
                       {formatTemperatures(dayEvents['temperatures'] as Temperature[])}
-                    </Stack>
+                    </DataList.Root>
                   </ScrollArea.Content>
                 </ScrollArea.Viewport>
                 <ScrollArea.Scrollbar>
