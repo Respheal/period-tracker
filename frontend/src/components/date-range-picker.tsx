@@ -18,7 +18,12 @@ export const RangePicker = () => {
       }}>
       <Stack gap='2' align='flex-start' maxW='sm'>
         <Heading>Log Period</Heading>
-        <DatePicker.Root selectionMode='range' name='dateRange' maxWidth={72}>
+        <DatePicker.Root
+          selectionMode='range'
+          name='dateRange'
+          maxWidth={72}
+          locale='en-US'
+          timeZone='UTC'>
           <DatePicker.Control>
             <DatePicker.Input index={0} name='dateRangeStart' required /> -
             <DatePicker.Input index={1} name='dateRangeEnd' />
