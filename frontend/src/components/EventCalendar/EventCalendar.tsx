@@ -1,7 +1,7 @@
 import { DatePicker } from '@chakra-ui/react';
 
 import type { Response } from '@/client/types.gen';
-import { DayTable } from './DayTable/DayTable';
+import { DayTable } from './DayTable';
 
 export function EventCalendar(props: { events: Response }) {
   const { events } = props;
