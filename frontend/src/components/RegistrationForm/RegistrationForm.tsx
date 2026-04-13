@@ -5,6 +5,10 @@ import { type UserCreate } from '@/client/types.gen';
 import { PasswordInput } from '@/components/ui/password-input';
 import { Button, Stack, Field, Input, Container, Card, Text } from '@chakra-ui/react';
 
+interface RegistrationForm extends UserCreate {
+  confirm_password: string;
+}
+
 export function RegistrationForm({
   registerFn,
   navigateFn,
@@ -13,21 +17,19 @@ export function RegistrationForm({
   navigateFn: ({ to }: { to: string }) => void;
 }) {
   const [loading, setLoading] = useState(false);
+  const defaultUser = {
+    username: '',
+    password: '',
+    confirm_password: '',
+  } as RegistrationForm;
   const form = useForm({
-    defaultValues: {
-      username: '',
-      password: '',
-      confirm_password: '',
-      display_name: '',
-    },
+    defaultValues: defaultUser,
     onSubmit: async ({ value }) => {
-      console.log('Submitting form with value:', value);
-      const data: UserCreate = {
+      registerFn({
         username: value.username,
         display_name: value.display_name,
         password: value.password,
-      };
-      registerFn(data);
+      });
       setLoading(false);
     },
   });
@@ -38,13 +40,15 @@ export function RegistrationForm({
         <Card.Header>
           <Card.Title>Register</Card.Title>
         </Card.Header>
-        <Card.Body>
-          <form
-            onSubmit={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              void form.handleSubmit();
-            }}>
+
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            setLoading(true);
+            void form.handleSubmit();
+          }}>
+          <Card.Body>
             <Stack gap='2' align='flex-start' maxW='sm'>
               <Field.Root required>
                 <Field.Label>
@@ -65,7 +69,7 @@ export function RegistrationForm({
                 <form.Field name='display_name'>
                   {(field) => (
                     <Input
-                      value={field.state.value}
+                      value={field.state.value ?? ''}
                       onChange={(e) => field.handleChange(e.target.value)}
                     />
                   )}
@@ -86,7 +90,7 @@ export function RegistrationForm({
                 </form.Field>
               </Field.Root>
 
-              <Field.Root required>
+              <Field.Root required invalid>
                 <Field.Label>
                   Confirm Password <Field.RequiredIndicator />
                 </Field.Label>
@@ -111,40 +115,40 @@ export function RegistrationForm({
                         onChange={(e) => field.handleChange(e.target.value)}
                       />
                       {field.state.meta.errors.map((err) => (
-                        <Text key={err}>{err}</Text>
+                        <Field.ErrorText>
+                          <Text key={err}>{err}</Text>
+                        </Field.ErrorText>
                       ))}
                     </>
                   )}
                 </form.Field>
               </Field.Root>
-
-              <Stack direction='row' gap='2'>
-                <Button onClick={() => navigateFn({ to: '/login' })}>Login</Button>
-                <form.Subscribe
-                  selector={(state) => ({
-                    canSubmit: state.canSubmit,
-                    isSubmitting: state.isSubmitting,
-                    username: state.values.username,
-                    password: state.values.password,
-                    confirm_password: state.values.confirm_password,
-                  })}
-                  children={(state) => {
-                    const allFieldsFilled =
-                      state.username && state.password && state.confirm_password;
-                    const disabled =
-                      !state.canSubmit || state.isSubmitting || !allFieldsFilled;
-                    return (
-                      <Button type='submit' loading={loading} disabled={disabled}>
-                        Register
-                      </Button>
-                    );
-                  }}
-                />
-              </Stack>
             </Stack>
-          </form>
-        </Card.Body>
-        <Card.Footer />
+          </Card.Body>
+          <Card.Footer justifyContent='flex-end'>
+            <Button onClick={() => navigateFn({ to: '/login' })}>Login</Button>
+            <form.Subscribe
+              selector={(state) => ({
+                canSubmit: state.canSubmit,
+                isSubmitting: state.isSubmitting,
+                username: state.values.username,
+                password: state.values.password,
+                confirm_password: state.values.confirm_password,
+              })}
+              children={(state) => {
+                const allFieldsFilled =
+                  state.username && state.password && state.confirm_password;
+                const disabled =
+                  !state.canSubmit || state.isSubmitting || !allFieldsFilled;
+                return (
+                  <Button type='submit' loading={loading} disabled={disabled}>
+                    Register
+                  </Button>
+                );
+              }}
+            />
+          </Card.Footer>
+        </form>
       </Card.Root>
     </Container>
   );
