@@ -4,37 +4,31 @@ import {
   ChakraProvider,
   createSystem,
   defaultConfig,
-  defineRecipe,
+  defineConfig,
 } from '@chakra-ui/react';
-import { ColorModeProvider, type ColorModeProviderProps } from './color-mode';
+import { ThemeProvider } from 'next-themes';
 
-const buttonRecipe = defineRecipe({
-  variants: {
-    variant: {
-      cyan: {
-        bg: 'bg',
-        borderColor: 'cyan.fg',
-        color: 'cyan.fg',
-        _hover: { bg: 'cyan.emphasized' },
-        _selected: { bg: 'cyan.fg', color: 'cyan.muted', _hover: { color: 'cyan.fg' } },
+interface ProviderProps {
+  children: React.ReactNode;
+  palette?: string;
+}
+
+function generateSystem(palette: string) {
+  return createSystem(
+    defaultConfig,
+    defineConfig({
+      globalCss: {
+        html: { colorPalette: palette },
       },
-    },
-  },
-  defaultVariants: {
-    variant: 'cyan',
-  },
-});
+    }),
+  );
+}
 
-const system = createSystem(defaultConfig, {
-  theme: {
-    recipes: { button: buttonRecipe },
-  },
-});
-
-export function Provider(props: ColorModeProviderProps) {
+export function Provider(props: ProviderProps) {
+  const system = generateSystem(props.palette || 'gray');
   return (
     <ChakraProvider value={system}>
-      <ColorModeProvider {...props} />
+      <ThemeProvider attribute='class'>{props.children}</ThemeProvider>
     </ChakraProvider>
   );
 }
