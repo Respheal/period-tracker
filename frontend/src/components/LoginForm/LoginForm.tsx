@@ -12,7 +12,7 @@ export function LoginForm({
   loginFn: (data: BodyLoginAuthPost) => void;
   navigateFn: ({ to }: { to: string }) => void;
 }) {
-  const [loading, setLoading] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
   const form = useForm({
     defaultValues: {
       username: '',
@@ -24,7 +24,7 @@ export function LoginForm({
         password: value.password,
       };
       loginFn(data);
-      setLoading(false);
+      setSubmitting(false);
     },
   });
 
@@ -38,39 +38,38 @@ export function LoginForm({
           onSubmit={(e) => {
             e.preventDefault();
             e.stopPropagation();
-            setLoading(true);
+            setSubmitting(true);
             void form.handleSubmit();
           }}>
           <Card.Body>
             <Stack gap='2' align='flex-start' maxW='sm'>
-              {/* Username Field */}
-              <Field.Root required>
-                <Field.Label>
-                  Username <Field.RequiredIndicator />
-                </Field.Label>
-                <form.Field name='username'>
-                  {(field) => (
+              <form.Field name='username'>
+                {(field) => (
+                  <Field.Root required>
+                    <Field.Label>
+                      Username <Field.RequiredIndicator />
+                    </Field.Label>
                     <Input
                       value={field.state.value}
                       onChange={(e) => field.handleChange(e.target.value)}
                     />
-                  )}
-                </form.Field>
-              </Field.Root>
-              {/* Password Field */}
-              <Field.Root required>
-                <Field.Label>
-                  Password <Field.RequiredIndicator />
-                </Field.Label>
-                <form.Field name='password'>
-                  {(field) => (
+                  </Field.Root>
+                )}
+              </form.Field>
+
+              <form.Field name='password'>
+                {(field) => (
+                  <Field.Root required>
+                    <Field.Label>
+                      Password <Field.RequiredIndicator />
+                    </Field.Label>
                     <PasswordInput
                       value={field.state.value}
                       onChange={(e) => field.handleChange(e.target.value)}
                     />
-                  )}
-                </form.Field>
-              </Field.Root>
+                  </Field.Root>
+                )}
+              </form.Field>
             </Stack>
           </Card.Body>
           <Card.Footer justifyContent='flex-end'>
@@ -87,7 +86,7 @@ export function LoginForm({
                 const disabled =
                   !state.canSubmit || state.isSubmitting || !allFieldsFilled;
                 return (
-                  <Button type='submit' loading={loading} disabled={disabled}>
+                  <Button type='submit' loading={submitting} disabled={disabled}>
                     Login
                   </Button>
                 );
