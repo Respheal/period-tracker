@@ -44,6 +44,9 @@ function periodDayStyle(periodDay: boolean) {
 export function DayTableCell({ day, events }: { day: DateValue; events?: Response }) {
   const eventData = events?.data || { periods: [], symptoms: [], temperatures: [] };
   const periodDay = isPeriodDay(day, events?.data.periods as Period[]);
+
+  // TODO: Keyboard navigation seems to be broken on period days - investigate and fix
+
   // Extract only events matching the calendar day in question
   const dayEvents = Object.fromEntries(
     Object.entries(eventData).map(([key, items]) => {

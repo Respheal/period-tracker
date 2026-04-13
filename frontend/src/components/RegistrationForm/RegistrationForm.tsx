@@ -1,9 +1,10 @@
-import { useState } from 'react';
-import { useForm } from '@tanstack/react-form';
+import { useState, useEffect, useMemo } from 'react';
+import { useForm, useStore } from '@tanstack/react-form';
+import { zxcvbn, zxcvbnOptions } from '@zxcvbn-ts/core';
+import { Button, Stack, Field, Input, Container, Card, Text } from '@chakra-ui/react';
 
 import { type UserCreate } from '@/client/types.gen';
-import { PasswordInput } from '@/components/ui/password-input';
-import { Button, Stack, Field, Input, Container, Card, Text } from '@chakra-ui/react';
+import { PasswordInput, PasswordStrengthMeter } from '@/components/ui/password-input';
 
 interface RegistrationForm extends UserCreate {
   confirm_password: string;
@@ -16,12 +17,31 @@ export function RegistrationForm({
   registerFn: (data: UserCreate) => void;
   navigateFn: ({ to }: { to: string }) => void;
 }) {
-  const [loading, setLoading] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const loadZxcvbn = async () => {
+      const common = await import('@zxcvbn-ts/language-common');
+      const en = await import('@zxcvbn-ts/language-en');
+
+      zxcvbnOptions.setOptions({
+        useLevenshteinDistance: true,
+        dictionary: { ...common.dictionary, ...en.dictionary },
+        graphs: common.adjacencyGraphs,
+        translations: en.translations,
+      });
+      setLoading(false);
+    };
+    loadZxcvbn();
+  }, []);
+
   const defaultUser = {
     username: '',
     password: '',
     confirm_password: '',
   } as RegistrationForm;
+
   const form = useForm({
     defaultValues: defaultUser,
     onSubmit: async ({ value }) => {
@@ -30,9 +50,19 @@ export function RegistrationForm({
         display_name: value.display_name,
         password: value.password,
       });
-      setLoading(false);
+      setSubmitting(false);
     },
   });
+
+  const passwordValue = useStore(form.store, (state) => state.values.password);
+  const strengthResult = useMemo(() => {
+    if (passwordValue && !loading) {
+      return zxcvbn(passwordValue);
+    }
+    return null;
+  }, [passwordValue, loading]);
+
+  const score = strengthResult?.score ?? 0;
 
   return (
     <Container maxW={'lg'}>
@@ -45,84 +75,86 @@ export function RegistrationForm({
           onSubmit={(e) => {
             e.preventDefault();
             e.stopPropagation();
-            setLoading(true);
+            setSubmitting(true);
             void form.handleSubmit();
           }}>
           <Card.Body>
             <Stack gap='2' align='flex-start' maxW='sm'>
-              <Field.Root required>
-                <Field.Label>
-                  Username <Field.RequiredIndicator />
-                </Field.Label>
-                <form.Field name='username'>
-                  {(field) => (
+              <form.Field name='username'>
+                {(field) => (
+                  <Field.Root required>
+                    <Field.Label>
+                      Username <Field.RequiredIndicator />
+                    </Field.Label>
                     <Input
                       value={field.state.value}
                       onChange={(e) => field.handleChange(e.target.value)}
                     />
-                  )}
-                </form.Field>
-              </Field.Root>
+                  </Field.Root>
+                )}
+              </form.Field>
 
-              <Field.Root>
-                <Field.Label>Display Name</Field.Label>
-                <form.Field name='display_name'>
-                  {(field) => (
+              <form.Field name='display_name'>
+                {(field) => (
+                  <Field.Root>
+                    <Field.Label>Display Name</Field.Label>
                     <Input
                       value={field.state.value ?? ''}
                       onChange={(e) => field.handleChange(e.target.value)}
                     />
-                  )}
-                </form.Field>
-              </Field.Root>
+                  </Field.Root>
+                )}
+              </form.Field>
 
-              <Field.Root required>
-                <Field.Label>
-                  Password <Field.RequiredIndicator />
-                </Field.Label>
-                <form.Field name='password'>
-                  {(field) => (
-                    <PasswordInput
-                      value={field.state.value}
-                      onChange={(e) => field.handleChange(e.target.value)}
-                    />
-                  )}
-                </form.Field>
-              </Field.Root>
-
-              <Field.Root required invalid>
-                <Field.Label>
-                  Confirm Password <Field.RequiredIndicator />
-                </Field.Label>
-                <form.Field
-                  name='confirm_password'
-                  validators={{
-                    onChangeListenTo: ['password'],
-                    onChange: ({ value, fieldApi }) => {
-                      if (
-                        form.getFieldMeta('confirm_password')?.isTouched &&
-                        value !== fieldApi.form.getFieldValue('password')
-                      ) {
-                        return 'Passwords do not match';
-                      }
-                      return undefined;
-                    },
-                  }}>
-                  {(field) => (
-                    <>
+              <form.Field name='password'>
+                {(field) => (
+                  <Field.Root required>
+                    <Field.Label>
+                      Password <Field.RequiredIndicator />
+                    </Field.Label>
+                    <Stack width={'full'}>
                       <PasswordInput
                         value={field.state.value}
                         onChange={(e) => field.handleChange(e.target.value)}
                       />
-                      {field.state.meta.errors.map((err) => (
-                        <Field.ErrorText>
-                          <Text key={err}>{err}</Text>
+                      <PasswordStrengthMeter value={score} />
+                    </Stack>
+                  </Field.Root>
+                )}
+              </form.Field>
+
+              <form.Field
+                name='confirm_password'
+                validators={{
+                  onChangeListenTo: ['password'],
+                  onChange: ({ value, fieldApi }) => {
+                    const isDirty =
+                      fieldApi.state.meta.isTouched || fieldApi.state.meta.isDirty;
+                    if (isDirty && value !== fieldApi.form.getFieldValue('password')) {
+                      return 'Passwords do not match';
+                    }
+                    return undefined;
+                  },
+                }}>
+                {(field) => (
+                  <Field.Root required invalid={field.state.meta.errors.length > 0}>
+                    <Field.Label>
+                      Confirm Password <Field.RequiredIndicator />
+                    </Field.Label>
+                    <PasswordInput
+                      value={field.state.value}
+                      onChange={(e) => field.handleChange(e.target.value)}
+                    />
+                    {field.state.meta.errors.map((err, index) => {
+                      return (
+                        <Field.ErrorText key={index}>
+                          <Text>{err}</Text>
                         </Field.ErrorText>
-                      ))}
-                    </>
-                  )}
-                </form.Field>
-              </Field.Root>
+                      );
+                    })}
+                  </Field.Root>
+                )}
+              </form.Field>
             </Stack>
           </Card.Body>
           <Card.Footer justifyContent='flex-end'>
@@ -141,7 +173,7 @@ export function RegistrationForm({
                 const disabled =
                   !state.canSubmit || state.isSubmitting || !allFieldsFilled;
                 return (
-                  <Button type='submit' loading={loading} disabled={disabled}>
+                  <Button type='submit' loading={submitting} disabled={disabled}>
                     Register
                   </Button>
                 );
