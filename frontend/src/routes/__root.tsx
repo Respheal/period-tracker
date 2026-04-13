@@ -11,6 +11,7 @@ import { Provider } from '@/components/ui/provider';
 import { ColorModeButton } from '@/components/ui/color-mode';
 import useAuth, { isLoggedIn } from '@/hooks/useAuth';
 import {
+  AbsoluteCenter,
   Box,
   Container,
   Flex,
@@ -47,10 +48,12 @@ function RootComponent() {
     }
     // Display the register or login page
     return (
-      <Provider palette={palette}>
-        <ColorModeButton />
-        <Outlet />
-        <TanStackRouterDevtools />
+      <Provider>
+        <AbsoluteCenter>
+          <Container>
+            <Outlet />
+          </Container>
+        </AbsoluteCenter>
       </Provider>
     );
   } else {

@@ -22,7 +22,6 @@ const useAuth = () => {
       console.log(error);
     },
     onSuccess: (data) => {
-      console.log(data);
       navigate({ to: '/login' });
     },
   });
