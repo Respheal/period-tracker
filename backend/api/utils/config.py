@@ -3,7 +3,7 @@ import warnings
 from pathlib import Path
 from typing import Annotated, Any, Literal
 
-from pydantic import AnyUrl, BeforeValidator, model_validator
+from pydantic import BeforeValidator, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from typing_extensions import Self
 
@@ -53,6 +53,7 @@ class Settings(BaseSettings):
     SECRET_KEY: str = secrets.token_urlsafe(32)  # Deprecated, use RSA keys instead
     PRIVATE_KEY_PATH: str | None = None  # Path to RSA private key for RS256
     PUBLIC_KEY_PATH: str | None = None  # Path to RSA public key for RS256
+    USE_REDIS: bool = False
     REDIS_HOST: str
     REDIS_PORT: int = 6379
     REDIS_DB: int = 0

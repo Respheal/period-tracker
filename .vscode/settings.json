@@ -11,11 +11,8 @@
     "**/.ruff_cache/**": true,
     "**/.tox/**": true,
     "**/.venv/**": true,
-    "**/dist/**": true,
     "**/node_modules/**": true,
-    "**/.tanstack/**": true,
-    "**/test-results/**": true,
-    "**/playwright-report/**": true
+    "**/.tanstack/**": true
   },
   "files.readonlyInclude": {
     "**/routeTree.gen.ts": true

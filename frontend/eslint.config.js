@@ -13,6 +13,7 @@ export default defineConfig([
   globalIgnores(['dist', 'src/client']),
   {
     files: ['**/*.{ts,tsx}'],
+    ignores: ['src/components/chakra-ui/*'],
     extends: [
       js.configs.recommended,
       tseslint.configs.recommended,
@@ -21,7 +22,10 @@ export default defineConfig([
       eslintConfigPrettier,
     ],
     languageOptions: { ecmaVersion: 2020, globals: globals.browser },
-    rules: { 'react-refresh/only-export-components': ['warn', { allowExportNames: ['Route', 'router'] }] },
+    rules: {
+      // Supressing error Tanstack Router Route components
+      'react-refresh/only-export-components': ['off', { allowExportNames: ['Route', 'router'] }],
+    },
   },
   ...storybook.configs['flat/recommended'],
   ...pluginRouter.configs['flat/recommended'],

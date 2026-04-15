@@ -8,7 +8,6 @@ export default defineConfig({
     indexFile: false,
   },
   plugins: [
-    '@hey-api/client-ky',
     '@hey-api/schemas',
     '@hey-api/transformers',
     {

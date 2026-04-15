@@ -1,20 +1,18 @@
 import React, { createContext, useContext, useState } from 'react';
-
 import { useMutation } from '@tanstack/react-query';
+
 import {
   createUserUsersPostMutation,
   loginAuthPostMutation,
-  refreshTokensAuthRefreshPostMutation,
 } from '@/client/@tanstack/react-query.gen';
 import type { BodyLoginAuthPost, UserCreate } from '@/client/types.gen';
 import { useCookie } from '@/hooks/useCookie';
-import { queryClient } from '@/query-client';
 import { router } from '@/router';
+import { queryClient } from '@/query-client';
 
 export interface AuthState {
   isAuthenticated: boolean;
   login: (data: BodyLoginAuthPost) => Promise<void>;
-  refresh: () => Promise<void>;
   logout: () => void;
   createAccount: (data: UserCreate) => Promise<void>;
 }
@@ -25,7 +23,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [isAuthenticated, setIsAuthenticated] = useState(() => {
     return !!localStorage.getItem('access_token');
   });
-  const { setCookie, getCookie, expireCookie } = useCookie();
+  const [, setCookieValue] = useCookie('refresh_token');
 
   const CreateUserMutation = useMutation({
     ...createUserUsersPostMutation(),
@@ -42,19 +40,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     },
     onSuccess: (data) => {
       localStorage.setItem('access_token', data.access_token);
-      setCookie('refresh_token', data.refresh_token);
+      setCookieValue(data.refresh_token, { httpOnly: true, secure: true });
       setIsAuthenticated(true);
-    },
-  });
-
-  const RefreshMutation = useMutation({
-    ...refreshTokensAuthRefreshPostMutation(),
-    onError: (error) => {
-      throw new Error(`Token refresh failed: ${error}`);
-    },
-    onSuccess: (data) => {
-      localStorage.setItem('access_token', data.access_token);
-      setCookie('refresh_token', data.refresh_token);
     },
   });
 
@@ -68,24 +55,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     CreateUserMutation.mutate({ body: data });
   }
 
-  async function refresh() {
-    if (RefreshMutation.isPending) return;
-    RefreshMutation.mutate({
-      body: { refresh_token: getCookie('refresh_token') },
-    });
-  }
-
   function logout() {
     setIsAuthenticated(false);
     localStorage.removeItem('access_token');
-    expireCookie('refresh_token');
+    setCookieValue('', { httpOnly: true, secure: true, expiresInDays: -1 });
     queryClient.clear();
     router.invalidate();
   }
 
   return (
-    <AuthContext.Provider
-      value={{ isAuthenticated, login, logout, refresh, createAccount }}>
+    <AuthContext.Provider value={{ isAuthenticated, login, logout, createAccount }}>
       {children}
     </AuthContext.Provider>
   );

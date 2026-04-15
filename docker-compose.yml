@@ -16,6 +16,7 @@ services:
       - .env
     environment:
       - DATA_DIR=/data/
+      - USE_REDIS=${USE_REDIS:-TRUE}
       - REDIS_HOST=redis
       - ALGORITHM=RS256
       - PRIVATE_KEY_PATH=/keys/private.pem
