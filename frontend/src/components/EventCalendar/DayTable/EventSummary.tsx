@@ -1,8 +1,9 @@
 'use client';
 
-import { type SymptomEvent } from '@/client/types.gen';
-import { Badge, Circle, Wrap, DataList, For, Stack } from '@chakra-ui/react';
 import type { JSX } from 'react';
+import { Badge, Circle, Wrap, DataList, For, Stack } from '@chakra-ui/react';
+
+import { type SymptomEvent } from '@/client/types.gen';
 
 interface EventSummary {
   symptoms: string[];

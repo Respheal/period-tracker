@@ -1,12 +1,13 @@
 // Hook to manage cookies (specifically the refresh_token cookie)
+// TODO: There's a good chance react router already has something for this
 
-const useCookie = () => {
-  const setCookie = (
+export function useCookie() {
+  function setCookie(
     name: string,
     value: string,
     exdays?: number | null,
     secure: boolean = true,
-  ) => {
+  ) {
     const d = new Date();
     if (!exdays) {
       exdays = import.meta.env.REFRESH_TOKEN_EXPIRE_DAYS
@@ -18,9 +19,9 @@ const useCookie = () => {
     const secureFlag = secure ? 'Secure; ' : '';
     const cookie = `${name}=${value}; ${expires}; ${secureFlag}SameSite=Strict; path=/`;
     document.cookie = cookie;
-  };
+  }
 
-  const getCookie = (name: string) => {
+  function getCookie(name: string) {
     const cname = `${name}=`;
     const decodedCookie = decodeURIComponent(document.cookie);
     const ca = decodedCookie.split(';');
@@ -34,17 +35,15 @@ const useCookie = () => {
       }
     }
     return '';
-  };
+  }
 
-  const expireCookie = (name: string) => {
+  function expireCookie(name: string) {
     setCookie(name, '', -1, true);
-  };
+  }
 
   return {
     setCookie,
     getCookie,
     expireCookie,
   };
-};
-
-export default useCookie;
+}

@@ -1,13 +1,12 @@
 import { createFileRoute } from '@tanstack/react-router';
-
 import { Box, Grid, Center, GridItem, Tabs, Heading } from '@chakra-ui/react';
 import dayjs from 'dayjs';
-import type { Period, Response, SymptomEvent, Temperature } from '@/client/types.gen';
 
+import type { Period, Response, SymptomEvent, Temperature } from '@/client/types.gen';
 import { EventCalendar } from '@/components/EventCalendar';
 import { LogPeriod } from '@/components/EventForm';
 
-export const Route = createFileRoute('/dashboard')({
+export const Route = createFileRoute('/_authenticated/dashboard')({
   component: RouteComponent,
 });
 

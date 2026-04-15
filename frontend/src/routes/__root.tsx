@@ -1,15 +1,9 @@
 import { useState } from 'react';
-import {
-  createRootRoute,
-  useRouterState,
-  Outlet,
-  useNavigate,
-} from '@tanstack/react-router';
-import { TanStackRouterDevtools } from '@tanstack/react-router-devtools';
+import { Outlet, createRootRouteWithContext } from '@tanstack/react-router';
+import { QueryClient } from '@tanstack/react-query';
 
-import { Provider } from '@/components/ui/provider';
-import { ColorModeButton } from '@/components/ui/color-mode';
-import useAuth, { isLoggedIn } from '@/hooks/useAuth';
+import { ChakraUIProvider } from '@/providers/ChakraUIProvider';
+import { ColorModeButton } from '@/components/chakra-ui/color-mode';
 import {
   AbsoluteCenter,
   Box,
@@ -22,53 +16,40 @@ import {
 import { MobileDrawer } from '@/components/Navigation/MobileDrawer';
 import { MenuLinks } from '@/components/Navigation/MenuLinks';
 import { PalettePicker } from '@/components/PalettePicker';
+import type { AuthState } from '@/providers/AuthProvider';
 
-export const Route = createRootRoute({
+interface MyRouterContext {
+  auth: AuthState;
+  queryClient: QueryClient;
+}
+
+export const Route = createRootRouteWithContext<MyRouterContext>()({
   component: RootComponent,
 });
 
 function RootComponent() {
+  const { auth } = Route.useRouteContext();
   const [palette, setPalette] = useState(localStorage.getItem('user-palette') || 'gray');
   const nav_items = [
     ['/dashboard', 'Home'],
     ['/api', 'API Test'],
   ] as const;
-  const navigate = useNavigate();
-  const router = useRouterState();
-  const { logout } = useAuth();
 
-  if (!isLoggedIn()) {
-    // If the user is not logged in, redirect to the register page if
-    // they are doing anything but visiting the register or login page
-    if (
-      router.location.pathname !== '/register' &&
-      router.location.pathname !== '/login'
-    ) {
-      navigate({ to: '/register' });
-    }
-    // Display the register or login page
+  if (!auth.isAuthenticated) {
+    // Display the bare login/registration page
     return (
-      <Provider>
+      <ChakraUIProvider>
         <AbsoluteCenter>
           <Container>
             <Outlet />
           </Container>
         </AbsoluteCenter>
-      </Provider>
+      </ChakraUIProvider>
     );
   } else {
-    // If a logged-in user tries to visit the register or login page,
-    // redirect them to the dashboard
-    if (
-      router.location.pathname === '/' ||
-      router.location.pathname === '/register' ||
-      router.location.pathname === '/login'
-    ) {
-      navigate({ to: '/dashboard' });
-    }
     // Display the main dashboard with sidebar
     return (
-      <Provider palette={palette}>
+      <ChakraUIProvider palette={palette}>
         <Container
           fluid
           centerContent={true}
@@ -76,12 +57,12 @@ function RootComponent() {
           <SkipNavLink id='main'>Skip to Content</SkipNavLink>
           <Flex direction='row' align='center' width='full' py={4}>
             <Box display={{ base: 'none', md: 'block' }}>
-              <MenuLinks nav_items={nav_items} logoutFn={logout} />
+              <MenuLinks nav_items={nav_items} logoutFn={auth.logout} />
             </Box>
 
             {/* Mobile Drawer */}
             <Box display={{ base: 'block', md: 'none' }}>
-              <MobileDrawer nav_items={nav_items} logoutFn={logout} />
+              <MobileDrawer nav_items={nav_items} logoutFn={auth.logout} />
             </Box>
 
             <Spacer />
@@ -92,9 +73,7 @@ function RootComponent() {
             <Outlet />
           </SkipNavContent>
         </Container>
-
-        <TanStackRouterDevtools />
-      </Provider>
+      </ChakraUIProvider>
     );
   }
 }

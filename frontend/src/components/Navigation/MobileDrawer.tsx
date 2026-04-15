@@ -7,6 +7,7 @@ import {
   Icon,
 } from '@chakra-ui/react';
 import { LuMenu } from 'react-icons/lu';
+
 import { MenuLinks } from './MenuLinks';
 
 export function MobileDrawer({

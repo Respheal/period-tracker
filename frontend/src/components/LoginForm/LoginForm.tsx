@@ -1,17 +1,17 @@
-import { useForm } from '@tanstack/react-form';
 import { useState } from 'react';
+import { useForm } from '@tanstack/react-form';
+import { type ToOptions } from '@tanstack/react-router';
 import { Button, Stack, Field, Input, Card } from '@chakra-ui/react';
 
-import { PasswordInput } from '@/components/ui/password-input';
+import { PasswordInput } from '@/components/chakra-ui/password-input';
 import type { BodyLoginAuthPost } from '@/client/types.gen';
 
-export function LoginForm({
-  loginFn,
-  navigateFn,
-}: {
-  loginFn: (data: BodyLoginAuthPost) => void;
-  navigateFn: ({ to }: { to: string }) => void;
-}) {
+interface LoginFormProps {
+  navigateFn: (options: ToOptions) => Promise<void>;
+  loginFn: (data: BodyLoginAuthPost) => Promise<void>;
+}
+
+export function LoginForm({ loginFn, navigateFn }: LoginFormProps) {
   const [submitting, setSubmitting] = useState(false);
   const form = useForm({
     defaultValues: {

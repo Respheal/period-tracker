@@ -8,7 +8,7 @@ import {
 } from '@chakra-ui/react';
 import { ThemeProvider } from 'next-themes';
 
-interface ProviderProps {
+interface ChakraUIProviderProps {
   children: React.ReactNode;
   palette?: string;
 }
@@ -24,7 +24,7 @@ function generateSystem(palette: string) {
   );
 }
 
-export function Provider(props: ProviderProps) {
+export function ChakraUIProvider(props: ChakraUIProviderProps) {
   const system = generateSystem(props.palette || 'gray');
   return (
     <ChakraProvider value={system}>

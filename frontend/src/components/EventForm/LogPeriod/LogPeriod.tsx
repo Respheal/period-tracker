@@ -2,6 +2,7 @@
 
 import { Button, DatePicker, Stack, Heading } from '@chakra-ui/react';
 import { LuCalendar } from 'react-icons/lu';
+
 import { DatePickerCalendar } from '../shared';
 
 export function LogPeriod() {

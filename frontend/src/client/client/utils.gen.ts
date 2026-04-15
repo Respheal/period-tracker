@@ -69,8 +69,6 @@ export const getParseAs = (
   contentType: string | null,
 ): Exclude<Config['parseAs'], 'auto'> => {
   if (!contentType) {
-    // If no Content-Type header is provided, the best we can do is return the raw response body,
-    // which is effectively the same as the 'stream' option.
     return 'stream';
   }
 
@@ -209,8 +207,6 @@ export const mergeHeaders = (
           mergedHeaders.append(key, v as string);
         }
       } else if (value !== undefined) {
-        // assume object headers are meant to be JSON stringified, i.e., their
-        // content value in OpenAPI specification is 'application/json'
         mergedHeaders.set(
           key,
           typeof value === 'object' ? JSON.stringify(value) : (value as string),
@@ -320,5 +316,7 @@ export const createConfig = <T extends ClientOptions = ClientOptions>(
   headers: defaultHeaders,
   parseAs: 'auto',
   querySerializer: defaultQuerySerializer,
+  throwOnError: false,
+  timeout: 10000,
   ...override,
 });

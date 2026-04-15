@@ -1,27 +1,30 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useForm, useStore } from '@tanstack/react-form';
+import type { ToOptions } from '@tanstack/react-router';
 import { zxcvbn, zxcvbnOptions } from '@zxcvbn-ts/core';
 import { Button, Stack, Field, Input, Card, Text } from '@chakra-ui/react';
 
 import { type UserCreate } from '@/client/types.gen';
-import { PasswordInput, PasswordStrengthMeter } from '@/components/ui/password-input';
+import {
+  PasswordInput,
+  PasswordStrengthMeter,
+} from '@/components/chakra-ui/password-input';
+
+interface RegistrationFormProps {
+  navigateFn: (options: ToOptions) => Promise<void>;
+  registerFn: (data: UserCreate) => void;
+}
 
 interface RegistrationForm extends UserCreate {
   confirm_password: string;
 }
 
-export function RegistrationForm({
-  registerFn,
-  navigateFn,
-}: {
-  registerFn: (data: UserCreate) => void;
-  navigateFn: ({ to }: { to: string }) => void;
-}) {
+export function RegistrationForm({ registerFn, navigateFn }: RegistrationFormProps) {
   const [submitting, setSubmitting] = useState(false);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const loadZxcvbn = async () => {
+    async function loadZxcvbn() {
       const common = await import('@zxcvbn-ts/language-common');
       const en = await import('@zxcvbn-ts/language-en');
 
@@ -32,7 +35,7 @@ export function RegistrationForm({
         translations: en.translations,
       });
       setLoading(false);
-    };
+    }
     loadZxcvbn();
   }, []);
 
@@ -51,6 +54,7 @@ export function RegistrationForm({
         password: value.password,
       });
       setSubmitting(false);
+      navigateFn({ to: '/login' });
     },
   });
 

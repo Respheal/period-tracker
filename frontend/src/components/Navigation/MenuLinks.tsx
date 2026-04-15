@@ -1,5 +1,5 @@
-import { HStack, VStack, Link as ChakraLink } from '@chakra-ui/react';
 import { Link } from '@tanstack/react-router';
+import { HStack, VStack, Link as ChakraLink } from '@chakra-ui/react';
 
 export function MenuLinks({
   nav_items = [],

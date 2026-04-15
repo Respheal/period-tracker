@@ -8,14 +8,12 @@ export default defineConfig({
     indexFile: false,
   },
   plugins: [
+    '@hey-api/client-ky',
     '@hey-api/schemas',
+    '@hey-api/transformers',
     {
-      dates: true,
-      name: '@hey-api/transformers',
-    },
-    {
-      enums: 'javascript',
       name: '@hey-api/typescript',
+      enums: 'javascript',
     },
     {
       name: '@hey-api/sdk',

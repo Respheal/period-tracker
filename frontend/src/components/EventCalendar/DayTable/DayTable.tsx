@@ -1,6 +1,5 @@
 'use client';
 
-import { type Response } from '@/client/types.gen';
 import {
   DatePickerTable,
   DatePickerTableBody,
@@ -14,6 +13,8 @@ import {
   DatePickerTableCell,
   type DatePickerDayTableProps,
 } from '@chakra-ui/react';
+
+import { type Response } from '@/client/types.gen';
 import { DayTableCell } from './DayTableCell';
 
 interface EventCalendarDayTableProps extends DatePickerDayTableProps {

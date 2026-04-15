@@ -1,12 +1,6 @@
 'use client';
 
 import {
-  type Period,
-  type Response,
-  type SymptomEvent,
-  type Temperature,
-} from '@/client/types.gen';
-import {
   DatePickerTableCellTrigger,
   Float,
   ScrollArea,
@@ -23,6 +17,13 @@ import {
 } from '@chakra-ui/react';
 import dayjs from 'dayjs';
 import LocalizedFormat from 'dayjs/plugin/localizedFormat';
+
+import {
+  type Period,
+  type Response,
+  type SymptomEvent,
+  type Temperature,
+} from '@/client/types.gen';
 import { EventSummary } from './EventSummary';
 
 /**
