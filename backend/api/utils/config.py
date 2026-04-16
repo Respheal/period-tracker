@@ -49,6 +49,7 @@ class Settings(BaseSettings):
     DATABASE: str
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 15
     REFRESH_TOKEN_EXPIRE_DAYS: int = 7
+    SSL_ENABLED: bool = False
     ALGORITHM: str
     SECRET_KEY: str = secrets.token_urlsafe(32)  # Deprecated, use RSA keys instead
     PRIVATE_KEY_PATH: str | None = None  # Path to RSA private key for RS256

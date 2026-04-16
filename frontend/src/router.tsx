@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import { ErrorComponent, createRouter, RouterProvider } from '@tanstack/react-router';
 import { useQueryClient } from '@tanstack/react-query';
 
-import { useAuth } from './providers/AuthProvider';
+import { useAuth } from '@/providers/AuthProvider';
 import { routeTree } from './routeTree.gen';
 
 export const router = createRouter({

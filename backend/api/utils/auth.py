@@ -152,7 +152,7 @@ async def refresh_tokens(
     refresh_token: str,
     session: Annotated[Session, Depends(get_session)],
     settings: Annotated[Settings, Depends(get_settings)],
-) -> models.LoginResponse:
+) -> models.TokenPair:
     """Refresh access and refresh tokens using a valid refresh token."""
     payload: models.TokenPayload = validate_token(
         token=refresh_token, token_type="refresh", settings=settings  # nosec B106
@@ -170,7 +170,7 @@ async def refresh_tokens(
         redis_client.set(
             f"{payload.jti}", 1, ex=settings.REFRESH_TOKEN_EXPIRE_DAYS * 86400
         )
-    return models.LoginResponse(
+    return models.TokenPair(
         access_token=create_token(
             user=user,
             token_type="access",  # nosec B106

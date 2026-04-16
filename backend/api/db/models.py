@@ -49,7 +49,7 @@ class RefreshToken(SQLModel):
     refresh_token: str
 
 
-class LoginResponse(SQLModel):
+class TokenPair(Token, RefreshToken):
     access_token: str
     refresh_token: str
     token_type: str

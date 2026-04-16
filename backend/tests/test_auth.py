@@ -26,8 +26,8 @@ class TestLogin:
         assert response.status_code == 200
         data = response.json()
         assert "access_token" in data
-        assert "refresh_token" in data
         assert data["token_type"] == "bearer"
+        assert response.cookies["refresh_token"]
 
     def test_login_with_incorrect_password(
         self, client: TestClient, session: Session
@@ -49,8 +49,7 @@ class TestLogin:
     ) -> None:
         login = login_user(client, session)
         assert login["response"].status_code == 200, login["response"]
-        data = login["response"].json()
-        refresh_token = data["refresh_token"]
+        refresh_token = login["response"].cookies["refresh_token"]
         # Try using the refresh token as the access token
         response = client.get(
             "/users/me",
@@ -65,8 +64,8 @@ class TestTokenRefresh:
     ) -> None:
         login = login_user(client, session)
         assert login["response"].status_code == 200
-        data = login["response"].json()
-        refresh_token = data["refresh_token"]
+        refresh_token = login["response"].cookies["refresh_token"]
+        access_token = login["response"].json()["access_token"]
 
         # Get JTI from old tokens
         old_refresh_jti = auth.validate_token(
@@ -75,25 +74,23 @@ class TestTokenRefresh:
             settings=settings,
         ).jti
         old_access_jti = auth.validate_token(
-            token=data["access_token"],
+            token=access_token,
             token_type="access",
             settings=settings,
         ).jti
 
         # Attempt the refresh
-        response = client.post(
-            "/auth/refresh",
-            json={"refresh_token": refresh_token},
-        )
+        client.cookies.set("refresh_token", refresh_token)
+        response = client.post("/auth/refresh")
         assert response.status_code == 200
 
         data = response.json()
         assert "access_token" in data
-        assert "refresh_token" in data
+        assert response.cookies["refresh_token"]
 
         # Get JTI from new tokens
         new_refresh_jti = auth.validate_token(
-            token=data["refresh_token"],
+            token=response.cookies["refresh_token"],
             token_type="refresh",
             settings=settings,
         ).jti
@@ -110,13 +107,17 @@ class TestTokenRefresh:
         # Verify that the old token is blacklisted in redis
         assert get_redis_client().get(f"{old_refresh_jti}")
 
+    def test_refresh_with_missing_token(self, client: TestClient) -> None:
+        client.cookies.delete("refresh_token")
+        response = client.post("/auth/refresh")
+        assert response.status_code == 401
+
     def test_refresh_with_access_token(
         self, client: TestClient, session: Session
     ) -> None:
         login = login_user(client, session)
         assert login["response"].status_code == 200
-        data = login["response"].json()
-        access_token = data["access_token"]
+        access_token = login["response"].json()["access_token"]
 
         # Try to refresh tokens using access token instead of refresh token
         response = client.post(
@@ -132,8 +133,7 @@ class TestTokenRefreshEdgeCases:
     ) -> None:
         login = login_user(client, session)
         assert login["response"].status_code == 200
-        data = login["response"].json()
-        refresh_token = data["refresh_token"]
+        refresh_token = login["response"].cookies["refresh_token"]
         user = login["user"]
 
         # Disable the user
@@ -142,10 +142,8 @@ class TestTokenRefreshEdgeCases:
         session.commit()
 
         # Try to refresh tokens with disabled user
-        response = client.post(
-            "/auth/refresh",
-            json={"refresh_token": refresh_token},
-        )
+        client.cookies.set("refresh_token", refresh_token)
+        response = client.post("/auth/refresh")
         assert response.status_code == 401
 
     def test_refresh_tokens_deleted_user(
@@ -153,8 +151,7 @@ class TestTokenRefreshEdgeCases:
     ) -> None:
         login = login_user(client, session)
         assert login["response"].status_code == 200
-        data = login["response"].json()
-        refresh_token = data["refresh_token"]
+        refresh_token = login["response"].cookies["refresh_token"]
         user = login["user"]
 
         # Delete the user
@@ -162,10 +159,8 @@ class TestTokenRefreshEdgeCases:
         session.commit()
 
         # Try to refresh tokens with deleted user
-        response = client.post(
-            "/auth/refresh",
-            json={"refresh_token": refresh_token},
-        )
+        client.cookies.set("refresh_token", refresh_token)
+        response = client.post("/auth/refresh")
         assert response.status_code == 401
 
 

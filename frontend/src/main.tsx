@@ -13,6 +13,7 @@ import './index.css';
 client.setConfig({
   // baseUrl: process.env.API_HOST || 'http://localhost:5000',
   baseUrl: 'http://localhost:5000',
+  credentials: 'same-origin',
   auth: () => {
     return localStorage.getItem('access_token') || undefined;
   },
