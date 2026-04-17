@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Outlet, createRootRouteWithContext } from '@tanstack/react-router';
-import { QueryClient } from '@tanstack/react-query';
+import { TanStackRouterDevtools } from '@tanstack/react-router-devtools';
+import type { QueryClient } from '@tanstack/react-query';
 
 import { ChakraUIProvider } from '@/providers/ChakraUIProvider';
 import { ColorModeButton } from '@/components/chakra-ui/color-mode';
@@ -16,26 +17,33 @@ import {
 import { MobileDrawer } from '@/components/Navigation/MobileDrawer';
 import { MenuLinks } from '@/components/Navigation/MenuLinks';
 import { PalettePicker } from '@/components/PalettePicker';
-import type { AuthState } from '@/providers/AuthProvider';
+import { useAuth } from '@/hooks/useAuth';
 
-interface MyRouterContext {
-  auth: AuthState;
+interface RouterContext {
   queryClient: QueryClient;
+  auth: { isAuthenticated: boolean };
 }
 
-export const Route = createRootRouteWithContext<MyRouterContext>()({
+export const Route = createRootRouteWithContext<RouterContext>()({
   component: RootComponent,
 });
 
+function getPallete() {
+  const storedPalette = localStorage.getItem('user-palette');
+  return storedPalette;
+}
+
 function RootComponent() {
+  const [palette, setPalette] = useState(() => getPallete() || 'gray');
   const { auth } = Route.useRouteContext();
-  const [palette, setPalette] = useState(localStorage.getItem('user-palette') || 'gray');
+  const isAuthenticated = auth.isAuthenticated;
+  const { logout } = useAuth();
   const nav_items = [
     ['/dashboard', 'Home'],
     ['/api', 'API Test'],
   ] as const;
 
-  if (!auth.isAuthenticated) {
+  if (!isAuthenticated) {
     // Display the bare login/registration page
     return (
       <ChakraUIProvider>
@@ -44,6 +52,7 @@ function RootComponent() {
             <Outlet />
           </Container>
         </AbsoluteCenter>
+        <TanStackRouterDevtools />
       </ChakraUIProvider>
     );
   } else {
@@ -57,12 +66,12 @@ function RootComponent() {
           <SkipNavLink id='main'>Skip to Content</SkipNavLink>
           <Flex direction='row' align='center' width='full' py={4}>
             <Box display={{ base: 'none', md: 'block' }}>
-              <MenuLinks nav_items={nav_items} logoutFn={auth.logout} />
+              <MenuLinks nav_items={nav_items} logoutFn={logout} />
             </Box>
 
             {/* Mobile Drawer */}
             <Box display={{ base: 'block', md: 'none' }}>
-              <MobileDrawer nav_items={nav_items} logoutFn={auth.logout} />
+              <MobileDrawer nav_items={nav_items} logoutFn={logout} />
             </Box>
 
             <Spacer />
@@ -73,6 +82,7 @@ function RootComponent() {
             <Outlet />
           </SkipNavContent>
         </Container>
+        <TanStackRouterDevtools />
       </ChakraUIProvider>
     );
   }

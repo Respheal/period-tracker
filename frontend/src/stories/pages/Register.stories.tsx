@@ -3,12 +3,14 @@ import { type ToOptions } from '@tanstack/react-router';
 
 import { RegistrationForm } from '@/components/RegistrationForm';
 
-async function MockRegistrationFn() {
+function MockRegistrationFn() {
   console.log('Registering account...');
+  return Promise.resolve();
 }
 
-async function MockNavigateFn(opts: ToOptions) {
+function MockNavigateFn(opts: ToOptions) {
   console.log('Navigating to:', opts.to);
+  return Promise.resolve();
 }
 
 const meta = {

@@ -5,6 +5,20 @@ export type ClientOptions = {
 };
 
 /**
+ * AccessToken
+ */
+export type AccessToken = {
+  /**
+   * Token Type
+   */
+  token_type: string;
+  /**
+   * Access Token
+   */
+  access_token: string;
+};
+
+/**
  * ApplicationInfo
  */
 export type ApplicationInfo = {
@@ -191,24 +205,6 @@ export type HealthCheck = {
 };
 
 /**
- * LoginResponse
- */
-export type LoginResponse = {
-  /**
-   * Access Token
-   */
-  access_token: string;
-  /**
-   * Refresh Token
-   */
-  refresh_token: string;
-  /**
-   * Token Type
-   */
-  token_type: string;
-};
-
-/**
  * Period
  *
  * Period Event model.
@@ -281,16 +277,6 @@ export type PredictedPeriod = {
    * Confidence
    */
   confidence?: number | null;
-};
-
-/**
- * RefreshToken
- */
-export type RefreshToken = {
-  /**
-   * Refresh Token
-   */
-  refresh_token: string;
 };
 
 /**
@@ -681,13 +667,13 @@ export type LoginAuthPostResponses = {
   /**
    * Successful Response
    */
-  200: LoginResponse;
+  200: AccessToken;
 };
 
 export type LoginAuthPostResponse = LoginAuthPostResponses[keyof LoginAuthPostResponses];
 
 export type RefreshTokensAuthRefreshPostData = {
-  body: RefreshToken;
+  body?: never;
   path?: never;
   query?: never;
   url: '/auth/refresh';
@@ -698,20 +684,13 @@ export type RefreshTokensAuthRefreshPostErrors = {
    * Not found
    */
   404: unknown;
-  /**
-   * Validation Error
-   */
-  422: HttpValidationError;
 };
-
-export type RefreshTokensAuthRefreshPostError =
-  RefreshTokensAuthRefreshPostErrors[keyof RefreshTokensAuthRefreshPostErrors];
 
 export type RefreshTokensAuthRefreshPostResponses = {
   /**
    * Successful Response
    */
-  200: LoginResponse;
+  200: AccessToken;
 };
 
 export type RefreshTokensAuthRefreshPostResponse =

@@ -23,7 +23,7 @@ export function LoginForm({ loginFn, navigateFn }: LoginFormProps) {
         username: value.username,
         password: value.password,
       };
-      loginFn(data);
+      await loginFn(data);
       setSubmitting(false);
     },
   });
@@ -72,7 +72,7 @@ export function LoginForm({ loginFn, navigateFn }: LoginFormProps) {
           </Stack>
         </Card.Body>
         <Card.Footer justifyContent='flex-end'>
-          <Button onClick={() => navigateFn({ to: '/register' })}>Register</Button>
+          <Button onClick={() => void navigateFn({ to: '/register' })}>Register</Button>
           <form.Subscribe
             selector={(state) => ({
               canSubmit: state.canSubmit,

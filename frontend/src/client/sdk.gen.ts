@@ -206,20 +206,13 @@ export const loginAuthPost = <ThrowOnError extends boolean = false>(
  * Refresh Tokens
  */
 export const refreshTokensAuthRefreshPost = <ThrowOnError extends boolean = false>(
-  options: Options<RefreshTokensAuthRefreshPostData, ThrowOnError>,
+  options?: Options<RefreshTokensAuthRefreshPostData, ThrowOnError>,
 ) =>
-  (options.client ?? client).post<
+  (options?.client ?? client).post<
     RefreshTokensAuthRefreshPostResponses,
     RefreshTokensAuthRefreshPostErrors,
     ThrowOnError
-  >({
-    url: '/auth/refresh',
-    ...options,
-    headers: {
-      'Content-Type': 'application/json',
-      ...options.headers,
-    },
-  });
+  >({ url: '/auth/refresh', ...options });
 
 /**
  * Get Users

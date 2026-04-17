@@ -1,6 +1,8 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router';
 
 import { RegistrationForm } from '@/components/RegistrationForm';
+import { useAuth } from '@/hooks/useAuth';
+import type { UserCreate } from '@/client/types.gen';
 
 export const Route = createFileRoute('/_auth/register')({
   component: RouteComponent,
@@ -8,7 +10,12 @@ export const Route = createFileRoute('/_auth/register')({
 
 function RouteComponent() {
   const navigate = useNavigate();
-  const { auth } = Route.useRouteContext();
+  const { createAccount } = useAuth();
 
-  return <RegistrationForm navigateFn={navigate} registerFn={auth.createAccount} />;
+  async function handleRegister(data: UserCreate) {
+    await createAccount(data);
+    void navigate({ to: '/dashboard', search: {}, replace: true });
+  }
+
+  return <RegistrationForm navigateFn={navigate} registerFn={handleRegister} />;
 }

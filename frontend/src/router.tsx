@@ -1,8 +1,6 @@
-import { useEffect } from 'react';
-import { ErrorComponent, createRouter, RouterProvider } from '@tanstack/react-router';
-import { useQueryClient } from '@tanstack/react-query';
+import { ErrorComponent, createRouter } from '@tanstack/react-router';
 
-import { useAuth } from '@/providers/AuthProvider';
+import { queryClient } from '@/query-client';
 import { routeTree } from './routeTree.gen';
 
 export const router = createRouter({
@@ -12,8 +10,12 @@ export const router = createRouter({
   ),
   defaultErrorComponent: ({ error }) => <ErrorComponent error={error} />,
   context: {
-    auth: undefined!,
-    queryClient: undefined!,
+    auth: {
+      get isAuthenticated() {
+        return localStorage.getItem('isLoggedIn') === 'true';
+      },
+    },
+    queryClient,
   },
   defaultPreload: 'intent',
   // Since we're using React Query, we don't want loader calls to ever be stale
@@ -26,15 +28,4 @@ declare module '@tanstack/react-router' {
   interface Register {
     router: typeof router;
   }
-}
-
-export function RouterContextProvider() {
-  const auth = useAuth();
-  const queryClient = useQueryClient();
-
-  useEffect(() => {
-    router.invalidate();
-  }, [auth.isAuthenticated]);
-
-  return <RouterProvider router={router} context={{ auth, queryClient }} />;
 }

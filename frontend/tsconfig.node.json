@@ -1,3 +1,4 @@
+//Node.js Runtime
 {
   "compilerOptions": {
     "paths": {
@@ -26,5 +27,12 @@
     "noFallthroughCasesInSwitch": true,
     "noUncheckedSideEffectImports": true
   },
-  "include": ["vite.config.ts"]
+  "include": [
+    "vite.config.ts",
+    "vitest.shims.d.ts",
+    "openapi-ts.config.ts",
+    "playwright.config.ts",
+    ".storybook/**/*",
+    "tests/**/*"
+  ]
 }

@@ -120,11 +120,9 @@ class TestTokenRefresh:
         access_token = login["response"].json()["access_token"]
 
         # Try to refresh tokens using access token instead of refresh token
-        response = client.post(
-            "/auth/refresh",
-            json={"refresh_token": access_token},
-        )
-        assert response.status_code == 401, response.json()
+        client.cookies.set("refresh_token", access_token)
+        response = client.post("/auth/refresh")
+        assert response.status_code == 401
 
 
 class TestTokenRefreshEdgeCases:

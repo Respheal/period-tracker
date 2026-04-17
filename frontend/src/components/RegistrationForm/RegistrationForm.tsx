@@ -12,7 +12,7 @@ import {
 
 interface RegistrationFormProps {
   navigateFn: (options: ToOptions) => Promise<void>;
-  registerFn: (data: UserCreate) => void;
+  registerFn: (data: UserCreate) => Promise<void>;
 }
 
 interface RegistrationForm extends UserCreate {
@@ -36,7 +36,10 @@ export function RegistrationForm({ registerFn, navigateFn }: RegistrationFormPro
       });
       setLoading(false);
     }
-    loadZxcvbn();
+    loadZxcvbn().catch((error) => {
+      console.error('Failed to load password strength library:', error);
+      setLoading(false);
+    });
   }, []);
 
   const defaultUser = {
@@ -48,13 +51,13 @@ export function RegistrationForm({ registerFn, navigateFn }: RegistrationFormPro
   const form = useForm({
     defaultValues: defaultUser,
     onSubmit: async ({ value }) => {
-      registerFn({
+      await registerFn({
         username: value.username,
         display_name: value.display_name,
         password: value.password,
       });
       setSubmitting(false);
-      navigateFn({ to: '/login' });
+      void navigateFn({ to: '/login' });
     },
   });
 
@@ -150,6 +153,7 @@ export function RegistrationForm({ registerFn, navigateFn }: RegistrationFormPro
                   />
                   {field.state.meta.errors.map((err, index) => {
                     return (
+                      // eslint-disable-next-line react-x/no-array-index-key
                       <Field.ErrorText key={index}>
                         <Text>{err}</Text>
                       </Field.ErrorText>
@@ -161,7 +165,7 @@ export function RegistrationForm({ registerFn, navigateFn }: RegistrationFormPro
           </Stack>
         </Card.Body>
         <Card.Footer justifyContent='flex-end'>
-          <Button onClick={() => navigateFn({ to: '/login' })}>Login</Button>
+          <Button onClick={() => void navigateFn({ to: '/login' })}>Login</Button>
           <form.Subscribe
             selector={(state) => ({
               canSubmit: state.canSubmit,
