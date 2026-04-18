@@ -1,10 +1,18 @@
 import { QueryCache, QueryClient } from '@tanstack/react-query';
+import { refreshTokensAuthRefreshPost } from './client/sdk.gen';
 
-// force react-query to throw the actual error response
 declare module '@tanstack/react-query' {
   interface Register {
     defaultError: Response;
   }
+}
+
+async function refreshAuthToken() {
+  await refreshTokensAuthRefreshPost()
+    .then((response) => queryClient.setQueryData(['auth'], response.data))
+    .catch(() => {
+      throw new Error('Token refresh failed: No data returned');
+    });
 }
 
 export const queryClient = new QueryClient({
@@ -15,9 +23,13 @@ export const queryClient = new QueryClient({
       refetchOnWindowFocus: false, // Don't refetch when window regains focus
       retry: (failureCount, error) => {
         if (error.status === 400 || error.status === 401) {
+          refreshAuthToken().catch(() => {
+            localStorage.setItem('isLoggedIn', false.toString());
+            queryClient.clear();
+            window.location.href = '/login';
+          });
           return failureCount <= 1;
         }
-
         return failureCount <= 3;
       },
     },

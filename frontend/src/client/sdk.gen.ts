@@ -185,7 +185,7 @@ export type Options<
 /**
  * Login
  */
-export const loginAuthPost = <ThrowOnError extends boolean = false>(
+export const loginAuthPost = <ThrowOnError extends boolean = true>(
   options: Options<LoginAuthPostData, ThrowOnError>,
 ) =>
   (options.client ?? client).post<
@@ -205,7 +205,7 @@ export const loginAuthPost = <ThrowOnError extends boolean = false>(
 /**
  * Refresh Tokens
  */
-export const refreshTokensAuthRefreshPost = <ThrowOnError extends boolean = false>(
+export const refreshTokensAuthRefreshPost = <ThrowOnError extends boolean = true>(
   options?: Options<RefreshTokensAuthRefreshPostData, ThrowOnError>,
 ) =>
   (options?.client ?? client).post<
@@ -222,7 +222,7 @@ export const refreshTokensAuthRefreshPost = <ThrowOnError extends boolean = fals
  * :return: A list of safe user representations (sans sensitive info)
  * :rtype: Sequence[UserSafe]
  */
-export const getUsersUsersGet = <ThrowOnError extends boolean = false>(
+export const getUsersUsersGet = <ThrowOnError extends boolean = true>(
   options?: Options<GetUsersUsersGetData, ThrowOnError>,
 ) =>
   (options?.client ?? client).get<
@@ -239,7 +239,7 @@ export const getUsersUsersGet = <ThrowOnError extends boolean = false>(
 /**
  * Create User
  */
-export const createUserUsersPost = <ThrowOnError extends boolean = false>(
+export const createUserUsersPost = <ThrowOnError extends boolean = true>(
   options: Options<CreateUserUsersPostData, ThrowOnError>,
 ) =>
   (options.client ?? client).post<
@@ -258,7 +258,7 @@ export const createUserUsersPost = <ThrowOnError extends boolean = false>(
 /**
  * Delete Me
  */
-export const deleteMeUsersMeDelete = <ThrowOnError extends boolean = false>(
+export const deleteMeUsersMeDelete = <ThrowOnError extends boolean = true>(
   options?: Options<DeleteMeUsersMeDeleteData, ThrowOnError>,
 ) =>
   (options?.client ?? client).delete<
@@ -274,7 +274,7 @@ export const deleteMeUsersMeDelete = <ThrowOnError extends boolean = false>(
 /**
  * Read Me
  */
-export const readMeUsersMeGet = <ThrowOnError extends boolean = false>(
+export const readMeUsersMeGet = <ThrowOnError extends boolean = true>(
   options?: Options<ReadMeUsersMeGetData, ThrowOnError>,
 ) =>
   (options?.client ?? client).get<
@@ -291,7 +291,7 @@ export const readMeUsersMeGet = <ThrowOnError extends boolean = false>(
 /**
  * Update Me
  */
-export const updateMeUsersMePatch = <ThrowOnError extends boolean = false>(
+export const updateMeUsersMePatch = <ThrowOnError extends boolean = true>(
   options: Options<UpdateMeUsersMePatchData, ThrowOnError>,
 ) =>
   (options.client ?? client).patch<
@@ -312,7 +312,7 @@ export const updateMeUsersMePatch = <ThrowOnError extends boolean = false>(
 /**
  * Get My Events
  */
-export const getMyEventsUsersMeEventsGet = <ThrowOnError extends boolean = false>(
+export const getMyEventsUsersMeEventsGet = <ThrowOnError extends boolean = true>(
   options?: Options<GetMyEventsUsersMeEventsGetData, ThrowOnError>,
 ) =>
   (options?.client ?? client).get<
@@ -329,7 +329,7 @@ export const getMyEventsUsersMeEventsGet = <ThrowOnError extends boolean = false
 /**
  * Get My Events Csv
  */
-export const getMyEventsCsvUsersMeEventsCsvGet = <ThrowOnError extends boolean = false>(
+export const getMyEventsCsvUsersMeEventsCsvGet = <ThrowOnError extends boolean = true>(
   options?: Options<GetMyEventsCsvUsersMeEventsCsvGetData, ThrowOnError>,
 ) =>
   (options?.client ?? client).get<
@@ -345,7 +345,7 @@ export const getMyEventsCsvUsersMeEventsCsvGet = <ThrowOnError extends boolean =
 /**
  * Get My Partners
  */
-export const getMyPartnersUsersMePartnersGet = <ThrowOnError extends boolean = false>(
+export const getMyPartnersUsersMePartnersGet = <ThrowOnError extends boolean = true>(
   options?: Options<GetMyPartnersUsersMePartnersGetData, ThrowOnError>,
 ) =>
   (options?.client ?? client).get<
@@ -363,7 +363,7 @@ export const getMyPartnersUsersMePartnersGet = <ThrowOnError extends boolean = f
  * Remove Partner
  */
 export const removePartnerUsersMePartnersPartnerIdDelete = <
-  ThrowOnError extends boolean = false,
+  ThrowOnError extends boolean = true,
 >(
   options: Options<RemovePartnerUsersMePartnersPartnerIdDeleteData, ThrowOnError>,
 ) =>
@@ -381,7 +381,7 @@ export const removePartnerUsersMePartnersPartnerIdDelete = <
  * Add Partner
  */
 export const addPartnerUsersMePartnersPartnerIdPost = <
-  ThrowOnError extends boolean = false,
+  ThrowOnError extends boolean = true,
 >(
   options: Options<AddPartnerUsersMePartnersPartnerIdPostData, ThrowOnError>,
 ) =>
@@ -399,7 +399,7 @@ export const addPartnerUsersMePartnersPartnerIdPost = <
 /**
  * Get All Periods
  */
-export const getAllPeriodsPeriodGet = <ThrowOnError extends boolean = false>(
+export const getAllPeriodsPeriodGet = <ThrowOnError extends boolean = true>(
   options?: Options<GetAllPeriodsPeriodGetData, ThrowOnError>,
 ) =>
   (options?.client ?? client).get<
@@ -416,7 +416,7 @@ export const getAllPeriodsPeriodGet = <ThrowOnError extends boolean = false>(
 /**
  * Create Period Event
  */
-export const createPeriodEventPeriodPost = <ThrowOnError extends boolean = false>(
+export const createPeriodEventPeriodPost = <ThrowOnError extends boolean = true>(
   options: Options<CreatePeriodEventPeriodPostData, ThrowOnError>,
 ) =>
   (options.client ?? client).post<
@@ -437,7 +437,7 @@ export const createPeriodEventPeriodPost = <ThrowOnError extends boolean = false
 /**
  * Get My Periods
  */
-export const getMyPeriodsPeriodMeGet = <ThrowOnError extends boolean = false>(
+export const getMyPeriodsPeriodMeGet = <ThrowOnError extends boolean = true>(
   options?: Options<GetMyPeriodsPeriodMeGetData, ThrowOnError>,
 ) =>
   (options?.client ?? client).get<
@@ -454,7 +454,7 @@ export const getMyPeriodsPeriodMeGet = <ThrowOnError extends boolean = false>(
 /**
  * Delete Period
  */
-export const deletePeriodPeriodMePeriodIdDelete = <ThrowOnError extends boolean = false>(
+export const deletePeriodPeriodMePeriodIdDelete = <ThrowOnError extends boolean = true>(
   options: Options<DeletePeriodPeriodMePeriodIdDeleteData, ThrowOnError>,
 ) =>
   (options.client ?? client).delete<
@@ -470,7 +470,7 @@ export const deletePeriodPeriodMePeriodIdDelete = <ThrowOnError extends boolean 
 /**
  * Get Single Period
  */
-export const getSinglePeriodPeriodMePeriodIdGet = <ThrowOnError extends boolean = false>(
+export const getSinglePeriodPeriodMePeriodIdGet = <ThrowOnError extends boolean = true>(
   options: Options<GetSinglePeriodPeriodMePeriodIdGetData, ThrowOnError>,
 ) =>
   (options.client ?? client).get<
@@ -487,7 +487,7 @@ export const getSinglePeriodPeriodMePeriodIdGet = <ThrowOnError extends boolean 
 /**
  * Update Period
  */
-export const updatePeriodPeriodMePeriodIdPatch = <ThrowOnError extends boolean = false>(
+export const updatePeriodPeriodMePeriodIdPatch = <ThrowOnError extends boolean = true>(
   options: Options<UpdatePeriodPeriodMePeriodIdPatchData, ThrowOnError>,
 ) =>
   (options.client ?? client).patch<
@@ -508,7 +508,7 @@ export const updatePeriodPeriodMePeriodIdPatch = <ThrowOnError extends boolean =
 /**
  * Get My Periods Csv
  */
-export const getMyPeriodsCsvPeriodMeCsvGet = <ThrowOnError extends boolean = false>(
+export const getMyPeriodsCsvPeriodMeCsvGet = <ThrowOnError extends boolean = true>(
   options?: Options<GetMyPeriodsCsvPeriodMeCsvGetData, ThrowOnError>,
 ) =>
   (options?.client ?? client).get<
@@ -524,7 +524,7 @@ export const getMyPeriodsCsvPeriodMeCsvGet = <ThrowOnError extends boolean = fal
 /**
  * Get Next Period
  */
-export const getNextPeriodPeriodMeNextGet = <ThrowOnError extends boolean = false>(
+export const getNextPeriodPeriodMeNextGet = <ThrowOnError extends boolean = true>(
   options?: Options<GetNextPeriodPeriodMeNextGetData, ThrowOnError>,
 ) =>
   (options?.client ?? client).get<
@@ -542,7 +542,7 @@ export const getNextPeriodPeriodMeNextGet = <ThrowOnError extends boolean = fals
  * Get Partner Periods
  */
 export const getPartnerPeriodsPeriodPartnerPartnerIdGet = <
-  ThrowOnError extends boolean = false,
+  ThrowOnError extends boolean = true,
 >(
   options: Options<GetPartnerPeriodsPeriodPartnerPartnerIdGetData, ThrowOnError>,
 ) =>
@@ -561,7 +561,7 @@ export const getPartnerPeriodsPeriodPartnerPartnerIdGet = <
  * Get Partner Periods Csv
  */
 export const getPartnerPeriodsCsvPeriodPartnerPartnerIdCsvGet = <
-  ThrowOnError extends boolean = false,
+  ThrowOnError extends boolean = true,
 >(
   options: Options<GetPartnerPeriodsCsvPeriodPartnerPartnerIdCsvGetData, ThrowOnError>,
 ) =>
@@ -578,7 +578,7 @@ export const getPartnerPeriodsCsvPeriodPartnerPartnerIdCsvGet = <
 /**
  * Get Temp Readings
  */
-export const getTempReadingsTempGet = <ThrowOnError extends boolean = false>(
+export const getTempReadingsTempGet = <ThrowOnError extends boolean = true>(
   options?: Options<GetTempReadingsTempGetData, ThrowOnError>,
 ) =>
   (options?.client ?? client).get<
@@ -595,7 +595,7 @@ export const getTempReadingsTempGet = <ThrowOnError extends boolean = false>(
 /**
  * Create Temp Reading
  */
-export const createTempReadingTempPost = <ThrowOnError extends boolean = false>(
+export const createTempReadingTempPost = <ThrowOnError extends boolean = true>(
   options: Options<CreateTempReadingTempPostData, ThrowOnError>,
 ) =>
   (options.client ?? client).post<
@@ -616,7 +616,7 @@ export const createTempReadingTempPost = <ThrowOnError extends boolean = false>(
 /**
  * Get My Readings
  */
-export const getMyReadingsTempMeGet = <ThrowOnError extends boolean = false>(
+export const getMyReadingsTempMeGet = <ThrowOnError extends boolean = true>(
   options?: Options<GetMyReadingsTempMeGetData, ThrowOnError>,
 ) =>
   (options?.client ?? client).get<
@@ -633,7 +633,7 @@ export const getMyReadingsTempMeGet = <ThrowOnError extends boolean = false>(
 /**
  * Delete Temp
  */
-export const deleteTempTempMeTemperatureIdDelete = <ThrowOnError extends boolean = false>(
+export const deleteTempTempMeTemperatureIdDelete = <ThrowOnError extends boolean = true>(
   options: Options<DeleteTempTempMeTemperatureIdDeleteData, ThrowOnError>,
 ) =>
   (options.client ?? client).delete<
@@ -650,7 +650,7 @@ export const deleteTempTempMeTemperatureIdDelete = <ThrowOnError extends boolean
  * Get Single Reading
  */
 export const getSingleReadingTempMeTemperatureIdGet = <
-  ThrowOnError extends boolean = false,
+  ThrowOnError extends boolean = true,
 >(
   options: Options<GetSingleReadingTempMeTemperatureIdGetData, ThrowOnError>,
 ) =>
@@ -669,7 +669,7 @@ export const getSingleReadingTempMeTemperatureIdGet = <
  * Update Reading
  */
 export const updateReadingTempMeTemperatureIdPatch = <
-  ThrowOnError extends boolean = false,
+  ThrowOnError extends boolean = true,
 >(
   options: Options<UpdateReadingTempMeTemperatureIdPatchData, ThrowOnError>,
 ) =>
@@ -691,7 +691,7 @@ export const updateReadingTempMeTemperatureIdPatch = <
 /**
  * Get My Temp Averages
  */
-export const getMyTempAveragesTempMeAveragesGet = <ThrowOnError extends boolean = false>(
+export const getMyTempAveragesTempMeAveragesGet = <ThrowOnError extends boolean = true>(
   options?: Options<GetMyTempAveragesTempMeAveragesGetData, ThrowOnError>,
 ) =>
   (options?.client ?? client).get<
@@ -707,7 +707,7 @@ export const getMyTempAveragesTempMeAveragesGet = <ThrowOnError extends boolean 
 /**
  * Get My Temp Readings Csv
  */
-export const getMyTempReadingsCsvTempMeCsvGet = <ThrowOnError extends boolean = false>(
+export const getMyTempReadingsCsvTempMeCsvGet = <ThrowOnError extends boolean = true>(
   options?: Options<GetMyTempReadingsCsvTempMeCsvGetData, ThrowOnError>,
 ) =>
   (options?.client ?? client).get<
@@ -724,7 +724,7 @@ export const getMyTempReadingsCsvTempMeCsvGet = <ThrowOnError extends boolean = 
  * Get Partner Temperatures
  */
 export const getPartnerTemperaturesTempPartnerPartnerIdGet = <
-  ThrowOnError extends boolean = false,
+  ThrowOnError extends boolean = true,
 >(
   options: Options<GetPartnerTemperaturesTempPartnerPartnerIdGetData, ThrowOnError>,
 ) =>
@@ -743,7 +743,7 @@ export const getPartnerTemperaturesTempPartnerPartnerIdGet = <
  * Get Partner Temp Readings Csv
  */
 export const getPartnerTempReadingsCsvTempPartnerPartnerIdCsvGet = <
-  ThrowOnError extends boolean = false,
+  ThrowOnError extends boolean = true,
 >(
   options: Options<GetPartnerTempReadingsCsvTempPartnerPartnerIdCsvGetData, ThrowOnError>,
 ) =>
@@ -760,7 +760,7 @@ export const getPartnerTempReadingsCsvTempPartnerPartnerIdCsvGet = <
 /**
  * Get Symptom Events
  */
-export const getSymptomEventsSymptomsGet = <ThrowOnError extends boolean = false>(
+export const getSymptomEventsSymptomsGet = <ThrowOnError extends boolean = true>(
   options?: Options<GetSymptomEventsSymptomsGetData, ThrowOnError>,
 ) =>
   (options?.client ?? client).get<
@@ -777,7 +777,7 @@ export const getSymptomEventsSymptomsGet = <ThrowOnError extends boolean = false
 /**
  * Create Symptom Event
  */
-export const createSymptomEventSymptomsPost = <ThrowOnError extends boolean = false>(
+export const createSymptomEventSymptomsPost = <ThrowOnError extends boolean = true>(
   options: Options<CreateSymptomEventSymptomsPostData, ThrowOnError>,
 ) =>
   (options.client ?? client).post<
@@ -798,7 +798,7 @@ export const createSymptomEventSymptomsPost = <ThrowOnError extends boolean = fa
 /**
  * Get My Symptom Events
  */
-export const getMySymptomEventsSymptomsMeGet = <ThrowOnError extends boolean = false>(
+export const getMySymptomEventsSymptomsMeGet = <ThrowOnError extends boolean = true>(
   options?: Options<GetMySymptomEventsSymptomsMeGetData, ThrowOnError>,
 ) =>
   (options?.client ?? client).get<
@@ -816,7 +816,7 @@ export const getMySymptomEventsSymptomsMeGet = <ThrowOnError extends boolean = f
  * Delete Symptom Event
  */
 export const deleteSymptomEventSymptomsMeSymptomIdDelete = <
-  ThrowOnError extends boolean = false,
+  ThrowOnError extends boolean = true,
 >(
   options: Options<DeleteSymptomEventSymptomsMeSymptomIdDeleteData, ThrowOnError>,
 ) =>
@@ -834,7 +834,7 @@ export const deleteSymptomEventSymptomsMeSymptomIdDelete = <
  * Get Single Symptom Event
  */
 export const getSingleSymptomEventSymptomsMeSymptomIdGet = <
-  ThrowOnError extends boolean = false,
+  ThrowOnError extends boolean = true,
 >(
   options: Options<GetSingleSymptomEventSymptomsMeSymptomIdGetData, ThrowOnError>,
 ) =>
@@ -853,7 +853,7 @@ export const getSingleSymptomEventSymptomsMeSymptomIdGet = <
  * Update Symptom Event
  */
 export const updateSymptomEventSymptomsMeSymptomIdPatch = <
-  ThrowOnError extends boolean = false,
+  ThrowOnError extends boolean = true,
 >(
   options: Options<UpdateSymptomEventSymptomsMeSymptomIdPatchData, ThrowOnError>,
 ) =>
@@ -875,7 +875,7 @@ export const updateSymptomEventSymptomsMeSymptomIdPatch = <
 /**
  * Export Symptoms Csv
  */
-export const exportSymptomsCsvSymptomsMeCsvGet = <ThrowOnError extends boolean = false>(
+export const exportSymptomsCsvSymptomsMeCsvGet = <ThrowOnError extends boolean = true>(
   options?: Options<ExportSymptomsCsvSymptomsMeCsvGetData, ThrowOnError>,
 ) =>
   (options?.client ?? client).get<
@@ -892,7 +892,7 @@ export const exportSymptomsCsvSymptomsMeCsvGet = <ThrowOnError extends boolean =
  * Get Partner Symptoms
  */
 export const getPartnerSymptomsSymptomsPartnerPartnerIdGet = <
-  ThrowOnError extends boolean = false,
+  ThrowOnError extends boolean = true,
 >(
   options: Options<GetPartnerSymptomsSymptomsPartnerPartnerIdGetData, ThrowOnError>,
 ) =>
@@ -911,7 +911,7 @@ export const getPartnerSymptomsSymptomsPartnerPartnerIdGet = <
  * Export Partner Symptoms Csv
  */
 export const exportPartnerSymptomsCsvSymptomsPartnerPartnerIdCsvGet = <
-  ThrowOnError extends boolean = false,
+  ThrowOnError extends boolean = true,
 >(
   options: Options<
     ExportPartnerSymptomsCsvSymptomsPartnerPartnerIdCsvGetData,
@@ -931,7 +931,7 @@ export const exportPartnerSymptomsCsvSymptomsPartnerPartnerIdCsvGet = <
 /**
  * Root
  */
-export const rootGet = <ThrowOnError extends boolean = false>(
+export const rootGet = <ThrowOnError extends boolean = true>(
   options?: Options<RootGetData, ThrowOnError>,
 ) =>
   (options?.client ?? client).get<RootGetResponses, unknown, ThrowOnError>({
@@ -942,7 +942,7 @@ export const rootGet = <ThrowOnError extends boolean = false>(
 /**
  * Health Check
  */
-export const healthCheckHealthGet = <ThrowOnError extends boolean = false>(
+export const healthCheckHealthGet = <ThrowOnError extends boolean = true>(
   options?: Options<HealthCheckHealthGetData, ThrowOnError>,
 ) =>
   (options?.client ?? client).get<HealthCheckHealthGetResponses, unknown, ThrowOnError>({

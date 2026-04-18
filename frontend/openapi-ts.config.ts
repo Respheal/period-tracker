@@ -8,6 +8,10 @@ export default defineConfig({
     indexFile: false,
   },
   plugins: [
+    {
+      name: '@hey-api/client-fetch',
+      throwOnError: true,
+    },
     '@hey-api/schemas',
     '@hey-api/transformers',
     {

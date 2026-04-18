@@ -96,7 +96,7 @@ export const CreatePeriodParamsSchema = {
       pattern: '^\\d{4}-\\d{2}-\\d{2}$',
       title: 'Start Date',
       description: 'Start date',
-      default: '2026-04-13',
+      default: '2026-04-14',
     },
     end_date: {
       anyOf: [
@@ -110,7 +110,7 @@ export const CreatePeriodParamsSchema = {
       ],
       title: 'End Date',
       description: 'End date (Optional)',
-      default: '2026-04-16',
+      default: '2026-04-17',
     },
   },
   type: 'object',

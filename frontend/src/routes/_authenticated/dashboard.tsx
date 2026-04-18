@@ -1,88 +1,12 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { Box, Grid, Center, GridItem, Tabs, Heading } from '@chakra-ui/react';
-import dayjs from 'dayjs';
 
-import type { Period, Response, SymptomEvent, Temperature } from '@/client/types.gen';
 import { EventCalendar } from '@/components/EventCalendar';
 import { LogPeriod } from '@/components/EventForm';
 
 export const Route = createFileRoute('/_authenticated/dashboard')({
   component: RouteComponent,
 });
-
-const mockSymptoms: SymptomEvent[] = [
-  {
-    user_id: '1',
-    flow_intensity: '2',
-    sex: ['protected'],
-    mood: ['big mad'],
-    ovulation_test: true,
-    discharge: ['terrible', 'gross'],
-    date: dayjs().toDate(),
-    symptoms: ['tummy hurt', 'headache', 'everything bad', 'aaaaaaaaaaaaaaaaa'],
-  },
-  {
-    user_id: '1',
-    flow_intensity: '0',
-    sex: null,
-    mood: ['big mad'],
-    ovulation_test: false,
-    discharge: null,
-    date: dayjs().add(1, 'day').toDate(),
-    symptoms: null,
-  },
-  {
-    user_id: '1',
-    flow_intensity: '0',
-    sex: null,
-    mood: null,
-    ovulation_test: true,
-    discharge: null,
-    date: dayjs().add(5, 'day').toDate(),
-    symptoms: null,
-  },
-  {
-    user_id: '1',
-    flow_intensity: '0',
-    sex: null,
-    mood: ['weh'],
-    ovulation_test: false,
-    discharge: null,
-    date: dayjs().add(5, 'day').toDate(),
-    symptoms: null,
-  },
-];
-
-const mockPeriods: Period[] = [
-  {
-    user_id: '1',
-    start_date: dayjs().toDate(),
-    end_date: dayjs().add(3, 'day').toDate(),
-  },
-];
-
-const mockTemps: Temperature[] = [
-  {
-    user_id: '1',
-    temperature: 32.0,
-    timestamp: dayjs().toDate(),
-  },
-  {
-    user_id: '1',
-    temperature: 31.2,
-    timestamp: dayjs().toDate(),
-  },
-  {
-    user_id: '1',
-    temperature: 31.0,
-    timestamp: dayjs().add(1, 'day').toDate(),
-  },
-];
-
-const mockEvents: Response = {
-  count: 4,
-  data: { symptoms: mockSymptoms, periods: mockPeriods, temperatures: mockTemps },
-};
 
 function RouteComponent() {
   return (
@@ -127,7 +51,7 @@ function RouteComponent() {
         rowStart={{ base: 2, md: 1 }}>
         <Box p={2} borderWidth='1px' borderRadius='md'>
           <Center>
-            <EventCalendar events={mockEvents} />
+            <EventCalendar />
           </Center>
         </Box>
       </GridItem>

@@ -46,7 +46,7 @@ export function DayTableCell({ day, events }: { day: DateValue; events?: Respons
   const eventData = events?.data || { periods: [], symptoms: [], temperatures: [] };
   const periodDay = isPeriodDay(day, events?.data.periods as Period[]);
 
-  // TODO: Keyboard navigation seems to be broken on period days - investigate and fix
+  // BUG: Keyboard navigation seems to be broken on period days - investigate and fix
 
   // Extract only events matching the calendar day in question
   const dayEvents = Object.fromEntries(
@@ -123,6 +123,8 @@ export function DayTableCell({ day, events }: { day: DateValue; events?: Respons
 }
 
 function dateValueToDate(date: DateValue): Date {
+  // BUG: see EventCal for smarter handling. I don't know what this would do in January (month: 1)
+  // Reminder that this arbitary DateValue is ass at converting to Date
   return new Date(date.year, date.month - 1, date.day);
 }
 
@@ -165,11 +167,16 @@ function formatTemperatures(temps: Temperature[]) {
 }
 
 function isPeriodDay(day: DateValue, periods: Period[]): boolean {
+  const convertedDay = dayjs(dateValueToDate(day));
+
   return periods.some(
     (period) =>
+      // is cal day same as start_date
       isSameDay(day, period.start_date) ||
-      (dateValueToDate(day) > period.start_date &&
-        period.end_date &&
-        dateValueToDate(day) <= period.end_date),
+      // is cal day same as end_date
+      (period.end_date && isSameDay(day, period.end_date)) ||
+      // is cal day between start_date and end_date
+      (convertedDay.isAfter(dayjs(period.start_date), 'day') &&
+        convertedDay.isBefore(dayjs(period.end_date), 'day')),
   );
 }
