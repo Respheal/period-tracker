@@ -14,30 +14,29 @@ export function useAuth() {
 
   const CreateUserMutation = useMutation({
     ...createUserUsersPostMutation(),
-    onError: (error: Error) => {
-      throw new Error(`Account creation failed: ${error}`);
-    },
   });
 
   async function createAccount(data: UserCreate) {
     if (CreateUserMutation.isPending) return;
-    await CreateUserMutation.mutateAsync({ body: data });
+    await CreateUserMutation.mutateAsync({ body: data }).catch((err) => {
+      throw new Error(`Account creation failed: ${err}`);
+    });
   }
 
   const LoginMutation = useMutation({
     ...loginAuthPostMutation(),
-    onError: (error: Error) => {
-      throw new Error(`Authentication failed: ${error}`);
-    },
-    onSuccess: (data) => {
-      queryClient.setQueryData(['auth'], data);
-      localStorage.setItem('isLoggedIn', true.toString());
-    },
   });
 
   async function login(data: BodyLoginAuthPost) {
     if (LoginMutation.isPending) return;
-    await LoginMutation.mutateAsync({ body: data });
+    await LoginMutation.mutateAsync({ body: data })
+      .catch((err) => {
+        throw new Error(`Authentication failed: ${err}`);
+      })
+      .then(() => {
+        queryClient.setQueryData(['auth'], data);
+        localStorage.setItem('isLoggedIn', true.toString());
+      });
   }
 
   function logout() {

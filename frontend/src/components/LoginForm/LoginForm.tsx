@@ -4,6 +4,7 @@ import { type ToOptions } from '@tanstack/react-router';
 import { Button, Stack, Field, Input, Card } from '@chakra-ui/react';
 
 import { PasswordInput } from '@/components/chakra-ui/password-input';
+import { toaster, Toaster } from '@/components/chakra-ui/toaster';
 import type { BodyLoginAuthPost } from '@/client/types.gen';
 
 interface LoginFormProps {
@@ -23,7 +24,12 @@ export function LoginForm({ loginFn, navigateFn }: LoginFormProps) {
         username: value.username,
         password: value.password,
       };
-      await loginFn(data);
+      await loginFn(data).catch((err) => {
+        toaster.create({
+          title: err.message || 'Login failed',
+          type: 'error',
+        });
+      });
       setSubmitting(false);
     },
   });
@@ -92,6 +98,7 @@ export function LoginForm({ loginFn, navigateFn }: LoginFormProps) {
           />
         </Card.Footer>
       </form>
+      <Toaster />
     </Card.Root>
   );
 }

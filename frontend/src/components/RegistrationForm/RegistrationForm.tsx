@@ -9,6 +9,7 @@ import {
   PasswordInput,
   PasswordStrengthMeter,
 } from '@/components/chakra-ui/password-input';
+import { toaster, Toaster } from '@/components/chakra-ui/toaster';
 
 interface RegistrationFormProps {
   navigateFn: (options: ToOptions) => Promise<void>;
@@ -55,6 +56,11 @@ export function RegistrationForm({ registerFn, navigateFn }: RegistrationFormPro
         username: value.username,
         display_name: value.display_name,
         password: value.password,
+      }).catch((err) => {
+        toaster.create({
+          title: err.message || 'Registration failed',
+          type: 'error',
+        });
       });
       setSubmitting(false);
       void navigateFn({ to: '/login' });
@@ -187,6 +193,7 @@ export function RegistrationForm({ registerFn, navigateFn }: RegistrationFormPro
           />
         </Card.Footer>
       </form>
+      <Toaster />
     </Card.Root>
   );
 }

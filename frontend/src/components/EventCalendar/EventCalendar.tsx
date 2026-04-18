@@ -1,11 +1,12 @@
+import { useEffect, useState } from 'react';
 import { DatePicker } from '@chakra-ui/react';
 import { keepPreviousData, useQuery, useQueryClient } from '@tanstack/react-query';
+import dayjs from 'dayjs';
 
 import { DayTable } from './DayTable';
+import { Toaster, toaster } from '@/components/chakra-ui/toaster';
 import type { Response as EventResponse } from '@/client/types.gen';
 import { getMyEventsUsersMeEventsGetOptions } from '@/client/@tanstack/react-query.gen';
-import { useEffect, useState } from 'react';
-import dayjs from 'dayjs';
 
 function startDateBuffer(startDate: dayjs.Dayjs, buffer: number = 14) {
   return startDate.subtract(buffer, 'day').format('YYYY-MM-DD');
@@ -60,33 +61,39 @@ export function EventCalendar() {
   }
 
   if (error instanceof Error) {
-    return <div>Error: {error.message}</div>;
+    toaster.create({
+      description: error.message,
+      type: 'error',
+    });
   }
 
   return (
-    <DatePicker.Root
-      fixedWeeks
-      inline
-      onVisibleRangeChange={(details) => {
-        // string conversion required to parse the date correctly (to my frustration)
-        const start = dayjs(details.visibleRange.start.toString());
-        const end = dayjs(details.visibleRange.end.toString());
-        setRenderedRange({ start, end });
-      }}>
-      <DatePicker.Content unstyled>
-        <DatePicker.View view='day'>
-          <DatePicker.Header />
-          {renderEvents(data)}
-        </DatePicker.View>
-        <DatePicker.View view='month'>
-          <DatePicker.Header />
-          <DatePicker.MonthTable />
-        </DatePicker.View>
-        <DatePicker.View view='year'>
-          <DatePicker.Header />
-          <DatePicker.YearTable />
-        </DatePicker.View>
-      </DatePicker.Content>
-    </DatePicker.Root>
+    <>
+      <DatePicker.Root
+        fixedWeeks
+        inline
+        onVisibleRangeChange={(details) => {
+          // string conversion required to parse the date correctly (to my frustration)
+          const start = dayjs(details.visibleRange.start.toString());
+          const end = dayjs(details.visibleRange.end.toString());
+          setRenderedRange({ start, end });
+        }}>
+        <DatePicker.Content unstyled>
+          <DatePicker.View view='day'>
+            <DatePicker.Header />
+            {renderEvents(data)}
+          </DatePicker.View>
+          <DatePicker.View view='month'>
+            <DatePicker.Header />
+            <DatePicker.MonthTable />
+          </DatePicker.View>
+          <DatePicker.View view='year'>
+            <DatePicker.Header />
+            <DatePicker.YearTable />
+          </DatePicker.View>
+        </DatePicker.Content>
+      </DatePicker.Root>
+      <Toaster />
+    </>
   );
 }
