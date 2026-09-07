@@ -24,7 +24,7 @@ package-mode = false
 [tool.poetry.group.lint.dependencies]
 flake8 = "^7.3.0"
 flake8-bugbear = "^25.11.29"
-mypy = "^1.19.0"
+mypy = "^2.0.0"
 black = "^26.0.0"
 isort = "^8.0.1"
 ruff = "^0.15.0" # for CI only
