@@ -12,6 +12,11 @@
 - https://auth0.com/blog/rs256-vs-hs256-whats-the-difference/
 - https://www.bestpractices.dev/en/criteria/0
 
+## Accessibility References
+
+- https://www.w3.org/WAI/ARIA/apg/example-index/
+- https://www.w3.org/TR/using-aria/#intro
+
 ## Similar Apps
 
 - https://github.com/moncycle-app/backend-api-web-app
@@ -165,17 +170,11 @@
 
 ### Framework
 
-- [x] [Vite + React](https://react.dev/learn/build-a-react-app-from-scratch)
+- [ ] [Vite + React](https://react.dev/learn/build-a-react-app-from-scratch)
+- [ ] [Chakra](https://chakra-ui.com/)
 - [ ] [TanStack Query](https://tanstack.com/query/latest) - API client, state handling
 - [ ] [TanStack Router](https://tanstack.com/router/latest) - routing? (consider form instead of hooks too)
-- [ ] [Ladle](https://ladle.dev/)
-- [ ] [Ladle Accessibility](https://ladle.dev/docs/a11y)
-- [ ] [Ladle Actions](https://ladle.dev/docs/actions)
-- [ ] [Ladle Controls](https://ladle.dev/docs/controls)
-- [ ] [Ladlbe Story Source](https://ladle.dev/docs/source)
-- [ ] [Ladle Width](https://ladle.dev/docs/width)
-- [ ] [Material UI](https://mui.com/material-ui/)
-- [ ] [Form Management](https://react-hook-form.com/)
+- [ ] [Form Management](https://tanstack.com/form/latest)
 - [ ] [Unit/Integration: Vitest + React Testing Library](https://vitest.dev/guide/browser/component-testing.html#testing-library-integration)
 - [ ] [E2E Tests: Playwright](https://playwright.dev/)
 - [ ] [Day.js](https://github.com/iamkun/dayjs) - If we need better date parsing on the frontend
