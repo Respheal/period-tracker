@@ -14,8 +14,8 @@ dependencies = [
     "pwdlib[argon2] (>=0.3.0,<0.4.0)",
     "tenacity (>=9.1.2,<10.0.0)",
     "redis (>=7.1.0,<8.0.0)",
-    "pandas (>=3.0.0,<3.1.0)",
-    "uvicorn (>=0.44.0,<0.45.0)",
+    "pandas (>=3.1.0,<3.2.0)",
+    "uvicorn (>=0.54.0,<0.55.0)",
 ]
 
 [tool.poetry]
@@ -23,10 +23,10 @@ package-mode = false
 
 [tool.poetry.group.lint.dependencies]
 flake8 = "^7.3.0"
-flake8-bugbear = "^25.11.29"
-mypy = "^1.19.0"
+flake8-bugbear = "^26.9.30"
+mypy = "<2.0.0"
 black = "^26.0.0"
-isort = "^8.0.1"
+isort = "^9.0.2"
 pandas-stubs = "^3.0.0.260204"
 
 [tool.poetry.group.security.dependencies]
