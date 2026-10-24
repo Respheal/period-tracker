@@ -11,7 +11,7 @@ So far the project is exclusively a backend, but a frontend is on the [todo list
 ## Requirements
 
 - Python 3.14
-- Poetry (or pip to install poetry from [requirements.txt](./backend/requirements.txt))
+- Poetry
 
 ## To Run (Locally)
 
@@ -20,7 +20,7 @@ variable configuration.
 
 ```bash
 cd backend
-pip install -r requirements.txt
+pipx install poetry
 poetry install
 # Set up the database with the admin user defined in env
 ./scripts/prestart.sh
