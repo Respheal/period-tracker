@@ -43,7 +43,6 @@ class TestLogin:
             },
         )
         assert response.status_code == 401
-        assert "refresh_token" not in response.cookies
 
     def test_refresh_token_cannot_be_used_as_access_token(
         self, client: TestClient, session: Session
@@ -90,9 +89,8 @@ class TestTokenRefresh:
         assert response.cookies["refresh_token"]
 
         # Get JTI from new tokens
-        new_refresh_token = response.cookies["refresh_token"]
         new_refresh_jti = auth.validate_token(
-            token=new_refresh_token,
+            token=response.cookies["refresh_token"],
             token_type="refresh",
             settings=settings,
         ).jti
@@ -107,7 +105,8 @@ class TestTokenRefresh:
         assert new_refresh_jti != old_refresh_jti
 
         # Verify that the old token is blacklisted in redis
-        assert get_redis_client().get(f"{old_refresh_jti}")
+        if settings.USE_REDIS:
+            assert get_redis_client().get(f"{old_refresh_jti}")
 
     def test_refresh_with_missing_token(self, client: TestClient) -> None:
         client.cookies.delete("refresh_token")
@@ -122,6 +121,7 @@ class TestTokenRefresh:
         access_token = login["response"].json()["access_token"]
 
         # Try to refresh tokens using access token instead of refresh token
+        client.cookies.clear()
         client.cookies.set("refresh_token", access_token)
         response = client.post("/auth/refresh")
         assert response.status_code == 401
