@@ -157,7 +157,7 @@ async def get_my_temp_averages(
     current_user: Annotated[models.UserProfile, Depends(get_current_user)],
     session: Annotated[Session, Depends(get_session)],
     params: Annotated[CommonEventParams, Depends()],
-    precision: Annotated[int, Query(embed=True, description="Decimal precision")] = 2,
+    precision: Annotated[int, Query(description="Decimal precision")] = 2,
 ) -> list[models.TemperatureEMA]:
     start_datetime, end_datetime = convert_dates_to_range(
         params.start_date, params.end_date
@@ -192,7 +192,7 @@ async def get_my_temp_readings_csv(
     current_user: Annotated[models.UserProfile, Depends(get_current_user)],
     session: Annotated[Session, Depends(get_session)],
     params: Annotated[CommonEventParams, Depends()],
-    precision: Annotated[int, Query(embed=True, description="Decimal precision")] = 2,
+    precision: Annotated[int, Query(description="Decimal precision")] = 2,
 ) -> StreamingResponse:  # pragma: no cover
     # We're excluding this from coverage because it is effectively the same as the
     # previous endpoint, just with CSV output.
@@ -242,7 +242,7 @@ async def get_partner_temp_readings_csv(
     current_user: Annotated[models.UserProfile, Depends(get_current_user)],
     session: Annotated[Session, Depends(get_session)],
     params: Annotated[CommonEventParams, Depends()],
-    precision: Annotated[int, Query(embed=True, description="Decimal precision")] = 2,
+    precision: Annotated[int, Query(description="Decimal precision")] = 2,
 ) -> StreamingResponse:  # pragma: no cover
     # We're excluding this from coverage because it is effectively the same as the
     # previous endpoint, just with CSV output.
