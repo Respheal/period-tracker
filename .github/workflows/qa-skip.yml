@@ -17,6 +17,8 @@ on:
   push:
     branches: ["main"]
 
+permissions: {}
+
 jobs:
   lint:
     name: Linting
