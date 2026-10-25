@@ -303,16 +303,16 @@ class TestPeriodPrediction:
         user_response = client.get("/users/me", headers=user_headers)
         user_id = user_response.json()["user_id"]
         user = session.get(models.User, user_id)
-        user.cycle_state = models.Cycle(
+        new_state = models.Cycle(
             state=models.CycleState.STABLE,
             avg_cycle_length=28,
             avg_period_length=3,
             last_period_start=last_period_start,
             last_evaluated=datetime.now(UTC),
         )
+        user.cycle_state.sqlmodel_update(new_state.model_dump(exclude_unset=True))
         session.add(user)
         session.commit()
-        session.refresh(user)
 
         # Now request the next period prediction
         response = client.get("/period/me/next/", headers=user_headers)

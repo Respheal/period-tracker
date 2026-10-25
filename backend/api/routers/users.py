@@ -166,7 +166,8 @@ async def get_my_partners(
     current_user: Annotated[models.UserProfile, Depends(get_current_user)],
 ) -> models.Response:
     return models.Response(
-        data={"partners": current_user.partners}, count=len(current_user.partners or [])
+        data={"partners": current_user.partners or []},
+        count=len(current_user.partners or []),
     )
 
 

@@ -124,9 +124,11 @@ def get_temperature_csv(
 def get_temp_state(
     session: Session,
     user_id: str,
-) -> models.TemperatureState | None:
+) -> models.UserTemperatureState | None:
     return session.exec(
-        select(models.TemperatureState).where(models.TemperatureState.user_id == user_id)
+        select(models.UserTemperatureState).where(
+            models.UserTemperatureState.user_id == user_id
+        )
     ).first()
 
 

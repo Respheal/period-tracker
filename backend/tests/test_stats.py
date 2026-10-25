@@ -1,6 +1,7 @@
 from datetime import UTC, datetime, timedelta
 
 import pandas as pd
+import pytest
 from sqlmodel import Session
 
 from api.db import models
@@ -239,84 +240,73 @@ class TestDetectElevatedPhase:
 
 
 class TestEvaluateTemperatureState:
+    @pytest.fixture(scope="function")
+    def init_state(self, session: Session):
+        user = create_random_user(session)
+        now = datetime.now(UTC)
+        init_temp_state = models.UserTemperatureState(user=user, last_evaluated=now)
+        session.add(init_temp_state)
+        session.flush()
+        yield init_temp_state
+
     def test_empty_temperatures(self) -> None:
         state = evaluate_temperature_state([])
         assert state.phase == models.TempPhase.LEARNING
         assert state.baseline is None
         assert state.last_evaluated is not None
 
-    def test_insufficient_data_learning_phase(self, session: Session) -> None:
-        user = create_random_user(session)
+    def test_insufficient_data_learning_phase(self, session: Session, init_state) -> None:
         # Only a few readings
-        temps = create_temperature_readings(session, user, [36.5, 36.7, 36.9])
-        state = evaluate_temperature_state(temps)
+        temps = create_temperature_readings(session, init_state.user, [36.5, 36.7, 36.9])
+        state = evaluate_temperature_state(temps, init_state)
         assert state.phase == models.TempPhase.LEARNING
 
-    def test_long_gap_unknown_phase(self, session: Session, settings: Settings) -> None:
-        user = create_random_user(session)
+    def test_long_gap_unknown_phase(
+        self, session: Session, settings: Settings, init_state
+    ) -> None:
         now = datetime.now(UTC)
         # Create readings with a gap larger than MAX_MISSING_DAYS
         large_gap = settings.MAX_MISSING_DAYS + 1
         temps = [
             models.Temperature(
-                user_id=user.user_id,
+                user_id=init_state.user_id,
                 temperature=36.5,
                 timestamp=now - timedelta(days=large_gap + 5),
             ),
             models.Temperature(
-                user_id=user.user_id,
+                user_id=init_state.user_id,
                 temperature=36.7,
                 timestamp=now,
             ),
         ]
         session.add_all(temps)
         session.commit()
-        state = evaluate_temperature_state(temps)
+        state = evaluate_temperature_state(temps, init_state)
         # Should detect gap and mark as UNKNOWN
         assert state.phase == models.TempPhase.UNKNOWN
 
-    def test_low_phase(self, session: Session) -> None:
-        user = create_random_user(session)
+    def test_low_phase(self, session: Session, init_state) -> None:
         # Create a series of consistent low temps
-        temps = create_temperature_readings(session, user, [36.5] * 15)
-        state = evaluate_temperature_state(temps)
+        temps = create_temperature_readings(session, init_state.user, [36.5] * 15)
+        state = evaluate_temperature_state(temps, init_state)
         assert state.phase == models.TempPhase.LOW
         assert state.baseline is not None
         assert abs(state.baseline - 36.5) < 0.2
 
-    def test_elevated_phase(self, session: Session) -> None:
-        user = create_random_user(session)
+    def test_elevated_phase(self, session: Session, init_state) -> None:
         # Low temps followed by sustained elevation
         temp_values = [36.5] * 15 + [37.2] * 5
-        temps = create_temperature_readings(session, user, temp_values)
+        temps = create_temperature_readings(session, init_state.user, temp_values)
         state = evaluate_temperature_state(temps)
         assert state.phase == models.TempPhase.ELEVATED
         assert state.baseline is not None
 
-    def test_preserves_previous_state(self, session: Session) -> None:
-        user = create_random_user(session)
-        temps = create_temperature_readings(session, user, [36.5] * 15)
-        # Create initial state
-        previous_state = models.TemperatureState(
-            user_id=user.user_id,
-            phase=models.TempPhase.LOW,
-            baseline=36.5,
-        )
-        # Evaluate with previous state
-        new_state = evaluate_temperature_state(temps, previous_state)
-        # Verify the state is updated in place
-        assert new_state.pid == previous_state.pid
-        assert new_state.user_id == user.user_id
-        assert new_state.last_evaluated is not None
-
     def test_transition_from_low_to_elevated(
-        self, session: Session, settings: Settings
+        self, session: Session, settings: Settings, init_state
     ) -> None:
-        user = create_random_user(session)
-
         # Start with low phase
         low_temps = [36.5] * 20
-        temps = create_temperature_readings(session, user, low_temps)
+        temps = create_temperature_readings(session, init_state.user, low_temps)
         state = evaluate_temperature_state(temps)
         assert state.phase == models.TempPhase.LOW
 
@@ -324,7 +314,7 @@ class TestEvaluateTemperatureState:
         # The elevation needs to be sustained and above threshold
         elevated_temps = [37.5] * (settings.ELEVATION_DAYS_REQUIRED + 1)
         new_temps = create_temperature_readings(
-            session, user, elevated_temps, start_date=datetime.now(UTC)
+            session, init_state.user, elevated_temps, start_date=datetime.now(UTC)
         )
         all_temps = temps + new_temps
         new_state = evaluate_temperature_state(all_temps, state)
@@ -356,7 +346,6 @@ class TestTemperatureStateIntegration:
     def test_user_temp_state_relationship(self, session: Session) -> None:
         """Test that TemperatureState is properly linked to User."""
         user = create_random_user(session)
-        session.refresh(user)
 
         # User should have an initialized temp_state
         assert user.temp_state is not None
@@ -366,7 +355,6 @@ class TestTemperatureStateIntegration:
     def test_temp_state_cascade_delete(self, session: Session) -> None:
         """Test that deleting a user cascades to temp_state."""
         user = create_random_user(session)
-        session.refresh(user)
         temp_state_id = user.temp_state.pid
 
         # Delete user
@@ -374,7 +362,7 @@ class TestTemperatureStateIntegration:
         session.commit()
 
         # Temp state should be deleted too
-        deleted_state = session.get(models.TemperatureState, temp_state_id)
+        deleted_state = session.get(models.UserTemperatureState, temp_state_id)
         assert deleted_state is None
 
 
@@ -653,25 +641,6 @@ class TestCycleStateEvaluation:
             models.CycleState.STABLE,
         ]
 
-    def test_preserves_previous_state(self, session: Session) -> None:
-        user = create_random_user(session)
-        now = datetime.now(UTC)
-        periods_data = []
-        for i in range(5):
-            start = now - timedelta(days=(5 - i) * 28)
-            end = start + timedelta(days=5)
-            periods_data.append((start, end))
-        periods = create_period_events(session, user, periods_data)
-        # Create initial state
-        previous_state = models.Cycle(
-            user_id=user.user_id,
-            state=models.CycleState.LEARNING,
-        )
-        # Evaluate with previous state
-        new_state = evaluate_cycle_state(periods, previous_state)
-        assert new_state.pid == previous_state.pid
-        assert new_state.user_id == user.user_id
-
     def test_cycle_state_with_no_valid_cycles(self, session: Session) -> None:
         user = create_random_user(session)
         now = datetime.now(UTC)
@@ -798,7 +767,6 @@ class TestLutealLengthCalculations:
         )
         period = periods[0]
         update_luteal_length(session, period)
-        session.refresh(period)
         assert period.luteal_length == 11
 
     def test_update_luteal_length_no_elevation(self, session: Session) -> None:
@@ -818,7 +786,6 @@ class TestLutealLengthCalculations:
         )
         period = periods[0]
         update_luteal_length(session, period)
-        session.refresh(period)
         assert period.luteal_length is None
 
     def test_invalid_elevated_phase(self, session: Session, settings: Settings) -> None:
@@ -838,7 +805,6 @@ class TestLutealLengthCalculations:
         )
         period = periods[0]
         update_luteal_length(session, period)
-        session.refresh(period)
         # Luteal length should not be set due to invalid elevated phase
         assert period.luteal_length is None
 

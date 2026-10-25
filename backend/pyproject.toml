@@ -24,7 +24,7 @@ package-mode = false
 [tool.poetry.group.lint.dependencies]
 flake8 = "^7.3.0"
 flake8-bugbear = "^26.9.30"
-mypy = "<2.0.0"
+mypy = "^2.4.0"
 black = "^26.0.0"
 isort = "^9.0.2"
 pandas-stubs = "^3.0.0.260204"

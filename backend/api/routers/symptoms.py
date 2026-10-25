@@ -26,10 +26,12 @@ async def create_symptom_event(
     session: Annotated[Session, Depends(get_session)],
 ) -> models.SymptomEvent:
     if not params.date:
-        params.date = datetime.now(UTC).isoformat()
+        event_date = datetime.now(UTC)
+    else:
+        event_date = datetime.strptime(params.date, "%Y-%m-%d").replace(tzinfo=UTC)
     symptom = models.CreateSymptomEvent(
         user_id=current_user.user_id,
-        date=params.date,
+        date=event_date,
         flow_intensity=params.flow_intensity,
         symptoms=params.symptoms,
         mood=params.mood,
