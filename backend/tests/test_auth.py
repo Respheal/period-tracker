@@ -126,6 +126,34 @@ class TestTokenRefresh:
         response = client.post("/auth/refresh")
         assert response.status_code == 401
 
+    def test_refresh_with_invalid_token(self, client: TestClient) -> None:
+        client.cookies.set("refresh_token", "invalidtoken")
+        response = client.post("/auth/refresh")
+        assert response.status_code == 401
+
+    def test_refresh_with_used_token(
+        self, client: TestClient, session: Session, settings: Settings
+    ) -> None:
+        if not settings.USE_REDIS:
+            pytest.skip(
+                "Skipping test because Redis is disabled. "
+                "Refresh token revocation requires Redis."
+            )
+        login = login_user(client, session)
+        assert login["response"].status_code == 200
+        refresh_token = login["response"].cookies["refresh_token"]
+
+        # Use the refresh token once
+        client.cookies.set("refresh_token", refresh_token)
+        response = client.post("/auth/refresh")
+        assert response.status_code == 200
+
+        # Attempt to use the same refresh token again
+        client.cookies.clear()
+        client.cookies.set("refresh_token", refresh_token)
+        response = client.post("/auth/refresh")
+        assert response.status_code == 401
+
 
 class TestTokenRefreshEdgeCases:
     def test_refresh_tokens_disabled_user(

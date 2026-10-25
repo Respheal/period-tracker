@@ -12,7 +12,9 @@ if os.environ.get("ENVIRONMENT") == "test":  # pragma: no branch
     env_path = rf"{Path(__file__).absolute().parent.parent.parent.parent}/.env.test"
     env_loaded = load_dotenv(env_path, override=False)
     print(f"Loaded .env.test: {env_loaded} from {env_path}")
-elif os.environ.get("PYTEST_CURRENT_TEST") or os.environ.get("PYTEST_VERSION"):
+elif os.environ.get("PYTEST_CURRENT_TEST") or os.environ.get(
+    "PYTEST_VERSION"
+):  # pragma: no cover
     print(
         "WARNING: pytest is running but ENVIRONMENT is not 'test', "
         "so .env.test was not loaded. Settings will resolve to bare defaults "

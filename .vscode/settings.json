@@ -36,7 +36,8 @@
     "**/bower_components": true,
     "**/bazel-out": true,
     "**/dist": true,
-    ".history": true
+    ".history": true,
+    "**/poetry.lock": true
   },
   "git.detectWorktrees": true,
   "editor.formatOnSave": true,
