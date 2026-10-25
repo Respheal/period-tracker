@@ -24,7 +24,7 @@ services:
     volumes:
       - db-data:/data
   redis:
-    image: redis
+    image: redis:8
 
 volumes:
   db-data:
