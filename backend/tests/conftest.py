@@ -51,12 +51,15 @@ def redis_server() -> Generator:
     server = TcpFakeServer(
         (Settings().REDIS_HOST, Settings().REDIS_PORT), server_type="redis"
     )
+    # Added to stop the pytest process from hanging due to the server thread
+    server.daemon_threads = True
     thread = Thread(target=server.serve_forever, daemon=True)
     thread.start()
     try:
         yield server
     finally:
         server.shutdown()
+        server.server_close()
 
 
 # Apply migrations at beginning and end of the test session
