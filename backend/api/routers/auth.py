@@ -24,9 +24,10 @@ def set_refresh_cookie(
     response.set_cookie(
         key="refresh_token",
         value=refresh_token,
+        path="/",  # /api maybe?
         httponly=True,
-        secure=True,
-        samesite="lax",
+        secure=settings.SSL_ENABLED,
+        samesite="strict",
         max_age=settings.REFRESH_TOKEN_EXPIRE_DAYS * 24 * 60 * 60,
     )
 
@@ -76,8 +77,8 @@ async def refresh_tokens(
     tokens = await auth.refresh_tokens(
         refresh_token=refresh_token, session=session, settings=settings
     )
-    set_refresh_cookie(response, tokens["refresh_token"], settings)
+    set_refresh_cookie(response, tokens.refresh_token, settings)
     return models.AccessToken(
-        access_token=tokens["access_token"],
+        access_token=tokens.access_token,
         token_type="bearer",  # nosec B106
     )

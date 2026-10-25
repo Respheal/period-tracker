@@ -1,6 +1,25 @@
 from datetime import UTC, datetime, time
+from typing import overload
 
 from fastapi import HTTPException, status
+
+
+@overload
+def convert_dates_to_range(
+    start_date: str, end_date: str
+) -> tuple[datetime, datetime]: ...
+
+
+@overload
+def convert_dates_to_range(start_date: str, end_date: None) -> tuple[datetime, None]: ...
+
+
+@overload
+def convert_dates_to_range(start_date: None, end_date: str) -> tuple[None, datetime]: ...
+
+
+@overload
+def convert_dates_to_range(start_date: None, end_date: None) -> tuple[None, None]: ...
 
 
 def convert_dates_to_range(

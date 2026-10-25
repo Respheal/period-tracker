@@ -1,4 +1,5 @@
 import enum
+from collections.abc import Sequence
 from datetime import UTC, date, datetime, timedelta
 from typing import Annotated, Literal
 from uuid import uuid4
@@ -31,7 +32,7 @@ class Response(SQLModel):
     """Base response model with count field used for list endpoints."""
 
     count: int
-    data: dict[str, list[Temperature | Period | SymptomEvent | UserSafe]]
+    data: dict[str, Sequence[Temperature | Period | SymptomEvent | UserSafe]]
 
 
 ###
@@ -45,8 +46,14 @@ class AccessToken(Token):
     access_token: str
 
 
-class RefreshToken(Token):
+class RefreshToken(SQLModel):
     refresh_token: str
+
+
+class TokenPair(Token, RefreshToken):
+    access_token: str
+    refresh_token: str
+    token_type: str
 
 
 class TokenPayload(SQLModel):
@@ -154,12 +161,12 @@ class User(UserSafe, table=True):
     # is_disabled
     # is_admin
     # user_id
-    temp_state: TemperatureState = Relationship(
+    temp_state: UserTemperatureState = Relationship(
         back_populates="user",
         cascade_delete=True,
         sa_relationship_kwargs={"uselist": False},
     )
-    cycle_state: Cycle = Relationship(
+    cycle_state: UserCycle = Relationship(
         back_populates="user",
         cascade_delete=True,
         sa_relationship_kwargs={"uselist": False},
@@ -255,12 +262,16 @@ class TempPhase(str, enum.Enum):
     UNKNOWN = "unknown"
 
 
-class TemperatureState(SQLModel, table=True):
-    pid: int | None = Field(default=None, primary_key=True, index=True)
-    user_id: str = Field(foreign_key="user.user_id", index=True, ondelete="CASCADE")
+class TemperatureState(SQLModel):
     phase: TempPhase = Field(default=TempPhase.LEARNING)
     baseline: float | None = None
     last_evaluated: datetime | None = Field(default=None, sa_column=Column(DateTime()))
+
+
+class UserTemperatureState(TemperatureState, table=True):
+    __tablename__ = "temperaturestate"
+    pid: int | None = Field(default=None, primary_key=True, index=True)
+    user_id: str = Field(foreign_key="user.user_id", index=True, ondelete="CASCADE")
     user: User = Relationship(back_populates="temp_state")
 
 
@@ -357,14 +368,17 @@ class CycleState(str, enum.Enum):
     UNSTABLE = "unstable"
 
 
-class Cycle(SQLModel, table=True):
-    pid: int | None = Field(default=None, primary_key=True, index=True)
-    user_id: str = Field(foreign_key="user.user_id", index=True, ondelete="CASCADE")
+class Cycle(SQLModel):
+    __tablename__ = "cycle"
     state: CycleState = Field(default=CycleState.LEARNING)
     avg_cycle_length: int | None = None
     avg_period_length: int | None = None
-    last_period_start: datetime | None = None
     last_evaluated: datetime | None = Field(default=None, sa_column=Column(DateTime()))
+
+
+class UserCycle(Cycle, table=True):
+    pid: int | None = Field(default=None, primary_key=True, index=True)
+    user_id: str = Field(foreign_key="user.user_id", index=True, ondelete="CASCADE")
     user: User = Relationship(back_populates="cycle_state")
 
 

@@ -3,9 +3,9 @@ description: Setup Python for testing suites
 
 inputs:
   working-directory:
-    description: "Working directory to run in, default ."
+    description: 'Working directory to run in, default .'
     required: false
-    default: "./backend"
+    default: './backend'
 
 runs:
   using: composite
@@ -13,12 +13,12 @@ runs:
     - name: Install Poetry
       shell: bash
       working-directory: ${{ inputs.working-directory }}
-      run: pip install -r ./requirements.txt
+      run: pip install poetry
 
     - name: Set up Python 3.14
       uses: actions/setup-python@v7
       with:
-        python-version: "3.14"
+        python-version: '3.14'
         cache: poetry
         cache-dependency-path: ${{ inputs.working-directory }}/poetry.lock
 

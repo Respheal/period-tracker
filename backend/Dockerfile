@@ -1,7 +1,6 @@
 FROM python:3.14-slim-bookworm AS builder
 
-COPY ./requirements.txt ./
-RUN pip install -r requirements.txt
+RUN pip install poetry
 ENV POETRY_NO_INTERACTION=1 \
     POETRY_VIRTUALENVS_IN_PROJECT=1 \
     POETRY_VIRTUALENVS_CREATE=1 \

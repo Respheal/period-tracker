@@ -1,10 +1,18 @@
+from datetime import UTC, datetime
 from typing import Sequence
 
 from sqlmodel import Session, select
 
-from api.db.models import TemperatureState, User, UserCreate, UserProfile, UserUpdate
+from api.db.models import (
+    TemperatureState,
+    User,
+    UserCreate,
+    UserCycle,
+    UserProfile,
+    UserTemperatureState,
+    UserUpdate,
+)
 from api.utils import auth
-from api.utils.stats import evaluate_cycle_state, evaluate_temperature_state
 
 
 def get_users(session: Session, offset: int = 0, limit: int = 100) -> Sequence[User]:
@@ -23,10 +31,13 @@ def create_user(session: Session, user: UserCreate) -> User:
         user, update={"hashed_password": auth.get_password_hash(user.password)}
     )
     session.add(db_user)
-    # Initialize temp state
-    db_user.temp_state = evaluate_temperature_state([])
-    # Initialize cycle state
-    db_user.cycle_state = evaluate_cycle_state([])
+    session.flush()
+    # Initialize temp and cycle state
+    now = datetime.now(UTC)
+    init_temp_state = UserTemperatureState(user_id=db_user.user_id, last_evaluated=now)
+    init_cycle_state = UserCycle(user_id=db_user.user_id, last_evaluated=now)
+    session.add(init_temp_state)
+    session.add(init_cycle_state)
     session.commit()
     session.refresh(db_user)
     return db_user
@@ -59,7 +70,7 @@ def update_temp_state(
     user = get_user(session, user_id)
     if not user:  # pragma: no cover
         return None
-    user.temp_state = new_state
+    user.temp_state.sqlmodel_update(new_state.model_dump(exclude_unset=True))
     session.add(user)
     session.commit()
     session.refresh(user)

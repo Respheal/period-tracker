@@ -188,7 +188,6 @@ class TestIsPartner:
         user1 = create_random_user(session)
         user2 = create_random_user(session)
         add_partner(session=session, user=user1, partner=user2)
-        session.refresh(user1)
         assert is_partner(session, user1, user2.user_id) is True
 
     def test_is_not_partner(self, client: TestClient, session: Session) -> None:

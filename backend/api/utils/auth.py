@@ -152,26 +152,33 @@ async def refresh_tokens(
     refresh_token: str,
     session: Annotated[Session, Depends(get_session)],
     settings: Annotated[Settings, Depends(get_settings)],
-) -> dict[str, str]:
+) -> models.TokenPair:
     """Refresh access and refresh tokens using a valid refresh token."""
     payload: models.TokenPayload = validate_token(
         token=refresh_token, token_type="refresh", settings=settings  # nosec B106
     )
     user = user_crud.get_user(session, payload.sub)
-    # Check if user is disabled or token is revoked
-    redis_client = get_redis_client()
-    if user is None or user.is_disabled or redis_client.get(f"{payload.jti}"):
+    used_token = None
+    if settings.USE_REDIS:
+        # Check if user is disabled or token is revoked
+        redis_client = get_redis_client()
+        used_token = redis_client.get(f"{payload.jti}")
+    if user is None or user.is_disabled or used_token:
         raise credentials_exception
     # Disable the used refresh token
-    redis_client.set(f"{payload.jti}", 1, ex=settings.REFRESH_TOKEN_EXPIRE_DAYS * 86400)
-    return {
-        "access_token": create_token(
+    if settings.USE_REDIS:
+        redis_client.set(
+            f"{payload.jti}", 1, ex=settings.REFRESH_TOKEN_EXPIRE_DAYS * 86400
+        )
+    return models.TokenPair(
+        access_token=create_token(
             user=user,
             token_type="access",  # nosec B106
             settings=settings,
             refreshed=True,
         ),
-        "refresh_token": create_token(
+        refresh_token=create_token(
             user=user, token_type="refresh", settings=settings
         ),  # nosec B106
-    }
+        token_type="bearer",
+    )

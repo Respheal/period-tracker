@@ -423,7 +423,6 @@ class TestTemperatureState:
     ) -> None:
         """Test that new users get an initialized temperature state."""
         user = create_random_user(session)
-        session.refresh(user)
 
         # User should have a temp_state initialized to LEARNING
         assert user.temp_state is not None

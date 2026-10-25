@@ -117,14 +117,15 @@ def create_temp_readings(session: Session, user: models.User) -> None:
         )
         db_temp = models.Temperature.model_validate(new_temp)
         session.add(db_temp)
-    session.commit()
-    session.refresh(user)
+    session.flush()
     # Update user's temperature state
     user_temps = session.exec(
         select(models.Temperature).where(models.Temperature.user_id == user.user_id)
     ).all()
-    user.temp_state = evaluate_temperature_state(user_temps, user.temp_state)
-    user.cycle_state = evaluate_cycle_state(db_periods, user.cycle_state)
+    processed_state = evaluate_temperature_state(user_temps)
+    user.temp_state.sqlmodel_update(processed_state.model_dump(exclude_unset=True))
+    processed_cycle = evaluate_cycle_state(db_periods)
+    user.cycle_state.sqlmodel_update(processed_cycle.model_dump(exclude_unset=True))
     session.add(user)
     session.commit()
 

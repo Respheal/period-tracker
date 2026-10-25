@@ -126,7 +126,8 @@ def eval_cycle_metrics(session: Session, user_id: str) -> None:
     ).all()
     user = session.get(models.User, user_id)
     if user:  # pragma: no branch
-        user.cycle_state = evaluate_cycle_state(periods, user.cycle_state)
+        new_state = evaluate_cycle_state(periods, user.cycle_state)
+        user.cycle_state.sqlmodel_update(new_state.model_dump(exclude_unset=True))
         session.add(user)
         session.commit()
 
