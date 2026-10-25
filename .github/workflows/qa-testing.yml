@@ -18,6 +18,7 @@ permissions:
 
 jobs:
   changes:
+    name: Detect Backend Python Changes
     runs-on: ubuntu-latest
     outputs:
       python: ${{ steps.filter.outputs.python }}
