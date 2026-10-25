@@ -1,4 +1,4 @@
-FROM python:3.14-slim-bookworm AS builder
+FROM python:3.15-slim-bookworm AS builder
 
 RUN pip install poetry
 ENV POETRY_NO_INTERACTION=1 \
@@ -11,7 +11,7 @@ WORKDIR /poetry
 COPY ./poetry.lock ./pyproject.toml ./
 RUN poetry install --only main --no-root && rm -rf $POETRY_CACHE_DIR
 
-FROM python:3.14-slim-bookworm AS runtime
+FROM python:3.15-slim-bookworm AS runtime
 
 ENV VIRTUAL_ENV=/poetry/.venv \
     PATH="/poetry/.venv/bin:$PATH"

@@ -137,6 +137,7 @@ def init_user(session: Session, temp_readings: bool = False) -> None:
         )
         user = user_crud.create_user(session=session, user=user_in)
         if temp_readings:
+            # Create temp readings for testing purposes
             create_temp_readings(session=session, user=user)
 
 
