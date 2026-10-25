@@ -23,9 +23,13 @@ class Settings(BaseSettings):
         env_ignore_empty=True,
         extra="ignore",
     )
+    # Base
     APP_NAME: str = "Period Tracker API"
     APP_VERSION: str = "0.1.0"
     ENVIRONMENT: Literal["local", "test", "production"]
+    BACKEND_CORS_ORIGINS: Annotated[list[str] | str, BeforeValidator(parse_cors)] = []
+    DATABASE: str
+
     # Constants for temperature analysis
     SMOOTHING_SPAN_DAYS: int = 5
     BASELINE_SPAN_DAYS: int = 30
@@ -33,20 +37,22 @@ class Settings(BaseSettings):
     ELEVATION_MIN_DELTA: float = 0.15  # °C
     ELEVATION_DAYS_REQUIRED: int = 3
     MAX_MISSING_DAYS: int = 6
+
     # Constants for period analysis
     CYCLE_EWM_SPAN: int = 6
     MIN_CYCLES_FOR_STABLE: int = 3
     MIN_PLAUSIBLE_CYCLE: int = 20
     MAX_PLAUSIBLE_CYCLE: int = 90
     LONG_GAP_MULTIPLIER: float = 1.75
+
     # Constants for luteal phase analysis
     MAX_LOOKBACK_DAYS: int = 25
     MIN_LUTEAL_DAYS: int = 9
     MAX_LUTEAL_DAYS: int = 18
+
     # Authentication settings
     FIRST_USER: str  # = "admin"
     FIRST_USER_PASS: str  # = "adminpass"
-    DATABASE: str
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 15
     REFRESH_TOKEN_EXPIRE_DAYS: int = 7
     SSL_ENABLED: bool = False
@@ -54,11 +60,10 @@ class Settings(BaseSettings):
     SECRET_KEY: str = secrets.token_urlsafe(32)  # Deprecated, use RSA keys instead
     PRIVATE_KEY_PATH: str | None = None  # Path to RSA private key for RS256
     PUBLIC_KEY_PATH: str | None = None  # Path to RSA public key for RS256
-    USE_REDIS: bool = False
+    USE_REDIS: bool = False  # Used for refresh token invalidation
     REDIS_HOST: str
     REDIS_PORT: int = 6379
     REDIS_DB: int = 0
-    BACKEND_CORS_ORIGINS: Annotated[list[str] | str, BeforeValidator(parse_cors)] = []
 
     # Cached keys to avoid reading from disk on every request
     _private_key_bytes: bytes | None = None

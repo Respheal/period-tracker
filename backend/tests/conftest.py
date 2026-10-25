@@ -8,6 +8,7 @@ from fakeredis import TcpFakeServer
 from fastapi.testclient import TestClient
 from sqlmodel import Session
 
+from api.db import models
 from api.db.session import engine
 from api.initial_data import init
 from api.main import app
@@ -45,27 +46,41 @@ def client() -> Generator:
         yield c
 
 
-@pytest.fixture(scope="session", autouse=True)
+@pytest.fixture(autouse=True, scope="session")
 def redis_server() -> Generator:
     server = TcpFakeServer(
         (Settings().REDIS_HOST, Settings().REDIS_PORT), server_type="redis"
     )
+    # Added to stop the pytest process from hanging due to the server thread
+    server.daemon_threads = True
     thread = Thread(target=server.serve_forever, daemon=True)
     thread.start()
     try:
         yield server
     finally:
         server.shutdown()
+        server.server_close()
 
 
-# Apply migrations at beginning and end of each test class
-@pytest.fixture(autouse=True, scope="class")
+# Apply migrations at beginning and end of the test session
+@pytest.fixture(autouse=True, scope="session")
 def setup() -> Generator:
     config = Config("alembic.ini")
     command.upgrade(config, "head")
     init()
     yield
     command.downgrade(config, "base")
+
+
+# Clear the database before each test function
+@pytest.fixture(autouse=True, scope="function")
+def clear_db() -> Generator:
+    with engine.begin() as connection:
+        # reversed to respect FK-constraints
+        for table in reversed(models.metadata.sorted_tables):
+            connection.execute(table.delete())
+    init()
+    yield
 
 
 @pytest.fixture

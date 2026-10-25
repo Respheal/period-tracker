@@ -90,7 +90,6 @@
 - [x] Configure RSA256 (min 2048 bits)
 - [x] Configure CORS policies
 - [ ] Offer Single Sign On via OAuth/OIDC as an _option_ (Signing in with Google defeats the point imo)
-- [ ] Testing Redis w/ mock redis
 
 ### Events
 

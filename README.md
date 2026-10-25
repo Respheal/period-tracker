@@ -10,7 +10,7 @@ So far the project is exclusively a backend, but a frontend is on the [todo list
 
 ## Requirements
 
-- Python 3.14
+- Python 3.15
 - Poetry
 
 ## To Run (Locally)

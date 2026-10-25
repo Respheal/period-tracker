@@ -9,10 +9,6 @@ on:
   pull_request:
     branches: ["main"]
     types: [opened, synchronize, reopened, ready_for_review]
-    paths:
-      - "backend/api/**/*.py"
-      - "backend/poetry.lock"
-      - "backend/pyproject.toml"
   push:
     branches: ["main"]
 
@@ -21,9 +17,29 @@ permissions:
   pull-requests: write
 
 jobs:
+  changes:
+    name: Detect Backend Python Changes
+    runs-on: ubuntu-latest
+    outputs:
+      python: ${{ steps.filter.outputs.python }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+      - name: Check for Python changes
+        id: filter
+        uses: dorny/paths-filter@v4
+        with:
+          filters: |
+            python:
+              - 'backend/api/**/*.py'
+              - 'backend/poetry.lock'
+              - 'backend/pyproject.toml'
+
   lint:
     name: Linting
     runs-on: ubuntu-latest
+    needs: changes
+    if: needs.changes.outputs.python == 'true'
     steps:
       - name: Checkout repository
         uses: actions/checkout@v7
@@ -35,6 +51,8 @@ jobs:
   security:
     name: Security Scan
     runs-on: ubuntu-latest
+    needs: changes
+    if: needs.changes.outputs.python == 'true'
     steps:
       - name: Checkout repository
         uses: actions/checkout@v7
@@ -46,6 +64,8 @@ jobs:
   pytest:
     name: Unit Tests
     runs-on: ubuntu-latest
+    needs: changes
+    if: needs.changes.outputs.python == 'true'
     steps:
       - name: Checkout repository
         uses: actions/checkout@v7
@@ -64,3 +84,21 @@ jobs:
           token: ${{ secrets.CODECOV_TOKEN }}
           report_type: test_results
           files: ./junit.xml
+
+  all-checks-passed:
+    name: Validate QA Checks
+    # No checkout so set the working directory to just .
+    defaults:
+      run:
+        working-directory: .
+    runs-on: ubuntu-latest
+    needs: [changes, lint, security, pytest]
+    if: always()
+    steps:
+      - name: All checks passed
+        run: |
+          # Fail if any QA test failed or was cancelled
+          if [[ "${{ needs.lint.result }}" != "success" ]] || [[ "${{ needs.security.result }}" != "success" ]] || [[ "${{ needs.pytest.result }}" != "success" ]]; then
+            exit 1
+          fi
+          echo "All QA checks passed successfully."

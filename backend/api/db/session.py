@@ -10,7 +10,17 @@ if os.environ.get("ENVIRONMENT") == "test":  # pragma: no branch
     # Alembic has no dotenv support, so we need to load the test env file manually
     # Pytest otherwise behaves and reads from .env.test automatically
     env_path = rf"{Path(__file__).absolute().parent.parent.parent.parent}/.env.test"
-    load_dotenv(env_path, override=True)
+    env_loaded = load_dotenv(env_path, override=False)
+    print(f"Loaded .env.test: {env_loaded} from {env_path}")
+elif os.environ.get("PYTEST_CURRENT_TEST") or os.environ.get(
+    "PYTEST_VERSION"
+):  # pragma: no cover
+    print(
+        "WARNING: pytest is running but ENVIRONMENT is not 'test', "
+        "so .env.test was not loaded. Settings will resolve to bare defaults "
+        "(e.g. database='local.db' instead of test.db). "
+        "Set ENVIRONMENT=test before importing api.db.session."
+    )
 
 DATABASE_DIR = os.environ.get("DATA_DIR", "./data/")
 os.makedirs(DATABASE_DIR, exist_ok=True)
