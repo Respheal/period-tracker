@@ -87,6 +87,10 @@ jobs:
 
   all-checks-passed:
     name: Validate QA Checks
+    # No checkout so set the working directory to just .
+    defaults:
+      run:
+        working-directory: .
     runs-on: ubuntu-latest
     needs: [changes, lint, security, pytest]
     if: always()
