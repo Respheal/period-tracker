@@ -7,7 +7,6 @@
 !poetry.lock
 
 # Include specific files from directories
-!requirements.txt
 !api/
 !api/**/
 !api/**/*.md
