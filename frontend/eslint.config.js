@@ -33,6 +33,8 @@ export default defineConfig([
       globals: globals.browser,
     },
     rules: {
+      // Supressing error Tanstack Router Route components
+      'react-refresh/only-export-components': ['off', { allowExportNames: ['Route', 'router'] }],
       '@typescript-eslint/only-throw-error': [
         'error',
         {
