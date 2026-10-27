@@ -173,9 +173,9 @@
 
 - [x] [Vite + React](https://react.dev/learn/build-a-react-app-from-scratch)
 - [x] [Hey API](https://heyapi.dev/)
-- [ ] [TanStack Router](https://tanstack.com/router/latest) - routing? (consider form instead of hooks too)
-- [ ] [Chakra](https://chakra-ui.com/)
-- [ ] [TanStack Query](https://tanstack.com/query/latest) - API client, state handling
+- [x] [TanStack Router](https://tanstack.com/router/latest) - routing? (consider form instead of hooks too)
+- [x] [Chakra](https://chakra-ui.com/)
+- [x] [TanStack Query](https://tanstack.com/query/latest) - API client, state handling
 - [ ] [Form Management](https://tanstack.com/form/latest)
 - [ ] [Unit/Integration: Vitest + React Testing Library](https://vitest.dev/guide/browser/component-testing.html#testing-library-integration)
 - [ ] [E2E Tests: Playwright](https://playwright.dev/)

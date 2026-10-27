@@ -8,7 +8,6 @@ import eslintConfigPrettier from 'eslint-config-prettier/flat';
 import reactDom from 'eslint-plugin-react-dom';
 import pluginRouter from '@tanstack/eslint-plugin-router';
 import pluginQuery from '@tanstack/eslint-plugin-query';
-
 import { defineConfig, globalIgnores } from 'eslint/config';
 
 export default defineConfig([

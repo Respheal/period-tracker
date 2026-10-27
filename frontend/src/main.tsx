@@ -1,14 +1,15 @@
-import { router } from '@/router';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { RouterProvider } from '@tanstack/react-router';
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
-import './index.css';
 
 import { client } from '@/client/client.gen';
+import type { AccessToken } from '@/client/types.gen';
 import { queryClient } from '@/query-client';
-import type { AccessToken } from './client/types.gen';
+import { router } from '@/router';
+
+import '@/index.css';
 
 client.setConfig({
   // baseUrl: process.env.API_HOST || 'http://localhost:5000',

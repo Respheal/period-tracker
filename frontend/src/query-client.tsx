@@ -1,5 +1,6 @@
 import { QueryCache, QueryClient } from '@tanstack/react-query';
-import { refreshTokensAuthRefreshPost } from './client/sdk.gen';
+
+import { refreshTokensAuthRefreshPost } from '@/client/sdk.gen';
 
 declare module '@tanstack/react-query' {
   interface Register {
