@@ -1,12 +1,13 @@
-import { Link as ChakraLink, Container } from '@chakra-ui/react';
-import { useQuery, useQueryClient, type QueryClient } from '@tanstack/react-query';
-import { createRootRouteWithContext, Link, Outlet } from '@tanstack/react-router';
+import { AbsoluteCenter, Link as ChakraLink, Container, Spinner } from '@chakra-ui/react';
+import { useQueryClient, type QueryClient } from '@tanstack/react-query';
+import { createRootRouteWithContext, Outlet } from '@tanstack/react-router';
 import { TanStackRouterDevtools } from '@tanstack/react-router-devtools';
 import { useState } from 'react';
 
-import { healthCheckHealthGetOptions } from '@/client/@tanstack/react-query.gen';
+import { ColorModeButton } from '@/components/chakra-ui/color-mode';
 import { Provider } from '@/components/chakra-ui/provider';
 import { PalettePicker } from '@/components/PalettePicker/PalettePicker';
+import { useAuth } from '@/hooks/useAuth';
 
 interface RouterContext {
   queryClient: QueryClient;
@@ -20,46 +21,52 @@ function getPallete() {
 
 function RootLayout() {
   const [palette, setPalette] = useState(() => getPallete() || 'gray');
-
+  // const [isLoading, setIsLoading] = useState(true);
+  const isLoading = false;
   const queryClient = useQueryClient();
   // Auth status held in memory, not retained between page refreshes
   const isAuthenticated = !!queryClient.getQueryData(['auth']) || false;
-  const { data, isLoading, error } = useQuery({ ...healthCheckHealthGetOptions() });
+  const { logout } = useAuth();
 
   if (isLoading) {
-    return <div>Loading...</div>;
+    return (
+      <Provider>
+        <AbsoluteCenter>
+          <Spinner size='xl' />
+        </AbsoluteCenter>
+      </Provider>
+    );
   }
 
-  if (error instanceof Error) {
-    return <div>Error: {error.message}</div>;
+  if (!isAuthenticated) {
+    // Display the bare login/registration page
+    return (
+      <Provider>
+        <AbsoluteCenter>
+          <Container>
+            <Outlet />
+          </Container>
+        </AbsoluteCenter>
+        <TanStackRouterDevtools />
+      </Provider>
+    );
+  } else {
+    return (
+      <Provider palette={palette}>
+        <Container
+          fluid
+          centerContent={true}
+          maxWidth={{ base: '100dvw', md: '90dvw', lg: '3xl' }}>
+          stuff
+          <ChakraLink onClick={logout}>Log Out</ChakraLink>
+          <PalettePicker setPalette={setPalette} />
+          <ColorModeButton />
+          <Outlet />
+        </Container>
+        <TanStackRouterDevtools />
+      </Provider>
+    );
   }
-
-  return (
-    <Provider palette={palette}>
-      <Container
-        fluid
-        centerContent={true}
-        maxWidth={{ base: '100dvw', md: '90dvw', lg: '3xl' }}>
-        <div className='p-2 flex gap-2'>
-          <ChakraLink asChild key='home'>
-            <Link to='/' activeProps={{ style: { fontWeight: 'bold' } }}>
-              Home
-            </Link>
-          </ChakraLink>
-        </div>
-        <div className='p-2 flex gap-2'>
-          <h1>API Check</h1>
-          <p>Authenticated: {isAuthenticated ? 'Authenticated' : 'Not Authenticated'}</p>
-          <p>Status: {data?.status}</p>
-          <p>Timestamp: {data?.timestamp?.toISOString()}</p>
-        </div>
-        <hr />
-        <PalettePicker setPalette={setPalette} />
-        <Outlet />
-      </Container>
-      <TanStackRouterDevtools />
-    </Provider>
-  );
 }
 
 export const Route = createRootRouteWithContext<RouterContext>()({

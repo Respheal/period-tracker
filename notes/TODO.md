@@ -176,7 +176,7 @@
 - [x] [TanStack Router](https://tanstack.com/router/latest) - routing? (consider form instead of hooks too)
 - [x] [Chakra](https://chakra-ui.com/)
 - [x] [TanStack Query](https://tanstack.com/query/latest) - API client, state handling
-- [ ] [Form Management](https://tanstack.com/form/latest)
+- [x] [Form Management](https://tanstack.com/form/latest)
 - [ ] [Unit/Integration: Vitest + React Testing Library](https://vitest.dev/guide/browser/component-testing.html#testing-library-integration)
 - [ ] [E2E Tests: Playwright](https://playwright.dev/)
 - [ ] [Day.js](https://github.com/iamkun/dayjs) - If we need better date parsing on the frontend

@@ -21,15 +21,6 @@ client.setConfig({
   },
 });
 
-client.interceptors.response.use((response) => {
-  if (!response.ok && (response.status == 401 || response.status == 403)) {
-    // throwing so we can get the actual entire response object in the retry
-    // eslint-disable-next-line @typescript-eslint/only-throw-error
-    throw response;
-  }
-  return response;
-});
-
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <QueryClientProvider client={queryClient}>

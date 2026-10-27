@@ -12,8 +12,7 @@ export const router = createRouter({
   context: {
     auth: {
       get isAuthenticated() {
-        //return localStorage.getItem('isLoggedIn') === 'true';
-        return true;
+        return localStorage.getItem('isLoggedIn') === 'true';
       },
     },
     queryClient,
