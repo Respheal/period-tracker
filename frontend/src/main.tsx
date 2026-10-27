@@ -1,17 +1,39 @@
 import { router } from '@/router';
+import { QueryClientProvider } from '@tanstack/react-query';
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { RouterProvider } from '@tanstack/react-router';
 import { StrictMode } from 'react';
-import ReactDOM from 'react-dom/client';
+import { createRoot } from 'react-dom/client';
 import './index.css';
 
-//tanstack query client config goes here
+import { client } from '@/client/client.gen';
+import { queryClient } from '@/query-client';
+import type { AccessToken } from './client/types.gen';
 
-const rootElement = document.getElementById('root')!;
-if (!rootElement.innerHTML) {
-  const root = ReactDOM.createRoot(rootElement);
-  root.render(
-    <StrictMode>
+client.setConfig({
+  // baseUrl: process.env.API_HOST || 'http://localhost:5000',
+  baseUrl: 'http://localhost:5000',
+  credentials: 'include',
+  auth: () => {
+    const authToken: AccessToken | undefined = queryClient.getQueryData(['auth']);
+    return authToken?.access_token;
+  },
+});
+
+client.interceptors.response.use((response) => {
+  if (!response.ok && (response.status == 401 || response.status == 403)) {
+    // throwing so we can get the actual entire response object in the retry
+    // eslint-disable-next-line @typescript-eslint/only-throw-error
+    throw response;
+  }
+  return response;
+});
+
+createRoot(document.getElementById('root')!).render(
+  <StrictMode>
+    <QueryClientProvider client={queryClient}>
       <RouterProvider router={router} />
-    </StrictMode>,
-  );
-}
+      <ReactQueryDevtools initialIsOpen={false} />
+    </QueryClientProvider>
+  </StrictMode>,
+);
