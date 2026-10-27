@@ -14,6 +14,7 @@
     "test-storybook": "vitest --project=storybook --coverage"
   },
   "dependencies": {
+    "@tanstack/react-query": "^5.105.0",
     "@tanstack/react-router": "^1.170.46",
     "@tanstack/react-router-devtools": "^1.167.2",
     "react": "^19.3.1",
