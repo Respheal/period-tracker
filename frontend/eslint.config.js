@@ -4,14 +4,18 @@ import reactHooks from 'eslint-plugin-react-hooks';
 import reactRefresh from 'eslint-plugin-react-refresh';
 import tseslint from 'typescript-eslint';
 import reactX from 'eslint-plugin-react-x';
+import eslintConfigPrettier from 'eslint-config-prettier/flat';
 import reactDom from 'eslint-plugin-react-dom';
+import pluginRouter from '@tanstack/eslint-plugin-router';
 
 import { defineConfig, globalIgnores } from 'eslint/config';
 
 export default defineConfig([
-  globalIgnores(['dist']),
+  ...pluginRouter.configs['flat/recommended'],
+  globalIgnores(['dist', 'src/client']),
   {
     files: ['**/*.{ts,tsx}'],
+    ignores: ['src/components/chakra-ui/*'],
     extends: [
       js.configs.recommended,
       tseslint.configs.recommendedTypeChecked,
@@ -19,6 +23,7 @@ export default defineConfig([
       reactHooks.configs.flat.recommended,
       reactRefresh.configs.vite,
       reactDom.configs.recommended,
+      eslintConfigPrettier,
     ],
     languageOptions: {
       parserOptions: {
