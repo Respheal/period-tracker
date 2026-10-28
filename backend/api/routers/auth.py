@@ -24,7 +24,7 @@ def set_refresh_cookie(
     response.set_cookie(
         key="refresh_token",
         value=refresh_token,
-        path="/",  # /api maybe?
+        path="/auth",  # /api maybe?
         httponly=True,
         secure=settings.SSL_ENABLED,
         samesite="strict",
