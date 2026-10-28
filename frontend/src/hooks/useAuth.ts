@@ -1,4 +1,4 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import { useNavigate, useRouter } from '@tanstack/react-router';
 
 import {
@@ -6,11 +6,19 @@ import {
   loginAuthPostMutation,
 } from '@/client/@tanstack/react-query.gen';
 import type { BodyLoginAuthPost, UserCreate } from '@/client/types.gen';
+import { authQuery, clearSession, decodeJWT, setSession } from '@/utils/auth';
+
+export function useTokenPayload() {
+  return useQuery({
+    ...authQuery,
+    enabled: false, // don't refetch from here, only read from the cache
+    select: (token) => decodeJWT(token.access_token),
+  }).data;
+}
 
 export function useAuth() {
   const router = useRouter();
   const navigate = useNavigate();
-  const queryClient = useQueryClient();
 
   const CreateUserMutation = useMutation({
     ...createUserUsersPostMutation(),
@@ -33,15 +41,13 @@ export function useAuth() {
       .catch((err) => {
         throw new Error(`Authentication failed: ${err}`);
       })
-      .then((accessToken) => {
-        queryClient.setQueryData(['auth'], accessToken);
-        localStorage.setItem('isLoggedIn', true.toString());
-      });
+      .then(setSession);
   }
 
   function logout() {
-    localStorage.setItem('isLoggedIn', false.toString());
-    queryClient.clear();
+    // invalidate the token on the backend first
+    // insert function here
+    clearSession();
     void router.invalidate();
     void navigate({
       to: '/login',

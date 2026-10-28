@@ -2,6 +2,7 @@ import { ErrorComponent, createRouter } from '@tanstack/react-router';
 
 import { queryClient } from '@/query-client';
 import { routeTree } from '@/routeTree.gen';
+import { getSession, isLoggedIn } from '@/utils/auth';
 
 export const router = createRouter({
   routeTree,
@@ -12,8 +13,9 @@ export const router = createRouter({
   context: {
     auth: {
       get isAuthenticated() {
-        return localStorage.getItem('isLoggedIn') === 'true';
+        return isLoggedIn();
       },
+      getSession,
     },
     queryClient,
   },

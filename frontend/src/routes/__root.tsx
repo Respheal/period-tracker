@@ -1,6 +1,10 @@
-import { AbsoluteCenter, Link as ChakraLink, Container, Spinner } from '@chakra-ui/react';
-import { useQueryClient, type QueryClient } from '@tanstack/react-query';
-import { createRootRouteWithContext, Outlet } from '@tanstack/react-router';
+import { AbsoluteCenter, Link as ChakraLink, Container } from '@chakra-ui/react';
+import { type QueryClient } from '@tanstack/react-query';
+import {
+  createRootRouteWithContext,
+  Outlet,
+  useRouterState,
+} from '@tanstack/react-router';
 import { TanStackRouterDevtools } from '@tanstack/react-router-devtools';
 import { useState } from 'react';
 
@@ -11,7 +15,7 @@ import { useAuth } from '@/hooks/useAuth';
 
 interface RouterContext {
   queryClient: QueryClient;
-  auth: { isAuthenticated: boolean };
+  auth: { isAuthenticated: boolean; getSession: () => Promise<string> };
 }
 
 function getPallete() {
@@ -21,22 +25,11 @@ function getPallete() {
 
 function RootLayout() {
   const [palette, setPalette] = useState(() => getPallete() || 'gray');
-  // const [isLoading, setIsLoading] = useState(true);
-  const isLoading = false;
-  const queryClient = useQueryClient();
-  // Auth status held in memory, not retained between page refreshes
-  const isAuthenticated = !!queryClient.getQueryData(['auth']) || false;
-  const { logout } = useAuth();
-
-  if (isLoading) {
-    return (
-      <Provider>
-        <AbsoluteCenter>
-          <Spinner size='xl' />
-        </AbsoluteCenter>
-      </Provider>
-    );
-  }
+  // _authenticated's beforeLoad guarantees a valid token for anything under it
+  const isAuthenticated = useRouterState({
+    select: (s) => s.matches.some((m) => m.routeId === '/_authenticated'),
+  });
+  const { logout } = useAuth(); //put wherever the navbar goes (or pass as a prop)
 
   if (!isAuthenticated) {
     // Display the bare login/registration page

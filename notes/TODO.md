@@ -89,6 +89,9 @@
 - [x] Using a refresh token stores its jti in redis to blacklist reuse
 - [x] Configure RSA256 (min 2048 bits)
 - [x] Configure CORS policies
+- [ ] Refresh Token Intervals
+  - Removes the Locks requirement from renewing refresh tokens
+- [ ] Refresh Token Families (and family revocation); revoke entire family on token replay outside interval
 - [ ] Offer Single Sign On via OAuth/OIDC as an _option_ (Signing in with Google defeats the point imo)
 
 ### Events

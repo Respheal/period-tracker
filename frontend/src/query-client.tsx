@@ -15,7 +15,3 @@ export const queryClient = new QueryClient({
   },
   queryCache: new QueryCache({}),
 });
-
-queryClient.setQueryDefaults(['auth'], {
-  gcTime: 30 * 60 * 1000, // Keep auth data in cache for 30 minutes
-});
