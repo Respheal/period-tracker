@@ -23,32 +23,6 @@ export function isLoggedIn() {
   return localStorage.getItem(LOGGED_IN_KEY) === 'true';
 }
 
-// /** Cached access token, or refresh to get one (e.g. after a page reload). */
-// export function ensureAccessToken() {
-//   return withSession(() => queryClient.query(authQuery));
-// }
-
-// /** Force a new access token (the current one was rejected). */
-// export function refreshAccessToken() {
-//   return withSession(() => queryClient.query({ ...authQuery, staleTime: 0 }));
-// }
-
-// /**
-//  * Executes the provided function to get an access token.
-//  */
-// async function withSession(getToken: () => Promise<AccessToken>) {
-//   if (!isLoggedIn()) throw new SessionExpiredError();
-//   try {
-//     return (await getToken()).access_token;
-//   } catch (err) {
-//     if (err instanceof SessionExpiredError) {
-//       clearSession();
-//       onSessionChange();
-//     }
-//     throw err;
-//   }
-// }
-
 export function setSession(token: AccessToken) {
   queryClient.setQueryData(authQuery.queryKey, token);
   localStorage.setItem(LOGGED_IN_KEY, 'true');
