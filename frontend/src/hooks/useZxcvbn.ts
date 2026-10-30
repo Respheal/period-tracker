@@ -37,7 +37,6 @@ export function usePasswordStrength(password: string) {
     zxcvbnInstanceRef.current
       ?.checkAsync(deferredPassword)
       .then((response) => {
-        console.log(response);
         setResult(response);
       })
       .catch((error) => console.error(error));
