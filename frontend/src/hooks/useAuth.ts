@@ -16,6 +16,16 @@ export function useTokenPayload() {
   }).data;
 }
 
+function getErrorMessage(err: unknown) {
+  const detail =
+    err && typeof err === 'object' && 'detail' in err ? err.detail : undefined;
+  return typeof detail === 'string'
+    ? detail
+    : err instanceof Error
+      ? err.message
+      : 'Unknown error';
+}
+
 export function useAuth() {
   const router = useRouter();
   const navigate = useNavigate();
@@ -27,7 +37,7 @@ export function useAuth() {
   async function createAccount(data: UserCreate) {
     if (CreateUserMutation.isPending) return;
     await CreateUserMutation.mutateAsync({ body: data }).catch((err) => {
-      throw new Error(`Account creation failed: ${err}`);
+      throw new Error(`Account creation failed: ${getErrorMessage(err)}`);
     });
   }
 
@@ -39,7 +49,7 @@ export function useAuth() {
     if (LoginMutation.isPending) return;
     await LoginMutation.mutateAsync({ body: data })
       .catch((err) => {
-        throw new Error(`Authentication failed: ${err}`);
+        throw new Error(`Authentication failed: ${getErrorMessage(err)}`);
       })
       .then(setSession);
   }

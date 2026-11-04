@@ -61,12 +61,14 @@ export const PasswordInput = React.forwardRef<HTMLInputElement, PasswordInputPro
         endElement={
           <VisibilityTrigger
             disabled={rest.disabled}
+            type='button'
+            tabIndex={0}
             onPointerDown={(e) => {
               if (rest.disabled) return;
               if (e.button !== 0) return;
               e.preventDefault();
-              setVisible(!visible);
-            }}>
+            }}
+            onClick={() => setVisible(!visible)}>
             {visible ? visibilityIcon.off : visibilityIcon.on}
           </VisibilityTrigger>
         }

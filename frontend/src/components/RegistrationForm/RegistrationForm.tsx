@@ -36,14 +36,15 @@ export function RegistrationForm({ registerFn, navigateFn }: RegistrationFormPro
         username: value.username,
         display_name: value.display_name,
         password: value.password,
-      }).catch((err: Error) => {
-        toaster.create({
-          title: err.message || 'Registration failed',
-          type: 'error',
-        });
-      });
-      setSubmitting(false);
-      void navigateFn({ to: '/login' });
+      })
+        .catch((err: Error) => {
+          toaster.create({
+            title: err.message || 'Registration failed',
+            type: 'error',
+          });
+        })
+        .then(() => void navigateFn({ to: '/login' }))
+        .finally(() => setSubmitting(false));
     },
   });
 

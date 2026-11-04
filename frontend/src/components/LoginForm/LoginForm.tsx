@@ -24,13 +24,14 @@ export function LoginForm({ loginFn, navigateFn }: LoginFormProps) {
         username: value.username,
         password: value.password,
       };
-      await loginFn(data).catch((err: Error) => {
-        toaster.create({
-          title: err.message || 'Login failed',
-          type: 'error',
-        });
-      });
-      setSubmitting(false);
+      await loginFn(data)
+        .catch((err: Error) => {
+          toaster.create({
+            title: err.message || 'Login failed',
+            type: 'error',
+          });
+        })
+        .finally(() => setSubmitting(false));
     },
   });
 

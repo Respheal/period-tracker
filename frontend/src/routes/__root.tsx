@@ -51,7 +51,9 @@ function RootLayout() {
           centerContent={true}
           maxWidth={{ base: '100dvw', md: '90dvw', lg: '3xl' }}>
           stuff
-          <ChakraLink onClick={logout}>Log Out</ChakraLink>
+          <ChakraLink onClick={logout} href='#' aria-label='Log Out'>
+            Log Out
+          </ChakraLink>
           <PalettePicker setPalette={setPalette} />
           <ColorModeButton />
           <Outlet />
