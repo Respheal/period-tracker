@@ -97,7 +97,17 @@ jobs:
     steps:
       - name: All checks passed
         run: |
-          # Fail if any QA test failed or was cancelled
+          # Fail if change detection itself didn't succeed (QA jobs would be skipped)
+          if [[ "${{ needs.changes.result }}" != "success" ]]; then
+            echo "Change detection did not succeed."
+            exit 1
+          fi
+          # No Python changes: the QA jobs are intentionally skipped
+          if [[ "${{ needs.changes.outputs.python }}" != "true" ]]; then
+            echo "No backend Python changes; QA checks skipped."
+            exit 0
+          fi
+          # Python changed: every QA job must have succeeded (skipped is not OK here)
           if [[ "${{ needs.lint.result }}" != "success" ]] || [[ "${{ needs.security.result }}" != "success" ]] || [[ "${{ needs.pytest.result }}" != "success" ]]; then
             exit 1
           fi

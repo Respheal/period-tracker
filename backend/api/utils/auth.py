@@ -161,14 +161,13 @@ async def refresh_tokens(
     if user is None or user.is_disabled:
         raise credentials_exception
     if settings.USE_REDIS:
-        # Check if user is disabled or token is revoked
+        # Check if user is disabled or token is revoked.
+        # nx so it fails if the token to be blacklisted already is.
         redis_client = get_redis_client()
-        if redis_client.get(f"{payload.jti}"):
+        if not redis_client.set(
+            f"{payload.jti}", 1, nx=True, ex=settings.REFRESH_TOKEN_EXPIRE_DAYS * 86400
+        ):
             raise credentials_exception
-        # Disable the used refresh token
-        redis_client.set(
-            f"{payload.jti}", 1, ex=settings.REFRESH_TOKEN_EXPIRE_DAYS * 86400
-        )
     return models.TokenPair(
         access_token=create_token(
             user=user,

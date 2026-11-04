@@ -17,7 +17,7 @@
   "useTabs": false,
   "overrides": [
     {
-      "files": ["**/*.html", "**/*.md", "**/*.js"],
+      "files": ["**/*.html", "**/*.js"],
       "options": {
         "printWidth": 150
       }

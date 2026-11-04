@@ -50,6 +50,25 @@
 
 ## Backend
 
+### Backend Bugs and Improvements
+
+Things that came up while working on the authentication flow on the frontend:
+
+- [ ] Anyone can register as an admin
+  - This was sort of intended at the start, since this was meant to be installed on a a
+    private machine and shared by only a few users, but the ability to register anyone as
+    an admin undermines the partners feature
+- [ ] Speaking of the partners features, it's currently set up backwards: A user picks
+      whose data they can access, rather than a user allowing a partner to access it.
+- [ ] The frontend will require a fresh token for critical actions like changing the
+      password, but the backend doesn't. The backend should block password change requests
+      from a not-fresh token. The frontend will also require a fresh token, and therefore
+      should never send a refreshed token to the backend in the first place.
+- [ ] POST /auth/logout, because there should be a way to expire tokens that isn't
+      refreshing them
+- [ ] valid_after timestamp on tokens, bumped on password changes or when an account is
+      disabled/enabled. Have /auth/refresh reject older tokens
+
 ### Framework
 
 - [x] FastAPI
@@ -68,7 +87,8 @@
 - [x] Average menses length (average period length in days) (separate model)
 - [x] Average cycle length (average time between period start dates) (separate model)
 - [x] Partners (List of users with access to this User's calendar, many-many)
-  - Period Only option (only displays the user's period dates and stats for the partner)
+  - [ ] Period Only option (only displays the user's period dates and stats for the
+        partner), not the temp or cycle data.
 
 #### User Stats
 
@@ -89,7 +109,13 @@
 - [x] Using a refresh token stores its jti in redis to blacklist reuse
 - [x] Configure RSA256 (min 2048 bits)
 - [x] Configure CORS policies
-- [ ] Offer Single Sign On via OAuth/OIDC as an _option_ (Signing in with Google defeats the point imo)
+- [ ] (New) Refresh Token Intervals
+  - Removes the Locks requirement from renewing refresh tokens
+- [ ] (New) Refresh Token Families (and family revocation); revoke entire family on token
+      replay outside interval
+- [ ] Offer Single Sign On via OAuth/OIDC as an _option_ (Signing in with Google defeats
+      the point imo)
+- [ ] Rate limiting on login (long term, post-release maybe)
 
 ### Events
 
@@ -131,7 +157,8 @@
   - User.id
   - Datetime (required)
   - Flow intensity (none, spotting, light, medium, heavy; int: 0-4)
-  - Symptoms (none, cramps, headache, bloating, acne, hot flashes, back pain, tender breasts, high libido, custom; list[str]?)
+  - Symptoms (none, cramps, headache, bloating, acne, hot flashes, back pain, tender
+    breasts, high libido, custom; list[str]?)
   - Mood (none, annoyed, anxious, energized, happy, sad, stressed, fatigued)
   - Ovulation test (none, positive, negative)
   - Discharge (none, creamy, sticky, unusual)
@@ -171,14 +198,17 @@
 
 ### Framework
 
-- [ ] [Vite + React](https://react.dev/learn/build-a-react-app-from-scratch)
-- [ ] [Chakra](https://chakra-ui.com/)
-- [ ] [TanStack Query](https://tanstack.com/query/latest) - API client, state handling
-- [ ] [TanStack Router](https://tanstack.com/router/latest) - routing? (consider form instead of hooks too)
-- [ ] [Form Management](https://tanstack.com/form/latest)
+- [x] [Vite + React](https://react.dev/learn/build-a-react-app-from-scratch)
+- [x] [Hey API](https://heyapi.dev/)
+- [x] [TanStack Router](https://tanstack.com/router/latest) - routing? (consider form
+      instead of hooks too)
+- [x] [Chakra](https://chakra-ui.com/)
+- [x] [TanStack Query](https://tanstack.com/query/latest) - API client, state handling
+- [x] [Form Management](https://tanstack.com/form/latest)
 - [ ] [Unit/Integration: Vitest + React Testing Library](https://vitest.dev/guide/browser/component-testing.html#testing-library-integration)
 - [ ] [E2E Tests: Playwright](https://playwright.dev/)
-- [ ] [Day.js](https://github.com/iamkun/dayjs) - If we need better date parsing on the frontend
+- [ ] [Day.js](https://github.com/iamkun/dayjs) - If we need better date parsing on the
+      frontend
 
 ### User UI functionality
 
@@ -195,7 +225,8 @@
 
 - [ ] Display symptom events in calendar
 - [ ] Display period event as a multi-day event
-  - If the event has end_date=null, create an estimation element with the ema length applied)
+  - If the event has end_date=null, create an estimation element with the ema length
+    applied)
 - [ ] Display fertile window estimate
 
 ## Stats UI

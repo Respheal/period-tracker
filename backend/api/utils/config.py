@@ -56,7 +56,7 @@ class Settings(BaseSettings):
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 15
     REFRESH_TOKEN_EXPIRE_DAYS: int = 7
     SSL_ENABLED: bool = False
-    ALGORITHM: str
+    ALGORITHM: Literal["HS256", "RS256"]
     SECRET_KEY: str = secrets.token_urlsafe(32)  # Deprecated, use RSA keys instead
     PRIVATE_KEY_PATH: str | None = None  # Path to RSA private key for RS256
     PUBLIC_KEY_PATH: str | None = None  # Path to RSA public key for RS256
@@ -83,10 +83,12 @@ class Settings(BaseSettings):
     @model_validator(mode="after")
     def _enforce_non_default_secrets(self) -> Self:
         # Only check SECRET_KEY if using HS256 (symmetric algorithm)
-        if self.ALGORITHM != "RS256":
+        if self.ALGORITHM == "HS256":
+            if not self.SECRET_KEY:
+                raise ValueError("SECRET_KEY must be set when using HS256 algorithm")
             self._check_default_secret("SECRET_KEY", self.SECRET_KEY)
 
-        self._check_default_secret("FIRST_SUPERUSER_PASSWORD", self.FIRST_USER_PASS)
+        self._check_default_secret("FIRST_USER_PASS", self.FIRST_USER_PASS)
 
         # Validate RSA configuration for RS256
         if self.ALGORITHM == "RS256":
